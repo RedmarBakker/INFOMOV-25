@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="PublishConfigData" remoteFilesAllowedToDisappearOnAutoupload="false">
+    <serverData>
+      <paths name="Dev SelfDrivingChallenge (c4eac992-4edd-4fc1-b80b-3a58d099c5ae)">
+        <serverdata>
+          <mappings>
+            <mapping deploy="/tmp/Assignment 1" local="$PROJECT_DIR$" />
+          </mappings>
+        </serverdata>
+      </paths>
+    </serverData>
+  </component>
+</project>
