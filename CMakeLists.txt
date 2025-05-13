@@ -76,3 +76,7 @@ add_custom_target(copy_assets ALL
 
 # Ensure that your main target triggers the asset copy
 add_dependencies(GAME copy_assets)
+
+# Compiler optimization for profiler
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O0")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O0")
