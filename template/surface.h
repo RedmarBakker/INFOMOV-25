@@ -2,8 +2,6 @@
 // Get the latest version from: https://github.com/jbikker/tmpl8
 // IGAD/NHTV/BUAS/UU - Jacco Bikker - 2006-2023
 
-
-#include <vector>
 #pragma once
 
 namespace Tmpl8 {
@@ -69,7 +67,7 @@ public:
 	void Box( int x1, int y1, int x2, int y2, uint color );
 	void Bar( int x1, int y1, int x2, int y2, uint color );
 	// attributes
-	std::vector<std::vector<uint>> pixels;
+	uint* pixels = 0;
 	int width = 0, height = 0;
 	bool ownBuffer = false;
 	// static data for the hardcoded font
