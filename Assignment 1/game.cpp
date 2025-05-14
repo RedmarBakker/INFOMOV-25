@@ -136,7 +136,7 @@ void DrawWuLine( Surface *screen, int X0, int Y0, int X1, int Y1, uint clrLine )
             weighting for the paired pixel */
             Weighting = ErrorAcc >> 8;
 
-            COLORREF clrBackGround = screen->pixels[X0 + Y0 * SCRWIDTH];
+            COLORREF clrBackGround = screen->pixels[Y0][X0];
             BYTE rb = GetRValue( clrBackGround );
             BYTE gb = GetGValue( clrBackGround );
             BYTE bb = GetBValue( clrBackGround );
@@ -147,7 +147,7 @@ void DrawWuLine( Surface *screen, int X0, int Y0, int X1, int Y1, uint clrLine )
             BYTE br = ( bb > bl ? ( ( BYTE )( ( ( double )( grayl<grayb?Weighting:(Weighting ^ 255)) ) / 255.0 * ( bb - bl ) + bl ) ) : ( ( BYTE )( ( ( double )( grayl<grayb?Weighting:(Weighting ^ 255)) ) / 255.0 * ( bl - bb ) + bb ) ) );
             screen->Plot( X0, Y0, RGB( rr, gr, br ) );
 
-            clrBackGround = screen->pixels[X0 + XDir + Y0 * SCRWIDTH];
+            clrBackGround = screen->pixels[Y0][X0 + XDir];
             rb = GetRValue( clrBackGround );
             gb = GetGValue( clrBackGround );
             bb = GetBValue( clrBackGround );
@@ -181,7 +181,7 @@ void DrawWuLine( Surface *screen, int X0, int Y0, int X1, int Y1, uint clrLine )
         weighting for the paired pixel */
         Weighting = ErrorAcc >> 8;
 
-        COLORREF clrBackGround = screen->pixels[X0 + Y0 * SCRWIDTH];
+        COLORREF clrBackGround = screen->pixels[Y0][X0];
         BYTE rb = GetRValue( clrBackGround );
         BYTE gb = GetGValue( clrBackGround );
         BYTE bb = GetBValue( clrBackGround );
@@ -193,7 +193,7 @@ void DrawWuLine( Surface *screen, int X0, int Y0, int X1, int Y1, uint clrLine )
 
         screen->Plot( X0, Y0, RGB( rr, gr, br ) );
 
-        clrBackGround = screen->pixels[X0 + (Y0 + 1 )* SCRWIDTH];
+        clrBackGround = screen->pixels[Y0 + 1][X0];
         rb = GetRValue( clrBackGround );
         gb = GetGValue( clrBackGround );
         bb = GetBValue( clrBackGround );
@@ -221,8 +221,8 @@ int Game::Evaluate()
 	__int64 diff = 0;
 	for( uint i = 0; i < count; i++ )
 	{
-		uint src = screen->pixels[i];
-		uint ref = reference->pixels[i];
+		uint src = screen->pixels[i / SCRWIDTH][i % SCRWIDTH];
+		uint ref = reference->pixels[i / SCRWIDTH][i % SCRWIDTH];
 		int r0 = (src >> 16) & 255, g0 = (src >> 8) & 255, b0 = src & 255;
 		int r1 = ref >> 16, g1 = (ref >> 8) & 255, b1 = ref & 255;
 		int dr = r0 - r1, dg = g0 - g1, db = b0 - b1;
@@ -252,7 +252,11 @@ void Game::Init()
 	}
 	reference = new Surface( "assets/bird.png" );
 	backup = new Surface( SCRWIDTH, SCRHEIGHT );
-	memset( screen->pixels, 255, SCRWIDTH * SCRHEIGHT * 4 );
+
+	for (int y = 0; y < SCRHEIGHT; y++)
+		for (int x = 0; x < SCRWIDTH; x++)
+			screen->pixels[y][x] = 0xFFFFFFFF;
+
 	for (int j = 0; j < LINES; j++)
 	{
 		DrawWuLine( screen, lx1[j], ly1[j], lx2[j], ly2[j], lc[j] );
@@ -268,8 +272,12 @@ void Game::Tick( float /* deltaTime */ )
 	timer.reset();
 	int lineCount = 0;
 	int iterCount = 0;
+
 	// draw up to lidx
-	memset( screen->pixels, 255, SCRWIDTH * SCRHEIGHT * 4 );
+	for (int y = 0; y < SCRHEIGHT; y++)
+		for (int x = 0; x < SCRWIDTH; x++)
+			screen->pixels[y][x] = 0xFFFFFFFF;
+
 	for (int j = 0; j < lidx; j++, lineCount++)
 	{
 		DrawWuLine( screen, lx1[j], ly1[j], lx2[j], ly2[j], lc[j] );
@@ -290,6 +298,7 @@ void Game::Tick( float /* deltaTime */ )
 		lidx = (lidx + 1) % LINES;
 		iterCount++;
 	}
+
 	// stats
 	char t[128];
 	float elapsed = timer.elapsed();
