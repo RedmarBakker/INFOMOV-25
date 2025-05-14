@@ -143,7 +143,7 @@ void DrawWuLine( Surface *screen, int X0, int Y0, int X1, int Y1, uint clrLine )
             BYTE bb = GetBValue( clrBackGround );
 
 //            double grayb = rb * 0.299 + gb * 0.587 + bb * 0.114;
-            double grayb = (rb * 299 + gb * 587 + bb * 114) / 1000;
+            int grayb = (rb * 299 + gb * 587 + bb * 114) >> 10;
 			double weight = (double)((grayl < grayb ? Weighting : (Weighting ^ 255) ) / 255.0);
 
             BYTE rr = ( rb > rl ? ( ( BYTE )(  weight * ( rb - rl ) + rl ) ) : ( ( BYTE )( weight * ( rl - rb ) + rb ) ) );
@@ -157,7 +157,7 @@ void DrawWuLine( Surface *screen, int X0, int Y0, int X1, int Y1, uint clrLine )
             bb = GetBValue( clrBackGround );
 
 //            grayb = rb * 0.299 + gb * 0.587 + bb * 0.114;
-            grayb = (rb * 299 + gb * 587 + bb * 114) / 1000;
+            grayb = (rb * 299 + gb * 587 + bb * 114) >> 10;
         	weight = (double)((grayl < grayb ? (Weighting ^ 255) : Weighting) / 255.0);
 
             rr = ( rb > rl ? ( ( BYTE )( weight * ( rb - rl ) + rl ) ) : ( ( BYTE )( weight * ( rl - rb ) + rb ) ) );
@@ -194,7 +194,7 @@ void DrawWuLine( Surface *screen, int X0, int Y0, int X1, int Y1, uint clrLine )
         BYTE bb = GetBValue( clrBackGround );
 
 //        double grayb = rb * 0.299 + gb * 0.587 + bb * 0.114;
-        double grayb = (rb * 299 + gb * 587 + bb * 114) / 1000;
+        int grayb = (rb * 299 + gb * 587 + bb * 114) >> 10;
 		double weight = ( ( double )( grayl<grayb?Weighting:(Weighting ^ 255)) ) / 255.0;
 
         BYTE rr = ( rb > rl ? ( ( BYTE )( weight * ( rb - rl ) + rl ) ) : ( ( BYTE )( weight * ( rl - rb ) + rb ) ) );
@@ -209,7 +209,7 @@ void DrawWuLine( Surface *screen, int X0, int Y0, int X1, int Y1, uint clrLine )
         bb = GetBValue( clrBackGround );
 
 //        grayb = rb * 0.299 + gb * 0.587 + bb * 0.114;
-        grayb = (rb * 299 + gb * 587 + bb * 114) / 1000;
+        grayb = (rb * 299 + gb * 587 + bb * 114) >> 10;
 		weight = ( ( double )( grayl<grayb?(Weighting ^ 255):Weighting) ) / 255.0;
 
         rr = ( rb > rl ? ( ( BYTE )( weight * ( rb - rl ) + rl ) ) : ( ( BYTE )( weight * ( rl - rb ) + rb ) ) );
