@@ -97,7 +97,7 @@ void DrawWuLine( Surface *screen, int X0, int Y0, int X1, int Y1, uint clrLine )
     else
     {
         XDir   = -1;
-        DeltaX = 0 - DeltaX; /* make DeltaX positive */
+        DeltaX = - DeltaX; /* make DeltaX positive */
     }
 
     /* Special-case horizontal, vertical, and diagonal lines, which
@@ -143,11 +143,11 @@ void DrawWuLine( Surface *screen, int X0, int Y0, int X1, int Y1, uint clrLine )
             BYTE bb = GetBValue( clrBackGround );
             double grayb = rb * 0.299 + gb * 0.587 + bb * 0.114;
 
-			double weight = (grayl<grayb?Weighting:(Weighting ^ 255))/255.0;
+			double weight = (double)((grayl < grayb ? Weighting : (Weighting ^ 255) ) / 255.0);
 
-            BYTE rr = ( rb > rl ? ( ( BYTE ) weight * ( rb - rl ) + rl ) : ( ( BYTE ) weight * ( rl - rb ) + rb ) );
-            BYTE gr = ( gb > gl ? ( ( BYTE ) weight * ( gb - gl ) + gl ) : ( ( BYTE ) weight * ( gl - gb ) + gb ) );
-            BYTE br = ( bb > bl ? ( ( BYTE ) weight * ( bb - bl ) + bl ) : ( ( BYTE ) weight * ( bl - bb ) + bb ) );
+            BYTE rr = ( rb > rl ? ( ( BYTE )(  weight * ( rb - rl ) + rl ) ) : ( ( BYTE )( weight * ( rl - rb ) + rb ) ) );
+            BYTE gr = ( gb > gl ? ( ( BYTE )( weight * ( gb - gl ) + gl ) ) : ( ( BYTE )( weight * ( gl - gb ) + gb ) ) );
+            BYTE br = ( bb > bl ? ( ( BYTE )( weight * ( bb - bl ) + bl ) ) : ( ( BYTE )( weight * ( bl - bb ) + bb ) ) );
             screen->Plot( X0, Y0, RGB( rr, gr, br ) );
 
             clrBackGround = screen->pixels[X0 + XDir + Y0 * SCRWIDTH];
@@ -155,13 +155,12 @@ void DrawWuLine( Surface *screen, int X0, int Y0, int X1, int Y1, uint clrLine )
             gb = GetGValue( clrBackGround );
             bb = GetBValue( clrBackGround );
             grayb = rb * 0.299 + gb * 0.587 + bb * 0.114;
+        	weight = (double)((grayl < grayb ? (Weighting ^ 255) : Weighting) / 255.0);
 
-        	weight = (grayl<grayb?(Weighting ^ 255):Weighting)/255.0;
-
-        	rr = ( rb > rl ? ( ( BYTE ) weight * ( rb - rl ) + rl ) : ( ( BYTE ) weight * ( rl - rb ) + rb ) );
-        	gr = ( gb > gl ? ( ( BYTE ) weight * ( gb - gl ) + gl ) : ( ( BYTE ) weight * ( gl - gb ) + gb ) );
-        	br = ( bb > bl ? ( ( BYTE ) weight * ( bb - bl ) + bl ) : ( ( BYTE ) weight * ( bl - bb ) + bb ) );
-			screen->Plot( X0 + XDir, Y0, RGB( rr, gr, br ) );
+            rr = ( rb > rl ? ( ( BYTE )( weight * ( rb - rl ) + rl ) ) : ( ( BYTE )( weight * ( rl - rb ) + rb ) ) );
+            gr = ( gb > gl ? ( ( BYTE )( weight * ( gb - gl ) + gl ) ) : ( ( BYTE )( weight * ( gl - gb ) + gb ) ) );
+            br = ( bb > bl ? ( ( BYTE )( weight * ( bb - bl ) + bl ) ) : ( ( BYTE )( weight * ( bl - bb ) + bb ) ) );
+            screen->Plot( X0 + XDir, Y0, RGB( rr, gr, br ) );
         }
         /* Draw the final pixel, which is always exactly intersected by the line
         and so needs no weighting */
@@ -191,12 +190,11 @@ void DrawWuLine( Surface *screen, int X0, int Y0, int X1, int Y1, uint clrLine )
         BYTE gb = GetGValue( clrBackGround );
         BYTE bb = GetBValue( clrBackGround );
         double grayb = rb * 0.299 + gb * 0.587 + bb * 0.114;
+		double weight = ( ( double )( grayl<grayb?Weighting:(Weighting ^ 255)) ) / 255.0;
 
-    	double weight = (grayl<grayb?Weighting:(Weighting ^ 255))/255.0;
-
-    	BYTE rr = ( rb > rl ? ( ( BYTE ) weight * ( rb - rl ) + rl ) : ( ( BYTE ) weight * ( rl - rb ) + rb ) );
-    	BYTE gr = ( gb > gl ? ( ( BYTE ) weight * ( gb - gl ) + gl ) : ( ( BYTE ) weight * ( gl - gb ) + gb ) );
-    	BYTE br = ( bb > bl ? ( ( BYTE ) weight * ( bb - bl ) + bl ) : ( ( BYTE ) weight * ( bl - bb ) + bb ) );
+        BYTE rr = ( rb > rl ? ( ( BYTE )( weight * ( rb - rl ) + rl ) ) : ( ( BYTE )( weight * ( rl - rb ) + rb ) ) );
+        BYTE gr = ( gb > gl ? ( ( BYTE )( weight * ( gb - gl ) + gl ) ) : ( ( BYTE )( weight * ( gl - gb ) + gb ) ) );
+        BYTE br = ( bb > bl ? ( ( BYTE )( weight * ( bb - bl ) + bl ) ) : ( ( BYTE )( weight * ( bl - bb ) + bb ) ) );
 
         screen->Plot( X0, Y0, RGB( rr, gr, br ) );
 
@@ -206,11 +204,11 @@ void DrawWuLine( Surface *screen, int X0, int Y0, int X1, int Y1, uint clrLine )
         bb = GetBValue( clrBackGround );
         grayb = rb * 0.299 + gb * 0.587 + bb * 0.114;
 
-    	weight = (grayl<grayb?(Weighting ^ 255):Weighting)/255.0;
+		weight = ( ( double )( grayl<grayb?(Weighting ^ 255):Weighting) ) / 255.0;
 
-    	rr = ( rb > rl ? ( ( BYTE ) weight * ( rb - rl ) + rl ) : ( ( BYTE ) weight * ( rl - rb ) + rb ) );
-    	gr = ( gb > gl ? ( ( BYTE ) weight * ( gb - gl ) + gl ) : ( ( BYTE ) weight * ( gl - gb ) + gb ) );
-    	br = ( bb > bl ? ( ( BYTE ) weight * ( bb - bl ) + bl ) : ( ( BYTE ) weight * ( bl - bb ) + bb ) );
+        rr = ( rb > rl ? ( ( BYTE )( weight * ( rb - rl ) + rl ) ) : ( ( BYTE )( weight * ( rl - rb ) + rb ) ) );
+        gr = ( gb > gl ? ( ( BYTE )( weight * ( gb - gl ) + gl ) ) : ( ( BYTE )( weight * ( gl - gb ) + gb ) ) );
+        br = ( bb > bl ? ( ( BYTE )( weight * ( bb - bl ) + bl ) ) : ( ( BYTE )( weight * ( bl - bb ) + bb ) ) );
 
         screen->Plot( X0, Y0 + 1, RGB( rr, gr, br ) );
     }
@@ -291,7 +289,7 @@ void Game::Tick( float /* deltaTime */ )
 	{
 		backup->CopyTo( screen, 0, 0 );
 		MutateLine( lidx );
-		for (int j = 0; j < LINES; j++, lineCount++)
+		for (int j = lidx; j < LINES; j++, lineCount++)
 		{
 			DrawWuLine( screen, lx1[j], ly1[j], lx2[j], ly2[j], lc[j] );
 		}
