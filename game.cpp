@@ -168,8 +168,7 @@ void DrawWuLine( Surface *screen, int X0, int Y0, int X1, int Y1, uint clrLine )
 //            int grayb = (rb * 299 + gb * 587 + bb * 114) >> 10;
 
             int grayb = (299 * rb + 587 * gb + 114 * bb) >> 10;  // Keep precision
-            bool isLight = grayl < grayb;
-			double weight = (double)(isLight ? Weighting : WeightingXOR) * weightNorm;
+			double weight = (double)(grayl < grayb ? Weighting : WeightingXOR) * weightNorm;
 			//double weight = (isLight * Weighting + (1 - isLight) * (Weighting ^ 255)) * weightNorm;
 
 //            BYTE rr = ( rb > rl ? ( ( BYTE )( weight * ( rb - rl ) + rl ) ) : ( ( BYTE )( weight * ( rl - rb ) + rb ) ) );
@@ -189,7 +188,7 @@ void DrawWuLine( Surface *screen, int X0, int Y0, int X1, int Y1, uint clrLine )
 
 //            grayb = rb * 0.299 + gb * 0.587 + bb * 0.114;
             grayb = (rb * 299 + gb * 587 + bb * 114) >> 10;
-        	weight = (double)(isLight ? WeightingXOR : Weighting) * weightNorm;
+        	weight = (double)(grayl < grayb ? WeightingXOR : Weighting) * weightNorm;
             //weight = (isLight * (Weighting ^ 255) + (1 - isLight) * Weighting) * weightNorm;
 
 //            rr = ( rb > rl ? ( ( BYTE )( weight * ( rb - rl ) + rl ) ) : ( ( BYTE )( weight * ( rl - rb ) + rb ) ) );
@@ -232,7 +231,6 @@ weighting for the paired pixel */
 
 //        double grayb = rb * 0.299 + gb * 0.587 + bb * 0.114;
             int grayb = (rb * 299 + gb * 587 + bb * 114) >> 10;
-            bool isLight = grayl < grayb;
             double weight = (double)((grayl < grayb) ? Weighting : WeightingXOR) * weightNorm;
             //double weight = (isLight * Weighting + (1 - isLight) * (Weighting ^ 255)) * weightNorm;
 
@@ -253,7 +251,7 @@ weighting for the paired pixel */
 
 //        grayb = rb * 0.299 + gb * 0.587 + bb * 0.114;
             grayb = (rb * 299 + gb * 587 + bb * 114) >> 10;
-            weight = (double)(isLight ? WeightingXOR : Weighting) * weightNorm;
+            weight = (double)(grayl < grayb ? WeightingXOR : Weighting) * weightNorm;
             //weight = (isLight * (Weighting ^ 255) + (1 - isLight) * Weighting) * weightNorm;
 
 //            rr = ( rb > rl ? ( ( BYTE )( weight * ( rb - rl ) + rl ) ) : ( ( BYTE )( weight * ( rl - rb ) + rb ) ) );
