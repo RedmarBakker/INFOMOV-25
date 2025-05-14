@@ -70,27 +70,103 @@ void UndoMutation( int i )
 	lc[i] = c_;
 }
 
-/*RGB calculateColor(int grayl, uint clrLine, COLORREF clrBackground, unsigned short Weighting, bool inverse = false)
+// -----------------------------------------------------------
+// Branchless color blending for Wu lines (extracted from DrawWuLine)
+// -----------------------------------------------------------
+inline uint BlendColorBranchless(uint lineClr, uint bgClr, int grayl, unsigned short Weighting, unsigned short WeightingXOR, bool inverse = false)
 {
-//    double grayb = rb * 0.299 + gb * 0.587 + bb * 0.114;
-//    int grayb = (rb * 299 + gb * 587 + bb * 114) >> 10;
+    int rl = GetRValue(lineClr);
+    int gl = GetGValue(lineClr);
+    int bl = GetBValue(lineClr);
 
-    int grayb = (299 * rb + 587 * gb + 114 * bb) >> 8;  // Keep precision
-    bool isLight = (grayl < grayb) ^ inverse;
+    int rb = GetRValue(bgClr);
+    int gb = GetGValue(bgClr);
+    int bb = GetBValue(bgClr);
 
-    double weight = (double)((isLight ? Weighting : (Weighting ^ 255)) * weightNorm;
-    //double weight = (isLight * Weighting + (1 - isLight) * (Weighting ^ 255)) * weightNorm;
+    int grayb = (rb * 299 + gb * 587 + bb * 114) >> 10;
+    int intWeight = ((grayl < grayb) ^ inverse ? Weighting : WeightingXOR);
 
-//    BYTE rr = ( rb > rl ? ( ( BYTE )( weight * ( rb - rl ) + rl ) ) : ( ( BYTE )( weight * ( rl - rb ) + rb ) ) );
-//    BYTE gr = ( gb > gl ? ( ( BYTE )( weight * ( gb - gl ) + gl ) ) : ( ( BYTE )( weight * ( gl - gb ) + gb ) ) );
-//    BYTE br = ( bb > bl ? ( ( BYTE )( weight * ( bb - bl ) + bl ) ) : ( ( BYTE )( weight * ( bl - bb ) + bb ) ) );
+    BYTE rr = rl + ((rb - rl) & -(rb < rl)) + ((intWeight * abs(rb - rl)) >> 8);
+    BYTE gr = gl + ((gb - gl) & -(gb < gl)) + ((intWeight * abs(gb - gl)) >> 8);
+    BYTE br = bl + ((bb - bl) & -(bb < bl)) + ((intWeight * abs(bb - bl)) >> 8);
 
-    BYTE rr = (BYTE)(weight * abs(GetRValue(clrBackground) - GetRValue(clrLine)) + std::min<int>((int)GetRValue(clrBackground), (int)GetRValue(clrLine)));
-    BYTE gr = (BYTE)(weight * abs(GetGValue(clrBackground) - GetGValue(clrLine)) + std::min<int>((int)GetGValue(clrBackground), (int)GetGValue(clrLine)));
-    BYTE br = (BYTE)(weight * abs(GetBValue(clrBackground) - GetBValue(clrLine)) + std::min<int>((int)GetBValue(clrBackground), (int)GetBValue(clrLine)));
+    return RGB(rr, gr, br);
+}
 
-    return RGB( rr, gr, br );
-}*/
+#if defined(__ARM_NEON) && (defined(__APPLE__) || defined(__aarch64__))
+    #include <arm_neon.h>
+
+    // BlendColorNEON: SIMD-accelerated color blending for Wu lines using NEON
+    inline uint BlendColorNEON(uint lineClr, uint bgClr, int grayl, unsigned short Weighting, unsigned short WeightingXOR, bool inverse = false)
+    {
+        int rl = GetRValue(lineClr);
+        int gl = GetGValue(lineClr);
+        int bl = GetBValue(lineClr);
+
+        int rb = GetRValue(bgClr);
+        int gb = GetGValue(bgClr);
+        int bb = GetBValue(bgClr);
+
+        int32x4_t rgbLine = { rl, gl, bl, 0 };
+        int32x4_t rgbBackground = { rb, gb, bb, 0 };
+
+        int32x4_t rgbDelta = vsubq_s32(rgbBackground, rgbLine);
+        int32x4_t neg_mask = vshrq_n_s32(rgbDelta, 31);
+        int32x4_t abs_diff = vsubq_s32(veorq_s32(rgbDelta, neg_mask), neg_mask);
+
+        int grayb = (299 * rb + 587 * gb + 114 * bb) >> 10;
+        int intWeight = ((grayl < grayb) ^ inverse ? Weighting : WeightingXOR);
+
+        int32x4_t weight_vec = vdupq_n_s32(intWeight);
+        int32x4_t scaled = vmulq_s32(abs_diff, weight_vec);
+        int32x4_t shifted = vshrq_n_s32(scaled, 8);
+        int32x4_t blended = vaddq_s32(rgbLine, shifted);
+
+        int rr = vgetq_lane_s32(blended, 0);
+        int gr = vgetq_lane_s32(blended, 1);
+        int br = vgetq_lane_s32(blended, 2);
+
+        return RGB(rr, gr, br);
+    }
+#endif
+
+#ifdef __SSE2__
+    #include <emmintrin.h>
+
+    inline uint BlendColorSSE(uint lineClr, uint bgClr, int grayl, unsigned short Weighting, unsigned short WeightingXOR, bool inverse = false)
+    {
+        int rl = GetRValue(lineClr);
+        int gl = GetGValue(lineClr);
+        int bl = GetBValue(lineClr);
+
+        int rb = GetRValue(bgClr);
+        int gb = GetGValue(bgClr);
+        int bb = GetBValue(bgClr);
+
+        __m128i rgbLine = _mm_set_epi32(0, bl, gl, rl);
+        __m128i rgbBackground = _mm_set_epi32(0, bb, gb, rb);
+
+        __m128i rgbDelta = _mm_sub_epi32(rgbBackground, rgbLine);
+        __m128i neg_mask = _mm_srai_epi32(rgbDelta, 31);
+        __m128i abs_diff = _mm_sub_epi32(_mm_xor_si128(rgbDelta, neg_mask), neg_mask);
+
+        int grayb = (299 * rb + 587 * gb + 114 * bb) >> 10;
+        int intWeight = ((grayl < grayb) ^ inverse ? Weighting : WeightingXOR);
+
+        __m128i weight_vec = _mm_set1_epi32(intWeight);
+        __m128i scaled = _mm_mullo_epi32(abs_diff, weight_vec);
+        __m128i shifted = _mm_srli_epi32(scaled, 8);
+        __m128i blended = _mm_add_epi32(rgbLine, shifted);
+
+        int rr = _mm_cvtsi128_si32(blended);
+        blended = _mm_srli_si128(blended, 4);
+        int gr = _mm_cvtsi128_si32(blended);
+        blended = _mm_srli_si128(blended, 4);
+        int br = _mm_cvtsi128_si32(blended);
+
+        return RGB(rr, gr, br);
+    }
+#endif
 
 // -----------------------------------------------------------
 // DrawWuLine
@@ -100,7 +176,8 @@ void UndoMutation( int i )
 // -----------------------------------------------------------
 void DrawWuLine( Surface *screen, int X0, int Y0, int X1, int Y1, uint clrLine )
 {
-	const float weightNorm = 1.f / 255.f;
+	//const float weightNorm = 1.f / 255.f;
+
     /* Make sure the line runs top to bottom */
     if (Y0 > Y1)
     {
@@ -117,7 +194,7 @@ void DrawWuLine( Surface *screen, int X0, int Y0, int X1, int Y1, uint clrLine )
     if( DeltaX < 0 )
     {
         XDir   = -1;
-        DeltaX = 0 - DeltaX; /* make DeltaX positive */
+        DeltaX = -DeltaX; /* make DeltaX positive */
     }
 
     /* Special-case horizontal, vertical, and diagonal lines, which
@@ -129,7 +206,8 @@ void DrawWuLine( Surface *screen, int X0, int Y0, int X1, int Y1, uint clrLine )
     unsigned short ErrorAccTemp, Weighting, WeightingXOR;
 
     /* Line is not horizontal, diagonal, or vertical */
-    unsigned short ErrorAcc = 0;  /* initialize the line error accumulator to 0 */
+    /* initialize the line error accumulator to 0 */
+    unsigned short ErrorAcc = 0;
 
     BYTE rl = GetRValue( clrLine );
     BYTE gl = GetGValue( clrLine );
@@ -140,81 +218,54 @@ void DrawWuLine( Surface *screen, int X0, int Y0, int X1, int Y1, uint clrLine )
     /* Is this an X-major or Y-major line? */
     if (DeltaY > DeltaX)
     {
-    /* Y-major line; calculate 16-bit fixed-point fractional part of a
-    pixel that X advances each time Y advances 1 pixel, truncating the
+        /* Y-major line; calculate 16-bit fixed-point fractional part of a
+        pixel that X advances each time Y advances 1 pixel, truncating the
         result so that we won't overrun the endpoint along the X axis */
         ErrorAdj = ((unsigned long) DeltaX << 16) / (unsigned long) DeltaY;
+
         /* Draw all pixels other than the first and last */
         while (--DeltaY) {
-            ErrorAccTemp = ErrorAcc;   /* remember currrent accumulated error */
-            ErrorAcc += ErrorAdj;      /* calculate error for next pixel */
+            /* remember currrent accumulated error */
+            ErrorAccTemp = ErrorAcc;
+
+            /* calculate error for next pixel */
+            ErrorAcc += ErrorAdj;
+
             if (ErrorAcc <= ErrorAccTemp) {
                 /* The error accumulator turned over, so advance the X coord */
                 X0 += XDir;
             }
-            Y0++; /* Y-major, so always advance Y */
-                  /* The IntensityBits most significant bits of ErrorAcc give us the
-                  intensity weighting for this pixel, and the complement of the
-            weighting for the paired pixel */
+
+            /* Y-major, so always advance Y */
+            Y0++;
+
+            /* The IntensityBits most significant bits of ErrorAcc give us the intensity weighting for this pixel, and the complement of the weighting for the paired pixel */
             Weighting = ErrorAcc >> 8;
             WeightingXOR = Weighting ^ 255;
 
+            // X, Y
             COLORREF clrBackGround = screen->pixels[X0 + Y0 * SCRWIDTH];
-            BYTE rb = GetRValue( clrBackGround );
-            BYTE gb = GetGValue( clrBackGround );
-            BYTE bb = GetBValue( clrBackGround );
 
-//            double grayb = rb * 0.299 + gb * 0.587 + bb * 0.114;
-//            int grayb = (rb * 299 + gb * 587 + bb * 114) >> 10;
+            #if defined(USE_SIMD) && defined(__ARM_NEON) && (defined(__APPLE__) || defined(__aarch64__))
+                screen->Plot(X0, Y0, BlendColorNEON(clrLine, clrBackGround, grayl, Weighting, WeightingXOR));
+            #elif defined(USE_SIMD) && defined(__SSE2__)
+                screen->Plot(X0, Y0, BlendColorSSE(clrLine, clrBackGround, grayl, Weighting, WeightingXOR));
+            #else
+                screen->Plot(X0, Y0, BlendColorBranchless(clrLine, clrBackGround, grayl, Weighting, WeightingXOR));
+            #endif
 
-            int grayb = (299 * rb + 587 * gb + 114 * bb) >> 10;  // Keep precision
-//			double weight = (double)(grayl < grayb ? Weighting : WeightingXOR) * weightNorm;
-			//double weight = (isLight * Weighting + (1 - isLight) * (Weighting ^ 255)) * weightNorm;
-
-            int isLighter = -(grayl < grayb);
-            int intWeight = (Weighting & isLighter) | (WeightingXOR & ~isLighter);
-
-            BYTE rr = rl + ((rb - rl) & -(rb < rl)) + ((intWeight * abs(rb - rl)) >> 8);
-            BYTE gr = gl + ((gb - gl) & -(gb < gl)) + ((intWeight * abs(gb - gl)) >> 8);
-            BYTE br = bl + ((bb - bl) & -(bb < bl)) + ((intWeight * abs(bb - bl)) >> 8);
-
-//            BYTE rr = ( rb > rl ? ( ( BYTE )( weight * ( rb - rl ) + rl ) ) : ( ( BYTE )( weight * ( rl - rb ) + rb ) ) );
-//            BYTE gr = ( gb > gl ? ( ( BYTE )( weight * ( gb - gl ) + gl ) ) : ( ( BYTE )( weight * ( gl - gb ) + gb ) ) );
-//            BYTE br = ( bb > bl ? ( ( BYTE )( weight * ( bb - bl ) + bl ) ) : ( ( BYTE )( weight * ( bl - bb ) + bb ) ) );
-
-//            BYTE rr = (BYTE)(weight * abs(rb - rl) + std::min<int>((int)rb, (int)rl));
-//            BYTE gr = (BYTE)(weight * abs(gb - gl) + std::min<int>((int)gb, (int)gl));
-//            BYTE br = (BYTE)(weight * abs(bb - bl) + std::min<int>((int)bb, (int)bl));
-
-            screen->Plot( X0, Y0, RGB( rr, gr, br ) );
-
+            // X + dir, Y
             clrBackGround = screen->pixels[X0 + XDir + Y0 * SCRWIDTH];
-            rb = GetRValue( clrBackGround );
-            gb = GetGValue( clrBackGround );
-            bb = GetBValue( clrBackGround );
 
-//            grayb = rb * 0.299 + gb * 0.587 + bb * 0.114;
-            grayb = (rb * 299 + gb * 587 + bb * 114) >> 10;
-//        	weight = (double)(grayl < grayb ? WeightingXOR : Weighting) * weightNorm;
-            //weight = (isLight * (Weighting ^ 255) + (1 - isLight) * Weighting) * weightNorm;
-
-            isLighter = -(grayl < grayb);
-            intWeight = (WeightingXOR & isLighter) | (Weighting & ~isLighter);
-
-            rr = rl + ((rb - rl) & -(rb < rl)) + ((intWeight * abs(rb - rl)) >> 8);
-            gr = gl + ((gb - gl) & -(gb < gl)) + ((intWeight * abs(gb - gl)) >> 8);
-            br = bl + ((bb - bl) & -(bb < bl)) + ((intWeight * abs(bb - bl)) >> 8);
-
-//            rr = ( rb > rl ? ( ( BYTE )( weight * ( rb - rl ) + rl ) ) : ( ( BYTE )( weight * ( rl - rb ) + rb ) ) );
-//            gr = ( gb > gl ? ( ( BYTE )( weight * ( gb - gl ) + gl ) ) : ( ( BYTE )( weight * ( gl - gb ) + gb ) ) );
-//            br = ( bb > bl ? ( ( BYTE )( weight * ( bb - bl ) + bl ) ) : ( ( BYTE )( weight * ( bl - bb ) + bb ) ) );
-
-//            rr = (BYTE)(weight * abs(rb - rl) + std::min<int>((int)rb, (int)rl));
-//            gr = (BYTE)(weight * abs(gb - gl) + std::min<int>((int)gb, (int)gl));
-//            br = (BYTE)(weight * abs(bb - bl) + std::min<int>((int)bb, (int)bl));
-
-            screen->Plot( X0 + XDir, Y0, RGB( rr, gr, br ) );
+            #if defined(USE_SIMD) && defined(__ARM_NEON) && (defined(__APPLE__) || defined(__aarch64__))
+                screen->Plot(X0 + XDir, Y0, BlendColorNEON(clrLine, clrBackGround, grayl, Weighting, WeightingXOR, true));
+            #elif defined(USE_SIMD) && defined(__SSE2__)
+                screen->Plot(X0 + XDir, Y0, BlendColorSSE(clrLine, clrBackGround, grayl, Weighting, WeightingXOR, true));
+            #else
+                screen->Plot(X0 + XDir, Y0, BlendColorBranchless(clrLine, clrBackGround, grayl, Weighting, WeightingXOR, true));
+            #endif
         }
+
         /* Draw the final pixel, which is always exactly intersected by the line
         and so needs no weighting */
         screen->Plot( X1, Y1, clrLine );
@@ -223,76 +274,48 @@ void DrawWuLine( Surface *screen, int X0, int Y0, int X1, int Y1, uint clrLine )
         pixel that Y advances each time X advances 1 pixel, truncating the
         result to avoid overrunning the endpoint along the X axis */
         ErrorAdj = ((unsigned long) DeltaY << 16) / (unsigned long) DeltaX;
+
         /* Draw all pixels other than the first and last */
         while (--DeltaX) {
-            ErrorAccTemp = ErrorAcc;   /* remember currrent accumulated error */
-            ErrorAcc += ErrorAdj;      /* calculate error for next pixel */
+            /* remember currrent accumulated error */
+            ErrorAccTemp = ErrorAcc;
+
+            /* calculate error for next pixel */
+            ErrorAcc += ErrorAdj;
+
             if (ErrorAcc <= ErrorAccTemp) {
                 /* The error accumulator turned over, so advance the Y coord */
                 Y0++;
             }
-            X0 += XDir; /* X-major, so always advance X */
-            /* The IntensityBits most significant bits of ErrorAcc give us the
-            intensity weighting for this pixel, and the complement of the
-weighting for the paired pixel */
+
+            X0 += XDir;
+
+            /* X-major, so always advance X */
+            /* The IntensityBits most significant bits of ErrorAcc give us the intensity weighting for this pixel, and the complement of the weighting for the paired pixel */
             Weighting = ErrorAcc >> 8;
             WeightingXOR = Weighting ^ 255;
 
+            // X, Y
             COLORREF clrBackGround = screen->pixels[X0 + Y0 * SCRWIDTH];
-            BYTE rb = GetRValue( clrBackGround );
-            BYTE gb = GetGValue( clrBackGround );
-            BYTE bb = GetBValue( clrBackGround );
 
-//        double grayb = rb * 0.299 + gb * 0.587 + bb * 0.114;
-            int grayb = (rb * 299 + gb * 587 + bb * 114) >> 10;
-//            double weight = (double)((grayl < grayb) ? Weighting : WeightingXOR) * weightNorm;
-            //double weight = (isLight * Weighting + (1 - isLight) * (Weighting ^ 255)) * weightNorm;
+            #if defined(USE_SIMD) && defined(__ARM_NEON) && (defined(__APPLE__) || defined(__aarch64__))
+                screen->Plot(X0, Y0, BlendColorNEON(clrLine, clrBackGround, grayl, Weighting, WeightingXOR));
+            #elif defined(USE_SIMD) && defined(__SSE2__)
+                screen->Plot(X0, Y0, BlendColorSSE(clrLine, clrBackGround, grayl, Weighting, WeightingXOR));
+            #else
+                screen->Plot(X0, Y0, BlendColorBranchless(clrLine, clrBackGround, grayl, Weighting, WeightingXOR));
+            #endif
 
-            int isLighter = -(grayl < grayb);
-            int intWeight = (Weighting & isLighter) | (WeightingXOR & ~isLighter);
-
-            BYTE rr = rl + ((rb - rl) & -(rb < rl)) + ((intWeight * abs(rb - rl)) >> 8);
-            BYTE gr = gl + ((gb - gl) & -(gb < gl)) + ((intWeight * abs(gb - gl)) >> 8);
-            BYTE br = bl + ((bb - bl) & -(bb < bl)) + ((intWeight * abs(bb - bl)) >> 8);
-
-//            BYTE rr = ( rb > rl ? ( ( BYTE )( weight * ( rb - rl ) + rl ) ) : ( ( BYTE )( weight * ( rl - rb ) + rb ) ) );
-//            BYTE gr = ( gb > gl ? ( ( BYTE )( weight * ( gb - gl ) + gl ) ) : ( ( BYTE )( weight * ( gl - gb ) + gb ) ) );
-//            BYTE br = ( bb > bl ? ( ( BYTE )( weight * ( bb - bl ) + bl ) ) : ( ( BYTE )( weight * ( bl - bb ) + bb ) ) );
-
-//            BYTE rr = (BYTE)(weight * abs(rb - rl) + std::min<int>((int)rb, (int)rl));
-//            BYTE gr = (BYTE)(weight * abs(gb - gl) + std::min<int>((int)gb, (int)gl));
-//            BYTE br = (BYTE)(weight * abs(bb - bl) + std::min<int>((int)bb, (int)bl));
-
-            screen->Plot( X0, Y0, RGB( rr, gr, br ) );
-
+            // X, Y+1
             clrBackGround = screen->pixels[X0 + (Y0 + 1) * SCRWIDTH];
-            rb = GetRValue( clrBackGround );
-            gb = GetGValue( clrBackGround );
-            bb = GetBValue( clrBackGround );
 
-//        grayb = rb * 0.299 + gb * 0.587 + bb * 0.114;
-            grayb = (rb * 299 + gb * 587 + bb * 114) >> 10;
-
-//            weight = (double)(grayl < grayb ? WeightingXOR : Weighting) * weightNorm;
-
-            isLighter = -(grayl < grayb);
-            intWeight = (Weighting & isLighter) | (WeightingXOR & ~isLighter);
-
-            rr = rl + ((rb - rl) & -(rb < rl)) + ((intWeight * abs(rb - rl)) >> 8);
-            gr = gl + ((gb - gl) & -(gb < gl)) + ((intWeight * abs(gb - gl)) >> 8);
-            br = bl + ((bb - bl) & -(bb < bl)) + ((intWeight * abs(bb - bl)) >> 8);
-
-            //weight = (isLight * (Weighting ^ 255) + (1 - isLight) * Weighting) * weightNorm;
-
-//            rr = ( rb > rl ? ( ( BYTE )( weight * ( rb - rl ) + rl ) ) : ( ( BYTE )( weight * ( rl - rb ) + rb ) ) );
-//            gr = ( gb > gl ? ( ( BYTE )( weight * ( gb - gl ) + gl ) ) : ( ( BYTE )( weight * ( gl - gb ) + gb ) ) );
-//            br = ( bb > bl ? ( ( BYTE )( weight * ( bb - bl ) + bl ) ) : ( ( BYTE )( weight * ( bl - bb ) + bb ) ) );
-
-//            rr = (BYTE)(weight * abs(rb - rl) + std::min<int>((int)rb, (int)rl));
-//            gr = (BYTE)(weight * abs(gb - gl) + std::min<int>((int)gb, (int)gl));
-//            br = (BYTE)(weight * abs(bb - bl) + std::min<int>((int)bb, (int)bl));
-
-            screen->Plot( X0, Y0 + 1, RGB( rr, gr, br ) );
+            #if defined(USE_SIMD) && defined(__ARM_NEON) && (defined(__APPLE__) || defined(__aarch64__))
+                screen->Plot(X0, Y0 + 1, BlendColorNEON(clrLine, clrBackGround, grayl, Weighting, WeightingXOR));
+            #elif defined(USE_SIMD) && defined(__SSE2__)
+                screen->Plot(X0, Y0 + 1, BlendColorSSE(clrLine, clrBackGround, grayl, Weighting, WeightingXOR));
+            #else
+                screen->Plot(X0, Y0 + 1, BlendColorBranchless(clrLine, clrBackGround, grayl, Weighting, WeightingXOR));
+            #endif
         }
 
 
@@ -356,45 +379,45 @@ void Game::Init()
 // -----------------------------------------------------------
 void Game::Tick( float /* deltaTime */ )
 {
-	timer.reset();
-	int lineCount = 0;
-	int iterCount = 0;
-	// draw up to lidx
-	memset( screen->pixels, 255, SCRWIDTH * SCRHEIGHT * 4 );
-	for (int j = 0; j < lidx; j++, lineCount++)
-	{
-		DrawWuLine( screen, lx1[j], ly1[j], lx2[j], ly2[j], lc[j] );
-	}
-	int base = lidx;
-	screen->CopyTo( backup, 0, 0 );
-	// iterate and draw from lidx to end
-	for (int k = 0; k < ITERATIONS; k++)
-	{
-		backup->CopyTo( screen, 0, 0 );
-		MutateLine( lidx );
-		for (int j = lidx; j < LINES; j++, lineCount++)
-		{
-			DrawWuLine( screen, lx1[j], ly1[j], lx2[j], ly2[j], lc[j] );
-		}
-		int diff = Evaluate();
-		if (diff < fitness) fitness = diff; else UndoMutation( lidx );
-		lidx = (lidx + 1) % LINES;
-		iterCount++;
-	}
-	// stats
-	char t[128];
-	float elapsed = timer.elapsed();
-	float lps = (float)lineCount / elapsed;
-	peak = max( lps, peak );
-	sprintf( t, "fitness: %i", fitness );
-	screen->Bar( 0, SCRHEIGHT - 33, 130, SCRHEIGHT - 1, 0 );
-	screen->Print( t, 2, SCRHEIGHT - 24, 0xffffff );
-	sprintf( t, "lps:     %5.2fK", lps );
-	screen->Print( t, 2, SCRHEIGHT - 16, 0xffffff );
-	sprintf( t, "ips:     %5.2f", (iterCount * 1000) / elapsed );
-	screen->Print( t, 2, SCRHEIGHT - 8, 0xffffff );
-	sprintf( t, "peak:    %5.2f", peak );
-	screen->Print( t, 2, SCRHEIGHT - 32, 0xffffff );
+    timer.reset();
+    int lineCount = 0;
+    int iterCount = 0;
+    // draw up to lidx
+    memset( screen->pixels, 255, SCRWIDTH * SCRHEIGHT * 4 );
+    for (int j = 0; j < lidx; j++, lineCount++)
+    {
+        DrawWuLine( screen, lx1[j], ly1[j], lx2[j], ly2[j], lc[j] );
+    }
+    int base = lidx;
+    screen->CopyTo( backup, 0, 0 );
+    // iterate and draw from lidx to end
+    for (int k = 0; k < ITERATIONS; k++)
+    {
+        backup->CopyTo( screen, 0, 0 );
+        MutateLine( lidx );
+        for (int j = base; j < LINES; j++, lineCount++)
+        {
+            DrawWuLine( screen, lx1[j], ly1[j], lx2[j], ly2[j], lc[j] );
+        }
+        int diff = Evaluate();
+        if (diff < fitness) fitness = diff; else UndoMutation( lidx );
+        lidx = (lidx + 1) % LINES;
+        iterCount++;
+    }
+    // stats
+    char t[128];
+    float elapsed = timer.elapsed();
+    float lps = (float)lineCount / elapsed;
+    peak = max( lps, peak );
+    sprintf( t, "fitness: %i", fitness );
+    screen->Bar( 0, SCRHEIGHT - 33, 130, SCRHEIGHT - 1, 0 );
+    screen->Print( t, 2, SCRHEIGHT - 24, 0xffffff );
+    sprintf( t, "lps:     %5.2fK", lps );
+    screen->Print( t, 2, SCRHEIGHT - 16, 0xffffff );
+    sprintf( t, "ips:     %5.2f", (iterCount * 1000) / elapsed );
+    screen->Print( t, 2, SCRHEIGHT - 8, 0xffffff );
+    sprintf( t, "peak:    %5.2f", peak );
+    screen->Print( t, 2, SCRHEIGHT - 32, 0xffffff );
 }
 
 // -----------------------------------------------------------
