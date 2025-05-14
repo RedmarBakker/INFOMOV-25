@@ -82,23 +82,20 @@ void DrawWuLine( Surface *screen, int X0, int Y0, int X1, int Y1, uint clrLine )
     /* Make sure the line runs top to bottom */
     if (Y0 > Y1)
     {
-        int Temp = Y0; Y0 = Y1; Y1 = Temp;
-        Temp = X0; X0 = X1; X1 = Temp;
+        std::swap( Y0, Y1 );
+		std::swap( X0, X1 );
     }
 
     /* Draw the initial pixel, which is always exactly intersected by
     the line and so needs no weighting */
     screen->Plot( X0, Y0, clrLine );
 
-    int XDir, DeltaX = X1 - X0;
-    if( DeltaX >= 0 )
-    {
-        XDir = 1;
-    }
-    else
+    int XDir = 1;
+	int DeltaX = X1 - X0;
+    if( DeltaX < 0 )
     {
         XDir   = -1;
-        DeltaX = - DeltaX; /* make DeltaX positive */
+        DeltaX = 0 - DeltaX; /* make DeltaX positive */
     }
 
     /* Special-case horizontal, vertical, and diagonal lines, which
