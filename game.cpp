@@ -70,6 +70,28 @@ void UndoMutation( int i )
 	lc[i] = c_;
 }
 
+RGB calculateColor(int grayl, uint clrLine, COLORREF clrBackground, unsigned short Weighting, bool inverse = false)
+{
+//    double grayb = rb * 0.299 + gb * 0.587 + bb * 0.114;
+//    int grayb = (rb * 299 + gb * 587 + bb * 114) >> 10;
+
+    int grayb = (299 * rb + 587 * gb + 114 * bb) >> 8;  // Keep precision
+    bool isLight = (grayl < grayb) ^ inverse;
+
+    double weight = (double)((isLight ? Weighting : (Weighting ^ 255)) * weightNorm;
+    //double weight = (isLight * Weighting + (1 - isLight) * (Weighting ^ 255)) * weightNorm;
+
+//    BYTE rr = ( rb > rl ? ( ( BYTE )( weight * ( rb - rl ) + rl ) ) : ( ( BYTE )( weight * ( rl - rb ) + rb ) ) );
+//    BYTE gr = ( gb > gl ? ( ( BYTE )( weight * ( gb - gl ) + gl ) ) : ( ( BYTE )( weight * ( gl - gb ) + gb ) ) );
+//    BYTE br = ( bb > bl ? ( ( BYTE )( weight * ( bb - bl ) + bl ) ) : ( ( BYTE )( weight * ( bl - bb ) + bb ) ) );
+
+    BYTE rr = (BYTE)(weight * abs(GetRValue(clrBackground) - GetRValue(clrLine)) + std::min<int>((int)GetRValue(clrBackground), (int)GetRValue(clrLine)));
+    BYTE gr = (BYTE)(weight * abs(GetGValue(clrBackground) - GetGValue(clrLine)) + std::min<int>((int)GetGValue(clrBackground), (int)GetGValue(clrLine)));
+    BYTE br = (BYTE)(weight * abs(GetBValue(clrBackground) - GetBValue(clrLine)) + std::min<int>((int)GetBValue(clrBackground), (int)GetBValue(clrLine)));
+
+    return RGB( rr, gr, br );
+}
+
 // -----------------------------------------------------------
 // DrawWuLine
 // Anti-aliased line rendering.
