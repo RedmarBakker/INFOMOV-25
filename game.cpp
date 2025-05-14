@@ -154,9 +154,9 @@ void DrawWuLine( Surface *screen, int X0, int Y0, int X1, int Y1, uint clrLine )
 //            BYTE gr = ( gb > gl ? ( ( BYTE )( weight * ( gb - gl ) + gl ) ) : ( ( BYTE )( weight * ( gl - gb ) + gb ) ) );
 //            BYTE br = ( bb > bl ? ( ( BYTE )( weight * ( bb - bl ) + bl ) ) : ( ( BYTE )( weight * ( bl - bb ) + bb ) ) );
 
-            BYTE rr = (BYTE)(weight * abs(rb - rl) + std::min(rb, (int)rl));
-            BYTE gr = (BYTE)(weight * abs(gb - gl) + std::min(gb, (int)gl));
-            BYTE br = (BYTE)(weight * abs(bb - bl) + std::min(bb, (int)bl));
+            BYTE rr = (BYTE)(weight * abs(rb - rl) + std::min<int>(rb, (int)rl));
+            BYTE gr = (BYTE)(weight * abs(gb - gl) + std::min<int>(gb, (int)gl));
+            BYTE br = (BYTE)(weight * abs(bb - bl) + std::min<int>(bb, (int)bl));
 
             screen->Plot( X0, Y0, RGB( rr, gr, br ) );
 
@@ -174,9 +174,9 @@ void DrawWuLine( Surface *screen, int X0, int Y0, int X1, int Y1, uint clrLine )
 //            gr = ( gb > gl ? ( ( BYTE )( weight * ( gb - gl ) + gl ) ) : ( ( BYTE )( weight * ( gl - gb ) + gb ) ) );
 //            br = ( bb > bl ? ( ( BYTE )( weight * ( bb - bl ) + bl ) ) : ( ( BYTE )( weight * ( bl - bb ) + bb ) ) );
 
-            BYTE rr = (BYTE)(weight * abs(rb - rl) + std::min(rb, (int)rl));
-            BYTE gr = (BYTE)(weight * abs(gb - gl) + std::min(gb, (int)gl));
-            BYTE br = (BYTE)(weight * abs(bb - bl) + std::min(bb, (int)bl));
+            BYTE rr = (BYTE)(weight * abs(rb - rl) + std::min<int>(rb, (int)rl));
+            BYTE gr = (BYTE)(weight * abs(gb - gl) + std::min<int>(gb, (int)gl));
+            BYTE br = (BYTE)(weight * abs(bb - bl) + std::min<int>(bb, (int)bl));
 
             screen->Plot( X0 + XDir, Y0, RGB( rr, gr, br ) );
         }
@@ -217,9 +217,9 @@ weighting for the paired pixel */
 //            BYTE gr = ( gb > gl ? ( ( BYTE )( weight * ( gb - gl ) + gl ) ) : ( ( BYTE )( weight * ( gl - gb ) + gb ) ) );
 //            BYTE br = ( bb > bl ? ( ( BYTE )( weight * ( bb - bl ) + bl ) ) : ( ( BYTE )( weight * ( bl - bb ) + bb ) ) );
 
-            BYTE rr = (BYTE)(weight * abs(rb - rl) + std::min(rb, (int)rl));
-            BYTE gr = (BYTE)(weight * abs(gb - gl) + std::min(gb, (int)gl));
-            BYTE br = (BYTE)(weight * abs(bb - bl) + std::min(bb, (int)bl));
+            BYTE rr = (BYTE)(weight * abs(rb - rl) + std::min<int>(rb, (int)rl));
+            BYTE gr = (BYTE)(weight * abs(gb - gl) + std::min<int>(gb, (int)gl));
+            BYTE br = (BYTE)(weight * abs(bb - bl) + std::min<int>(bb, (int)bl));
 
             screen->Plot( X0, Y0, RGB( rr, gr, br ) );
 
@@ -237,9 +237,9 @@ weighting for the paired pixel */
 //            gr = ( gb > gl ? ( ( BYTE )( weight * ( gb - gl ) + gl ) ) : ( ( BYTE )( weight * ( gl - gb ) + gb ) ) );
 //            br = ( bb > bl ? ( ( BYTE )( weight * ( bb - bl ) + bl ) ) : ( ( BYTE )( weight * ( bl - bb ) + bb ) ) );
 
-            BYTE rr = (BYTE)(weight * abs(rb - rl) + std::min(rb, (int)rl));
-            BYTE gr = (BYTE)(weight * abs(gb - gl) + std::min(gb, (int)gl));
-            BYTE br = (BYTE)(weight * abs(bb - bl) + std::min(bb, (int)bl));
+            BYTE rr = (BYTE)(weight * abs(rb - rl) + std::min<int>(rb, (int)rl));
+            BYTE gr = (BYTE)(weight * abs(gb - gl) + std::min<int>(gb, (int)gl));
+            BYTE br = (BYTE)(weight * abs(bb - bl) + std::min<int>(bb, (int)bl));
 
             screen->Plot( X0, Y0 + 1, RGB( rr, gr, br ) );
         }
