@@ -172,9 +172,9 @@ void DrawWuLine( Surface *screen, int X0, int Y0, int X1, int Y1, uint clrLine )
 			//double weight = (isLight * Weighting + (1 - isLight) * (Weighting ^ 255)) * weightNorm;
 
             int intWeight = (grayl < grayb ? Weighting : WeightingXOR);
-            BYTE rr = (rb < rl ? rb : rl) + ((intWeight * abs(rb - rl)) >> 8);
-            BYTE gr = (gb < gl ? gb : gl) + ((intWeight * abs(gb - gl)) >> 8);
-            BYTE br = (bb < bl ? bb : bl) + ((intWeight * abs(bb - bl)) >> 8);
+            BYTE rr = std::min<int>(rb, rl) + ((intWeight * abs(rb - rl)) >> 8);
+            BYTE gr = std::min<int>(gb, gl) + ((intWeight * abs(gb - gl)) >> 8);
+            BYTE br = std::min<int>(bb, bl) + ((intWeight * abs(bb - bl)) >> 8);
 
 //            BYTE rr = ( rb > rl ? ( ( BYTE )( weight * ( rb - rl ) + rl ) ) : ( ( BYTE )( weight * ( rl - rb ) + rb ) ) );
 //            BYTE gr = ( gb > gl ? ( ( BYTE )( weight * ( gb - gl ) + gl ) ) : ( ( BYTE )( weight * ( gl - gb ) + gb ) ) );
@@ -197,9 +197,9 @@ void DrawWuLine( Surface *screen, int X0, int Y0, int X1, int Y1, uint clrLine )
             //weight = (isLight * (Weighting ^ 255) + (1 - isLight) * Weighting) * weightNorm;
 
             intWeight = (grayl < grayb ? WeightingXOR : Weighting);
-            rr = (rb < rl ? rb : rl) + ((intWeight * abs(rb - rl)) >> 8);
-            gr = (gb < gl ? gb : gl) + ((intWeight * abs(gb - gl)) >> 8);
-            br = (bb < bl ? bb : bl) + ((intWeight * abs(bb - bl)) >> 8);
+            rr = std::min<int>(rb, rl) + ((intWeight * abs(rb - rl)) >> 8);
+            gr = std::min<int>(gb, gl) + ((intWeight * abs(gb - gl)) >> 8);
+            br = std::min<int>(bb, bl) + ((intWeight * abs(bb - bl)) >> 8);
 
 //            rr = ( rb > rl ? ( ( BYTE )( weight * ( rb - rl ) + rl ) ) : ( ( BYTE )( weight * ( rl - rb ) + rb ) ) );
 //            gr = ( gb > gl ? ( ( BYTE )( weight * ( gb - gl ) + gl ) ) : ( ( BYTE )( weight * ( gl - gb ) + gb ) ) );
@@ -245,9 +245,9 @@ weighting for the paired pixel */
             //double weight = (isLight * Weighting + (1 - isLight) * (Weighting ^ 255)) * weightNorm;
 
             int intWeight = (grayl < grayb ? Weighting : WeightingXOR);
-            BYTE rr = (rb < rl ? rb : rl) + ((intWeight * abs(rb - rl)) >> 8);
-            BYTE gr = (gb < gl ? gb : gl) + ((intWeight * abs(gb - gl)) >> 8);
-            BYTE br = (bb < bl ? bb : bl) + ((intWeight * abs(bb - bl)) >> 8);
+            BYTE rr = std::min<int>(rb, rl) + ((intWeight * abs(rb - rl)) >> 8);
+            BYTE gr = std::min<int>(gb, gl) + ((intWeight * abs(gb - gl)) >> 8);
+            BYTE br = std::min<int>(bb, bl) + ((intWeight * abs(bb - bl)) >> 8);
 
 //            BYTE rr = ( rb > rl ? ( ( BYTE )( weight * ( rb - rl ) + rl ) ) : ( ( BYTE )( weight * ( rl - rb ) + rb ) ) );
 //            BYTE gr = ( gb > gl ? ( ( BYTE )( weight * ( gb - gl ) + gl ) ) : ( ( BYTE )( weight * ( gl - gb ) + gb ) ) );
@@ -270,9 +270,9 @@ weighting for the paired pixel */
 //            weight = (double)(grayl < grayb ? WeightingXOR : Weighting) * weightNorm;
 
             intWeight = (grayl < grayb ? WeightingXOR : Weighting);
-            rr = (rb < rl ? rb : rl) + ((intWeight * abs(rb - rl)) >> 8);
-            gr = (gb < gl ? gb : gl) + ((intWeight * abs(gb - gl)) >> 8);
-            br = (bb < bl ? bb : bl) + ((intWeight * abs(bb - bl)) >> 8);
+            rr = std::min<int>(rb, rl) + ((intWeight * abs(rb - rl)) >> 8);
+            gr = std::min<int>(gb, gl) + ((intWeight * abs(gb - gl)) >> 8);
+            br = std::min<int>(bb, bl) + ((intWeight * abs(bb - bl)) >> 8);
 
             //weight = (isLight * (Weighting ^ 255) + (1 - isLight) * Weighting) * weightNorm;
 
