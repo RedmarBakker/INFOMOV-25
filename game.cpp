@@ -70,7 +70,7 @@ void UndoMutation( int i )
 	lc[i] = c_;
 }
 
-RGB calculateColor(int grayl, uint clrLine, COLORREF clrBackground, unsigned short Weighting, bool inverse = false)
+/*RGB calculateColor(int grayl, uint clrLine, COLORREF clrBackground, unsigned short Weighting, bool inverse = false)
 {
 //    double grayb = rb * 0.299 + gb * 0.587 + bb * 0.114;
 //    int grayb = (rb * 299 + gb * 587 + bb * 114) >> 10;
@@ -90,7 +90,7 @@ RGB calculateColor(int grayl, uint clrLine, COLORREF clrBackground, unsigned sho
     BYTE br = (BYTE)(weight * abs(GetBValue(clrBackground) - GetBValue(clrLine)) + std::min<int>((int)GetBValue(clrBackground), (int)GetBValue(clrLine)));
 
     return RGB( rr, gr, br );
-}
+}*/
 
 // -----------------------------------------------------------
 // DrawWuLine
@@ -169,15 +169,16 @@ void DrawWuLine( Surface *screen, int X0, int Y0, int X1, int Y1, uint clrLine )
 
             int grayb = (299 * rb + 587 * gb + 114 * bb) >> 10;  // Keep precision
 			double weight = (double)(grayl < grayb ? Weighting : WeightingXOR) * weightNorm;
+			//bool isLight = grayl < grayb;
 			//double weight = (isLight * Weighting + (1 - isLight) * (Weighting ^ 255)) * weightNorm;
 
-//            BYTE rr = ( rb > rl ? ( ( BYTE )( weight * ( rb - rl ) + rl ) ) : ( ( BYTE )( weight * ( rl - rb ) + rb ) ) );
-//            BYTE gr = ( gb > gl ? ( ( BYTE )( weight * ( gb - gl ) + gl ) ) : ( ( BYTE )( weight * ( gl - gb ) + gb ) ) );
-//            BYTE br = ( bb > bl ? ( ( BYTE )( weight * ( bb - bl ) + bl ) ) : ( ( BYTE )( weight * ( bl - bb ) + bb ) ) );
+            BYTE rr = ( rb > rl ? ( ( BYTE )( weight * ( rb - rl ) + rl ) ) : ( ( BYTE )( weight * ( rl - rb ) + rb ) ) );
+            BYTE gr = ( gb > gl ? ( ( BYTE )( weight * ( gb - gl ) + gl ) ) : ( ( BYTE )( weight * ( gl - gb ) + gb ) ) );
+            BYTE br = ( bb > bl ? ( ( BYTE )( weight * ( bb - bl ) + bl ) ) : ( ( BYTE )( weight * ( bl - bb ) + bb ) ) );
 
-            BYTE rr = (BYTE)(weight * abs(rb - rl) + std::min<int>((int)rb, (int)rl));
-            BYTE gr = (BYTE)(weight * abs(gb - gl) + std::min<int>((int)gb, (int)gl));
-            BYTE br = (BYTE)(weight * abs(bb - bl) + std::min<int>((int)bb, (int)bl));
+            //BYTE rr = (BYTE)(weight * abs(rb - rl) + std::min<int>((int)rb, (int)rl));
+            //BYTE gr = (BYTE)(weight * abs(gb - gl) + std::min<int>((int)gb, (int)gl));
+            //BYTE br = (BYTE)(weight * abs(bb - bl) + std::min<int>((int)bb, (int)bl));
 
             screen->Plot( X0, Y0, RGB( rr, gr, br ) );
 
@@ -189,15 +190,16 @@ void DrawWuLine( Surface *screen, int X0, int Y0, int X1, int Y1, uint clrLine )
 //            grayb = rb * 0.299 + gb * 0.587 + bb * 0.114;
             grayb = (rb * 299 + gb * 587 + bb * 114) >> 10;
         	weight = (double)(grayl < grayb ? WeightingXOR : Weighting) * weightNorm;
+			//isLight = grayl < grayb;
             //weight = (isLight * (Weighting ^ 255) + (1 - isLight) * Weighting) * weightNorm;
 
-//            rr = ( rb > rl ? ( ( BYTE )( weight * ( rb - rl ) + rl ) ) : ( ( BYTE )( weight * ( rl - rb ) + rb ) ) );
-//            gr = ( gb > gl ? ( ( BYTE )( weight * ( gb - gl ) + gl ) ) : ( ( BYTE )( weight * ( gl - gb ) + gb ) ) );
-//            br = ( bb > bl ? ( ( BYTE )( weight * ( bb - bl ) + bl ) ) : ( ( BYTE )( weight * ( bl - bb ) + bb ) ) );
+            rr = ( rb > rl ? ( ( BYTE )( weight * ( rb - rl ) + rl ) ) : ( ( BYTE )( weight * ( rl - rb ) + rb ) ) );
+            gr = ( gb > gl ? ( ( BYTE )( weight * ( gb - gl ) + gl ) ) : ( ( BYTE )( weight * ( gl - gb ) + gb ) ) );
+            br = ( bb > bl ? ( ( BYTE )( weight * ( bb - bl ) + bl ) ) : ( ( BYTE )( weight * ( bl - bb ) + bb ) ) );
 
-            rr = (BYTE)(weight * abs(rb - rl) + std::min<int>((int)rb, (int)rl));
-            gr = (BYTE)(weight * abs(gb - gl) + std::min<int>((int)gb, (int)gl));
-            br = (BYTE)(weight * abs(bb - bl) + std::min<int>((int)bb, (int)bl));
+            //rr = (BYTE)(weight * abs(rb - rl) + std::min<int>((int)rb, (int)rl));
+            //gr = (BYTE)(weight * abs(gb - gl) + std::min<int>((int)gb, (int)gl));
+            //br = (BYTE)(weight * abs(bb - bl) + std::min<int>((int)bb, (int)bl));
 
             screen->Plot( X0 + XDir, Y0, RGB( rr, gr, br ) );
         }
@@ -220,7 +222,7 @@ void DrawWuLine( Surface *screen, int X0, int Y0, int X1, int Y1, uint clrLine )
             X0 += XDir; /* X-major, so always advance X */
             /* The IntensityBits most significant bits of ErrorAcc give us the
             intensity weighting for this pixel, and the complement of the
-weighting for the paired pixel */
+			weighting for the paired pixel */
             Weighting = ErrorAcc >> 8;
             WeightingXOR = Weighting ^ 255;
 
@@ -232,15 +234,16 @@ weighting for the paired pixel */
 //        double grayb = rb * 0.299 + gb * 0.587 + bb * 0.114;
             int grayb = (rb * 299 + gb * 587 + bb * 114) >> 10;
             double weight = (double)((grayl < grayb) ? Weighting : WeightingXOR) * weightNorm;
+        	//bool isLight = grayl < grayb;
             //double weight = (isLight * Weighting + (1 - isLight) * (Weighting ^ 255)) * weightNorm;
 
-//            BYTE rr = ( rb > rl ? ( ( BYTE )( weight * ( rb - rl ) + rl ) ) : ( ( BYTE )( weight * ( rl - rb ) + rb ) ) );
-//            BYTE gr = ( gb > gl ? ( ( BYTE )( weight * ( gb - gl ) + gl ) ) : ( ( BYTE )( weight * ( gl - gb ) + gb ) ) );
-//            BYTE br = ( bb > bl ? ( ( BYTE )( weight * ( bb - bl ) + bl ) ) : ( ( BYTE )( weight * ( bl - bb ) + bb ) ) );
+            BYTE rr = ( rb > rl ? ( ( BYTE )( weight * ( rb - rl ) + rl ) ) : ( ( BYTE )( weight * ( rl - rb ) + rb ) ) );
+            BYTE gr = ( gb > gl ? ( ( BYTE )( weight * ( gb - gl ) + gl ) ) : ( ( BYTE )( weight * ( gl - gb ) + gb ) ) );
+            BYTE br = ( bb > bl ? ( ( BYTE )( weight * ( bb - bl ) + bl ) ) : ( ( BYTE )( weight * ( bl - bb ) + bb ) ) );
 
-            BYTE rr = (BYTE)(weight * abs(rb - rl) + std::min<int>((int)rb, (int)rl));
-            BYTE gr = (BYTE)(weight * abs(gb - gl) + std::min<int>((int)gb, (int)gl));
-            BYTE br = (BYTE)(weight * abs(bb - bl) + std::min<int>((int)bb, (int)bl));
+            //BYTE rr = (BYTE)(weight * abs(rb - rl) + std::min<int>((int)rb, (int)rl));
+            //BYTE gr = (BYTE)(weight * abs(gb - gl) + std::min<int>((int)gb, (int)gl));
+            //BYTE br = (BYTE)(weight * abs(bb - bl) + std::min<int>((int)bb, (int)bl));
 
             screen->Plot( X0, Y0, RGB( rr, gr, br ) );
 
@@ -252,15 +255,16 @@ weighting for the paired pixel */
 //        grayb = rb * 0.299 + gb * 0.587 + bb * 0.114;
             grayb = (rb * 299 + gb * 587 + bb * 114) >> 10;
             weight = (double)(grayl < grayb ? WeightingXOR : Weighting) * weightNorm;
+			//isLight = grayl < grayb;
             //weight = (isLight * (Weighting ^ 255) + (1 - isLight) * Weighting) * weightNorm;
 
-//            rr = ( rb > rl ? ( ( BYTE )( weight * ( rb - rl ) + rl ) ) : ( ( BYTE )( weight * ( rl - rb ) + rb ) ) );
-//            gr = ( gb > gl ? ( ( BYTE )( weight * ( gb - gl ) + gl ) ) : ( ( BYTE )( weight * ( gl - gb ) + gb ) ) );
-//            br = ( bb > bl ? ( ( BYTE )( weight * ( bb - bl ) + bl ) ) : ( ( BYTE )( weight * ( bl - bb ) + bb ) ) );
+            rr = ( rb > rl ? ( ( BYTE )( weight * ( rb - rl ) + rl ) ) : ( ( BYTE )( weight * ( rl - rb ) + rb ) ) );
+            gr = ( gb > gl ? ( ( BYTE )( weight * ( gb - gl ) + gl ) ) : ( ( BYTE )( weight * ( gl - gb ) + gb ) ) );
+            br = ( bb > bl ? ( ( BYTE )( weight * ( bb - bl ) + bl ) ) : ( ( BYTE )( weight * ( bl - bb ) + bb ) ) );
 
-            rr = (BYTE)(weight * abs(rb - rl) + std::min<int>((int)rb, (int)rl));
-            gr = (BYTE)(weight * abs(gb - gl) + std::min<int>((int)gb, (int)gl));
-            br = (BYTE)(weight * abs(bb - bl) + std::min<int>((int)bb, (int)bl));
+            //rr = (BYTE)(weight * abs(rb - rl) + std::min<int>((int)rb, (int)rl));
+            //gr = (BYTE)(weight * abs(gb - gl) + std::min<int>((int)gb, (int)gl));
+            //br = (BYTE)(weight * abs(bb - bl) + std::min<int>((int)bb, (int)bl));
 
             screen->Plot( X0, Y0 + 1, RGB( rr, gr, br ) );
         }
