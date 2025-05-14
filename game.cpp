@@ -166,10 +166,10 @@ void DrawWuLine( Surface *screen, int X0, int Y0, int X1, int Y1, uint clrLine )
 //            double grayb = rb * 0.299 + gb * 0.587 + bb * 0.114;
 //            int grayb = (rb * 299 + gb * 587 + bb * 114) >> 10;
 
-            int grayb = (299 * rb + 587 * gb + 114 * bb) >> 8;  // Keep precision
+            int grayb = (299 * rb + 587 * gb + 114 * bb) >> 10;  // Keep precision
             bool isLight = grayl < grayb;
 
-			double weight = (double)((grayl < grayb) ? Weighting : (Weighting ^ 255)) * weightNorm;
+			double weight = (double)(isLight ? Weighting : (Weighting ^ 255)) * weightNorm;
 			//double weight = (isLight * Weighting + (1 - isLight) * (Weighting ^ 255)) * weightNorm;
 
 //            BYTE rr = ( rb > rl ? ( ( BYTE )( weight * ( rb - rl ) + rl ) ) : ( ( BYTE )( weight * ( rl - rb ) + rb ) ) );
@@ -188,8 +188,8 @@ void DrawWuLine( Surface *screen, int X0, int Y0, int X1, int Y1, uint clrLine )
             bb = GetBValue( clrBackGround );
 
 //            grayb = rb * 0.299 + gb * 0.587 + bb * 0.114;
-            grayb = (rb * 299 + gb * 587 + bb * 114) >> 8;
-        	weight = (double)((grayl < grayb) ? (Weighting ^ 255) : Weighting) * weightNorm;
+            grayb = (rb * 299 + gb * 587 + bb * 114) >> 10;
+        	weight = (double)(isLight ? (Weighting ^ 255) : Weighting) * weightNorm;
             //weight = (isLight * (Weighting ^ 255) + (1 - isLight) * Weighting) * weightNorm;
 
 //            rr = ( rb > rl ? ( ( BYTE )( weight * ( rb - rl ) + rl ) ) : ( ( BYTE )( weight * ( rl - rb ) + rb ) ) );
@@ -230,7 +230,7 @@ weighting for the paired pixel */
             BYTE bb = GetBValue( clrBackGround );
 
 //        double grayb = rb * 0.299 + gb * 0.587 + bb * 0.114;
-            int grayb = (rb * 299 + gb * 587 + bb * 114) >> 8;
+            int grayb = (rb * 299 + gb * 587 + bb * 114) >> 10;
             bool isLight = grayl < grayb;
             double weight = (double)((grayl < grayb) ? Weighting : (Weighting ^ 255)) * weightNorm;
             //double weight = (isLight * Weighting + (1 - isLight) * (Weighting ^ 255)) * weightNorm;
@@ -251,7 +251,7 @@ weighting for the paired pixel */
             bb = GetBValue( clrBackGround );
 
 //        grayb = rb * 0.299 + gb * 0.587 + bb * 0.114;
-            grayb = (rb * 299 + gb * 587 + bb * 114) >> 8;
+            grayb = (rb * 299 + gb * 587 + bb * 114) >> 10;
             weight = (double)((grayl < grayb) ? (Weighting ^ 255) : Weighting) * weightNorm;
             //weight = (isLight * (Weighting ^ 255) + (1 - isLight) * Weighting) * weightNorm;
 
