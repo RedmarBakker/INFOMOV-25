@@ -172,13 +172,9 @@ void DrawWuLine( Surface *screen, int X0, int Y0, int X1, int Y1, uint clrLine )
 			//double weight = (isLight * Weighting + (1 - isLight) * (Weighting ^ 255)) * weightNorm;
 
             int intWeight = (grayl < grayb ? Weighting : WeightingXOR);
-            int rbl = rb - rl;
-            int gbl = gb - gl;
-            int bbl = bb - bl;
-
-            BYTE rr = rl + ((rb - rl) & -(rb < rl)) + ((intWeight * ((rbl ^ (rbl >> 31)) - (rbl >> 31))) >> 8);
-            BYTE gr = gl + ((gb - gl) & -(gb < gl)) + ((intWeight * ((gbl ^ (gbl >> 31)) - (gbl >> 31))) >> 8);
-            BYTE br = bl + ((bb - bl) & -(bb < bl)) + ((intWeight * ((bbl ^ (bbl >> 31)) - (bbl >> 31))) >> 8);
+            BYTE rr = rl + ((rb - rl) & -(rb < rl)) + ((intWeight * (((rb - rl) ^ ((rb - rl) >> 31)) - ((rb - rl) >> 31))) >> 8);
+            BYTE gr = gl + ((gb - gl) & -(gb < gl)) + ((intWeight * (((gb - gl) ^ ((gb - gl) >> 31)) - ((gb - gl) >> 31))) >> 8);
+            BYTE br = bl + ((bb - bl) & -(bb < bl)) + ((intWeight * (((bb - bl) ^ ((bb - bl) >> 31)) - ((bb - bl) >> 31))) >> 8);
 
 //            BYTE rr = ( rb > rl ? ( ( BYTE )( weight * ( rb - rl ) + rl ) ) : ( ( BYTE )( weight * ( rl - rb ) + rb ) ) );
 //            BYTE gr = ( gb > gl ? ( ( BYTE )( weight * ( gb - gl ) + gl ) ) : ( ( BYTE )( weight * ( gl - gb ) + gb ) ) );
@@ -201,13 +197,9 @@ void DrawWuLine( Surface *screen, int X0, int Y0, int X1, int Y1, uint clrLine )
             //weight = (isLight * (Weighting ^ 255) + (1 - isLight) * Weighting) * weightNorm;
 
             intWeight = (grayl < grayb ? WeightingXOR : Weighting);
-            rbl = rb - rl;
-            gbl = gb - gl;
-            bbl = bb - bl;
-
-            rr = rl + ((rb - rl) & -(rb < rl)) + ((intWeight * ((rbl ^ (rbl >> 31)) - (rbl >> 31))) >> 8);
-            gr = gl + ((gb - gl) & -(gb < gl)) + ((intWeight * ((gbl ^ (gbl >> 31)) - (gbl >> 31))) >> 8);
-            br = bl + ((bb - bl) & -(bb < bl)) + ((intWeight * ((bbl ^ (bbl >> 31)) - (bbl >> 31))) >> 8);
+            rr = rl + ((rb - rl) & -(rb < rl)) + ((intWeight * (((rb - rl) ^ ((rb - rl) >> 31)) - ((rb - rl) >> 31))) >> 8);
+            gr = gl + ((gb - gl) & -(gb < gl)) + ((intWeight * (((gb - gl) ^ ((gb - gl) >> 31)) - ((gb - gl) >> 31))) >> 8);
+            br = bl + ((bb - bl) & -(bb < bl)) + ((intWeight * (((bb - bl) ^ ((bb - bl) >> 31)) - ((bb - bl) >> 31))) >> 8);
 
 //            rr = ( rb > rl ? ( ( BYTE )( weight * ( rb - rl ) + rl ) ) : ( ( BYTE )( weight * ( rl - rb ) + rb ) ) );
 //            gr = ( gb > gl ? ( ( BYTE )( weight * ( gb - gl ) + gl ) ) : ( ( BYTE )( weight * ( gl - gb ) + gb ) ) );
@@ -253,13 +245,9 @@ weighting for the paired pixel */
             //double weight = (isLight * Weighting + (1 - isLight) * (Weighting ^ 255)) * weightNorm;
 
             int intWeight = (grayl < grayb ? Weighting : WeightingXOR);
-            int rbl = rb - rl;
-            int gbl = gb - gl;
-            int bbl = bb - bl;
-
-            BYTE rr = rl + ((rb - rl) & -(rb < rl)) + ((intWeight * ((rbl ^ (rbl >> 31)) - (rbl >> 31))) >> 8);
-            BYTE gr = gl + ((gb - gl) & -(gb < gl)) + ((intWeight * ((gbl ^ (gbl >> 31)) - (gbl >> 31))) >> 8);
-            BYTE br = bl + ((bb - bl) & -(bb < bl)) + ((intWeight * ((bbl ^ (bbl >> 31)) - (bbl >> 31))) >> 8);
+            BYTE rr = rl + ((rb - rl) & -(rb < rl)) + ((intWeight * (((rb - rl) ^ ((rb - rl) >> 31)) - ((rb - rl) >> 31))) >> 8);
+            BYTE gr = gl + ((gb - gl) & -(gb < gl)) + ((intWeight * (((gb - gl) ^ ((gb - gl) >> 31)) - ((gb - gl) >> 31))) >> 8);
+            BYTE br = bl + ((bb - bl) & -(bb < bl)) + ((intWeight * (((bb - bl) ^ ((bb - bl) >> 31)) - ((bb - bl) >> 31))) >> 8);
 
 //            BYTE rr = ( rb > rl ? ( ( BYTE )( weight * ( rb - rl ) + rl ) ) : ( ( BYTE )( weight * ( rl - rb ) + rb ) ) );
 //            BYTE gr = ( gb > gl ? ( ( BYTE )( weight * ( gb - gl ) + gl ) ) : ( ( BYTE )( weight * ( gl - gb ) + gb ) ) );
@@ -282,13 +270,9 @@ weighting for the paired pixel */
 //            weight = (double)(grayl < grayb ? WeightingXOR : Weighting) * weightNorm;
 
             intWeight = (grayl < grayb ? WeightingXOR : Weighting);
-            rbl = rb - rl;
-            gbl = gb - gl;
-            bbl = bb - bl;
-
-            rr = rl + ((rb - rl) & -(rb < rl)) + ((intWeight * ((rbl ^ (rbl >> 31)) - (rbl >> 31))) >> 8);
-            gr = gl + ((gb - gl) & -(gb < gl)) + ((intWeight * ((gbl ^ (gbl >> 31)) - (gbl >> 31))) >> 8);
-            br = bl + ((bb - bl) & -(bb < bl)) + ((intWeight * ((bbl ^ (bbl >> 31)) - (bbl >> 31))) >> 8);
+            rr = rl + ((rb - rl) & -(rb < rl)) + ((intWeight * (((rb - rl) ^ ((rb - rl) >> 31)) - ((rb - rl) >> 31))) >> 8);
+            gr = gl + ((gb - gl) & -(gb < gl)) + ((intWeight * (((gb - gl) ^ ((gb - gl) >> 31)) - ((gb - gl) >> 31))) >> 8);
+            br = bl + ((bb - bl) & -(bb < bl)) + ((intWeight * (((bb - bl) ^ ((bb - bl) >> 31)) - ((bb - bl) >> 31))) >> 8);
 
             //weight = (isLight * (Weighting ^ 255) + (1 - isLight) * Weighting) * weightNorm;
 
