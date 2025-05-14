@@ -79,7 +79,6 @@ void UndoMutation( int i )
 void DrawWuLine( Surface *screen, int X0, int Y0, int X1, int Y1, uint clrLine )
 {
 	const float weightNorm = 1.f / 255.f;
-	const float graybNorm = 1.f / 1000.f;
     /* Make sure the line runs top to bottom */
     if (Y0 > Y1)
     {
@@ -148,7 +147,7 @@ void DrawWuLine( Surface *screen, int X0, int Y0, int X1, int Y1, uint clrLine )
 //            double grayb = rb * 0.299 + gb * 0.587 + bb * 0.114;
 //            int grayb = (rb * 299 + gb * 587 + bb * 114) >> 10;
 
-            int grayb = (299 * rb + 587 * gb + 114 * bb) * graybNorm;  // Keep precision
+            int grayb = (299 * rb + 587 * gb + 114 * bb) >> 8;  // Keep precision
 			double weight = (double)((grayl < grayb) ? Weighting : (Weighting ^ 255)) * weightNorm;
 
             BYTE rr = ( rb > rl ? ( ( BYTE )(  weight * ( rb - rl ) + rl ) ) : ( ( BYTE )( weight * ( rl - rb ) + rb ) ) );
@@ -162,7 +161,7 @@ void DrawWuLine( Surface *screen, int X0, int Y0, int X1, int Y1, uint clrLine )
             bb = GetBValue( clrBackGround );
 
 //            grayb = rb * 0.299 + gb * 0.587 + bb * 0.114;
-            grayb = (rb * 299 + gb * 587 + bb * 114) * graybNorm;
+            grayb = (rb * 299 + gb * 587 + bb * 114) >> 8;
         	weight = (double)((grayl < grayb) ? (Weighting ^ 255) : Weighting) * weightNorm;
 
             rr = ( rb > rl ? ( ( BYTE )( weight * ( rb - rl ) + rl ) ) : ( ( BYTE )( weight * ( rl - rb ) + rb ) ) );
@@ -198,7 +197,7 @@ weighting for the paired pixel */
             BYTE bb = GetBValue( clrBackGround );
 
 //        double grayb = rb * 0.299 + gb * 0.587 + bb * 0.114;
-            int grayb = (rb * 299 + gb * 587 + bb * 114) * graybNorm;
+            int grayb = (rb * 299 + gb * 587 + bb * 114) >> 8;
             double weight = (double)((grayl < grayb) ? Weighting : (Weighting ^ 255)) * weightNorm;
 
             BYTE rr = ( rb > rl ? ( ( BYTE )( weight * ( rb - rl ) + rl ) ) : ( ( BYTE )( weight * ( rl - rb ) + rb ) ) );
@@ -213,7 +212,7 @@ weighting for the paired pixel */
             bb = GetBValue( clrBackGround );
 
 //        grayb = rb * 0.299 + gb * 0.587 + bb * 0.114;
-            grayb = (rb * 299 + gb * 587 + bb * 114) * graybNorm;
+            grayb = (rb * 299 + gb * 587 + bb * 114) >> 8;
             weight = (double)((grayl < grayb) ? (Weighting ^ 255) : Weighting) * weightNorm;
 
             rr = ( rb > rl ? ( ( BYTE )( weight * ( rb - rl ) + rl ) ) : ( ( BYTE )( weight * ( rl - rb ) + rb ) ) );
