@@ -1,4 +1,6 @@
 #!/bin/bash
 
-make build
+cd build
+make
+cd ..
 ./build/GAME

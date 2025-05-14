@@ -217,7 +217,7 @@ weighting for the paired pixel */
 //        grayb = rb * 0.299 + gb * 0.587 + bb * 0.114;
             grayb = (rb * 299 + gb * 587 + bb * 114) >> 8;
             //weight = (double)((grayl < grayb) ? (Weighting ^ 255) : Weighting) * weightNorm;
-            weight = isLight * (Weighting ^ 255)) + (1 - isLight) * Weighting;
+            weight = isLight * (Weighting ^ 255) + (1 - isLight) * Weighting;
 
             rr = ( rb > rl ? ( ( BYTE )( weight * ( rb - rl ) + rl ) ) : ( ( BYTE )( weight * ( rl - rb ) + rb ) ) );
             gr = ( gb > gl ? ( ( BYTE )( weight * ( gb - gl ) + gl ) ) : ( ( BYTE )( weight * ( gl - gb ) + gb ) ) );
