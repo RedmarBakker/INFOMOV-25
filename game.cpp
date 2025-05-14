@@ -126,7 +126,7 @@ void DrawWuLine( Surface *screen, int X0, int Y0, int X1, int Y1, uint clrLine )
     int DeltaY = Y1 - Y0;
 
     unsigned short ErrorAdj;
-    unsigned short ErrorAccTemp, Weighting;
+    unsigned short ErrorAccTemp, Weighting, WeightingXOR;
 
     /* Line is not horizontal, diagonal, or vertical */
     unsigned short ErrorAcc = 0;  /* initialize the line error accumulator to 0 */
@@ -157,6 +157,7 @@ void DrawWuLine( Surface *screen, int X0, int Y0, int X1, int Y1, uint clrLine )
                   intensity weighting for this pixel, and the complement of the
             weighting for the paired pixel */
             Weighting = ErrorAcc >> 8;
+            WeightingXOR = Weighting ^ 255;
 
             COLORREF clrBackGround = screen->pixels[X0 + Y0 * SCRWIDTH];
             BYTE rb = GetRValue( clrBackGround );
@@ -168,8 +169,7 @@ void DrawWuLine( Surface *screen, int X0, int Y0, int X1, int Y1, uint clrLine )
 
             int grayb = (299 * rb + 587 * gb + 114 * bb) >> 10;  // Keep precision
             bool isLight = grayl < grayb;
-
-			double weight = (double)(isLight ? Weighting : (Weighting ^ 255)) * weightNorm;
+			double weight = (double)(isLight ? Weighting : WeightingXOR) * weightNorm;
 			//double weight = (isLight * Weighting + (1 - isLight) * (Weighting ^ 255)) * weightNorm;
 
 //            BYTE rr = ( rb > rl ? ( ( BYTE )( weight * ( rb - rl ) + rl ) ) : ( ( BYTE )( weight * ( rl - rb ) + rb ) ) );
@@ -189,7 +189,7 @@ void DrawWuLine( Surface *screen, int X0, int Y0, int X1, int Y1, uint clrLine )
 
 //            grayb = rb * 0.299 + gb * 0.587 + bb * 0.114;
             grayb = (rb * 299 + gb * 587 + bb * 114) >> 10;
-        	weight = (double)(isLight ? (Weighting ^ 255) : Weighting) * weightNorm;
+        	weight = (double)(isLight ? WeightingXOR : Weighting) * weightNorm;
             //weight = (isLight * (Weighting ^ 255) + (1 - isLight) * Weighting) * weightNorm;
 
 //            rr = ( rb > rl ? ( ( BYTE )( weight * ( rb - rl ) + rl ) ) : ( ( BYTE )( weight * ( rl - rb ) + rb ) ) );
@@ -223,6 +223,7 @@ void DrawWuLine( Surface *screen, int X0, int Y0, int X1, int Y1, uint clrLine )
             intensity weighting for this pixel, and the complement of the
 weighting for the paired pixel */
             Weighting = ErrorAcc >> 8;
+            WeightingXOR = Weighting ^ 255;
 
             COLORREF clrBackGround = screen->pixels[X0 + Y0 * SCRWIDTH];
             BYTE rb = GetRValue( clrBackGround );
@@ -232,7 +233,7 @@ weighting for the paired pixel */
 //        double grayb = rb * 0.299 + gb * 0.587 + bb * 0.114;
             int grayb = (rb * 299 + gb * 587 + bb * 114) >> 10;
             bool isLight = grayl < grayb;
-            double weight = (double)((grayl < grayb) ? Weighting : (Weighting ^ 255)) * weightNorm;
+            double weight = (double)((grayl < grayb) ? Weighting : WeightingXOR) * weightNorm;
             //double weight = (isLight * Weighting + (1 - isLight) * (Weighting ^ 255)) * weightNorm;
 
 //            BYTE rr = ( rb > rl ? ( ( BYTE )( weight * ( rb - rl ) + rl ) ) : ( ( BYTE )( weight * ( rl - rb ) + rb ) ) );
@@ -252,7 +253,7 @@ weighting for the paired pixel */
 
 //        grayb = rb * 0.299 + gb * 0.587 + bb * 0.114;
             grayb = (rb * 299 + gb * 587 + bb * 114) >> 10;
-            weight = (double)((grayl < grayb) ? (Weighting ^ 255) : Weighting) * weightNorm;
+            weight = (double)(isLight ? WeightingXOR : Weighting) * weightNorm;
             //weight = (isLight * (Weighting ^ 255) + (1 - isLight) * Weighting) * weightNorm;
 
 //            rr = ( rb > rl ? ( ( BYTE )( weight * ( rb - rl ) + rl ) ) : ( ( BYTE )( weight * ( rl - rb ) + rb ) ) );
