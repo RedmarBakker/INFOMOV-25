@@ -70,7 +70,7 @@ void UndoMutation( int i )
 	lc[i] = c_;
 }
 
-RGB calculateColor(int grayl, uint clrLine, COLORREF clrBackground, unsigned short Weighting, bool inverse = false)
+/*RGB calculateColor(int grayl, uint clrLine, COLORREF clrBackground, unsigned short Weighting, bool inverse = false)
 {
 //    double grayb = rb * 0.299 + gb * 0.587 + bb * 0.114;
 //    int grayb = (rb * 299 + gb * 587 + bb * 114) >> 10;
@@ -90,7 +90,7 @@ RGB calculateColor(int grayl, uint clrLine, COLORREF clrBackground, unsigned sho
     BYTE br = (BYTE)(weight * abs(GetBValue(clrBackground) - GetBValue(clrLine)) + std::min<int>((int)GetBValue(clrBackground), (int)GetBValue(clrLine)));
 
     return RGB( rr, gr, br );
-}
+}*/
 
 // -----------------------------------------------------------
 // DrawWuLine
@@ -196,7 +196,7 @@ void DrawWuLine( Surface *screen, int X0, int Y0, int X1, int Y1, uint clrLine )
 //        	weight = (double)(grayl < grayb ? WeightingXOR : Weighting) * weightNorm;
             //weight = (isLight * (Weighting ^ 255) + (1 - isLight) * Weighting) * weightNorm;
 
-            int intWeight = (grayl < grayb ? WeightingXOR : Weighting);
+            intWeight = (grayl < grayb ? WeightingXOR : Weighting);
             rr = (intWeight * abs(rb - rl) + std::min((int)rb, (int)rl)) >> 8;
             gr = (intWeight * abs(gb - gl) + std::min((int)gb, (int)gl)) >> 8;
             br = (intWeight * abs(bb - bl) + std::min((int)bb, (int)bl)) >> 8;
