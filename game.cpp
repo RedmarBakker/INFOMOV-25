@@ -201,9 +201,9 @@ void DrawWuLine( Surface *screen, int X0, int Y0, int X1, int Y1, uint clrLine )
             //weight = (isLight * (Weighting ^ 255) + (1 - isLight) * Weighting) * weightNorm;
 
             intWeight = (grayl < grayb ? WeightingXOR : Weighting);
-            int rbl = rb - rl;
-            int gbl = gb - gl;
-            int bbl = bb - bl;
+            rbl = rb - rl;
+            gbl = gb - gl;
+            bbl = bb - bl;
 
             rr = rl + ((rb - rl) & -(rb < rl)) + ((intWeight * ((rbl ^ (rbl >> 31)) - (rbl >> 31))) >> 8);
             gr = gl + ((gb - gl) & -(gb < gl)) + ((intWeight * ((gbl ^ (gbl >> 31)) - (gbl >> 31))) >> 8);
@@ -282,9 +282,9 @@ weighting for the paired pixel */
 //            weight = (double)(grayl < grayb ? WeightingXOR : Weighting) * weightNorm;
 
             intWeight = (grayl < grayb ? WeightingXOR : Weighting);
-            int rbl = rb - rl;
-            int gbl = gb - gl;
-            int bbl = bb - bl;
+            rbl = rb - rl;
+            gbl = gb - gl;
+            bbl = bb - bl;
 
             rr = rl + ((rb - rl) & -(rb < rl)) + ((intWeight * ((rbl ^ (rbl >> 31)) - (rbl >> 31))) >> 8);
             gr = gl + ((gb - gl) & -(gb < gl)) + ((intWeight * ((gbl ^ (gbl >> 31)) - (gbl >> 31))) >> 8);
