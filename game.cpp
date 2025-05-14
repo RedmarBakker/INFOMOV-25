@@ -93,7 +93,7 @@ inline uint BlendColorBranchless(uint lineClr, uint bgClr, int grayl, unsigned s
     return RGB(rr, gr, br);
 }
 
-#if defined(__ARM_NEON) && (defined(__APPLE__) || defined(__aarch64__))
+#if defined(USE_SIMD) && defined(__ARM_NEON) && (defined(__APPLE__) || defined(__aarch64__))
     #include <arm_neon.h>
 
     // BlendColorNEON: SIMD-accelerated color blending for Wu lines using NEON
@@ -130,7 +130,7 @@ inline uint BlendColorBranchless(uint lineClr, uint bgClr, int grayl, unsigned s
     }
 #endif
 
-#ifdef __SSE2__
+#if defined(USE_SIMD) && defined(__SSE2__)
     #include <emmintrin.h>
 
     inline uint BlendColorSSE(uint lineClr, uint bgClr, int grayl, unsigned short Weighting, unsigned short WeightingXOR, bool inverse = false)
@@ -331,6 +331,18 @@ void DrawWuLine( Surface *screen, int X0, int Y0, int X1, int Y1, uint clrLine )
 // -----------------------------------------------------------
 int Game::Evaluate()
 {
+//    Mogelijke optimalisatie:
+
+//    const uint count = SCRWIDTH * SCRHEIGHT;
+//    uint* srcSet = screen->pixels;
+//    uint* refSet = reference->pixels;
+//    uint* end = src + count;
+//    while (src < end)
+//    {
+//        uint src = *srcSet++, ref = *refSet++;
+//        ...
+//    }
+
 	const uint count = SCRWIDTH * SCRHEIGHT;
 	__int64 diff = 0;
 	for( uint i = 0; i < count; i++ )
