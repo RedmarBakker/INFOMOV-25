@@ -172,9 +172,9 @@ void DrawWuLine( Surface *screen, int X0, int Y0, int X1, int Y1, uint clrLine )
 			//double weight = (isLight * Weighting + (1 - isLight) * (Weighting ^ 255)) * weightNorm;
 
             int intWeight = (grayl < grayb ? Weighting : WeightingXOR);
-            rr = ((rb * intWeight) + (rl * (256 - intWeight))) >> 8;
-            gr = ((gb * intWeight) + (gl * (256 - intWeight))) >> 8;
-            br = ((bb * intWeight) + (bl * (256 - intWeight))) >> 8;
+            BYTE rr = ((rb * intWeight) + (rl * (256 - intWeight))) >> 8;
+            BYTE gr = ((gb * intWeight) + (gl * (256 - intWeight))) >> 8;
+            BYTE br = ((bb * intWeight) + (bl * (256 - intWeight))) >> 8;
 
 //            BYTE rr = ( rb > rl ? ( ( BYTE )( weight * ( rb - rl ) + rl ) ) : ( ( BYTE )( weight * ( rl - rb ) + rb ) ) );
 //            BYTE gr = ( gb > gl ? ( ( BYTE )( weight * ( gb - gl ) + gl ) ) : ( ( BYTE )( weight * ( gl - gb ) + gb ) ) );
@@ -196,7 +196,7 @@ void DrawWuLine( Surface *screen, int X0, int Y0, int X1, int Y1, uint clrLine )
 //        	weight = (double)(grayl < grayb ? WeightingXOR : Weighting) * weightNorm;
             //weight = (isLight * (Weighting ^ 255) + (1 - isLight) * Weighting) * weightNorm;
 
-            int intWeight = (grayl < grayb ? WeightingXOR : Weighting);
+            intWeight = (grayl < grayb ? WeightingXOR : Weighting);
             rr = ((rb * intWeight) + (rl * (256 - intWeight))) >> 8;
             gr = ((gb * intWeight) + (gl * (256 - intWeight))) >> 8;
             br = ((bb * intWeight) + (bl * (256 - intWeight))) >> 8;
@@ -245,9 +245,9 @@ weighting for the paired pixel */
             //double weight = (isLight * Weighting + (1 - isLight) * (Weighting ^ 255)) * weightNorm;
 
             int intWeight = (grayl < grayb ? Weighting : WeightingXOR);
-            rr = ((rb * intWeight) + (rl * (256 - intWeight))) >> 8;
-            gr = ((gb * intWeight) + (gl * (256 - intWeight))) >> 8;
-            br = ((bb * intWeight) + (bl * (256 - intWeight))) >> 8;
+            BYTE rr = ((rb * intWeight) + (rl * (256 - intWeight))) >> 8;
+            BYTE gr = ((gb * intWeight) + (gl * (256 - intWeight))) >> 8;
+            BYTE br = ((bb * intWeight) + (bl * (256 - intWeight))) >> 8;
 
 //            BYTE rr = ( rb > rl ? ( ( BYTE )( weight * ( rb - rl ) + rl ) ) : ( ( BYTE )( weight * ( rl - rb ) + rb ) ) );
 //            BYTE gr = ( gb > gl ? ( ( BYTE )( weight * ( gb - gl ) + gl ) ) : ( ( BYTE )( weight * ( gl - gb ) + gb ) ) );
