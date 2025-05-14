@@ -171,7 +171,9 @@ void DrawWuLine( Surface *screen, int X0, int Y0, int X1, int Y1, uint clrLine )
 //			double weight = (double)(grayl < grayb ? Weighting : WeightingXOR) * weightNorm;
 			//double weight = (isLight * Weighting + (1 - isLight) * (Weighting ^ 255)) * weightNorm;
 
-            int intWeight = (grayl < grayb ? Weighting : WeightingXOR);
+            int isLighter = -(grayl < grayb);
+            int intWeight = (Weighting & isLighter) | (WeightingXOR & ~isLighter);
+
             BYTE rr = rl + ((rb - rl) & -(rb < rl)) + ((intWeight * abs(rb - rl)) >> 8);
             BYTE gr = gl + ((gb - gl) & -(gb < gl)) + ((intWeight * abs(gb - gl)) >> 8);
             BYTE br = bl + ((bb - bl) & -(bb < bl)) + ((intWeight * abs(bb - bl)) >> 8);
@@ -196,7 +198,9 @@ void DrawWuLine( Surface *screen, int X0, int Y0, int X1, int Y1, uint clrLine )
 //        	weight = (double)(grayl < grayb ? WeightingXOR : Weighting) * weightNorm;
             //weight = (isLight * (Weighting ^ 255) + (1 - isLight) * Weighting) * weightNorm;
 
-            intWeight = (grayl < grayb ? WeightingXOR : Weighting);
+            isLighter = -(grayl < grayb);
+            intWeight = (WeightingXOR & isLighter) | (Weighting & ~isLighter);
+
             rr = rl + ((rb - rl) & -(rb < rl)) + ((intWeight * abs(rb - rl)) >> 8);
             gr = gl + ((gb - gl) & -(gb < gl)) + ((intWeight * abs(gb - gl)) >> 8);
             br = bl + ((bb - bl) & -(bb < bl)) + ((intWeight * abs(bb - bl)) >> 8);
@@ -244,7 +248,9 @@ weighting for the paired pixel */
 //            double weight = (double)((grayl < grayb) ? Weighting : WeightingXOR) * weightNorm;
             //double weight = (isLight * Weighting + (1 - isLight) * (Weighting ^ 255)) * weightNorm;
 
-            int intWeight = (grayl < grayb ? Weighting : WeightingXOR);
+            int isLighter = -(grayl < grayb);
+            int intWeight = (Weighting & isLighter) | (WeightingXOR & ~isLighter);
+
             BYTE rr = rl + ((rb - rl) & -(rb < rl)) + ((intWeight * abs(rb - rl)) >> 8);
             BYTE gr = gl + ((gb - gl) & -(gb < gl)) + ((intWeight * abs(gb - gl)) >> 8);
             BYTE br = bl + ((bb - bl) & -(bb < bl)) + ((intWeight * abs(bb - bl)) >> 8);
@@ -269,7 +275,9 @@ weighting for the paired pixel */
 
 //            weight = (double)(grayl < grayb ? WeightingXOR : Weighting) * weightNorm;
 
-            intWeight = (grayl < grayb ? WeightingXOR : Weighting);
+            isLighter = -(grayl < grayb);
+            intWeight = (Weighting & isLighter) | (WeightingXOR & ~isLighter);
+
             rr = rl + ((rb - rl) & -(rb < rl)) + ((intWeight * abs(rb - rl)) >> 8);
             gr = gl + ((gb - gl) & -(gb < gl)) + ((intWeight * abs(gb - gl)) >> 8);
             br = bl + ((bb - bl) & -(bb < bl)) + ((intWeight * abs(bb - bl)) >> 8);
