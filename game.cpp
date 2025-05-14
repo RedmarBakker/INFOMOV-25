@@ -78,6 +78,7 @@ void UndoMutation( int i )
 // -----------------------------------------------------------
 void DrawWuLine( Surface *screen, int X0, int Y0, int X1, int Y1, uint clrLine )
 {
+	const float pixelNorm = 1.f / 255.f;
     /* Make sure the line runs top to bottom */
     if (Y0 > Y1)
     {
@@ -145,7 +146,7 @@ void DrawWuLine( Surface *screen, int X0, int Y0, int X1, int Y1, uint clrLine )
 
 //            double grayb = rb * 0.299 + gb * 0.587 + bb * 0.114;
             int grayb = (rb * 299 + gb * 587 + bb * 114) >> 10;
-			double weight = (double)((grayl < grayb ? Weighting : (Weighting ^ 255)) / 255.0);
+			double weight = (double)((grayl < grayb ? Weighting : (Weighting ^ 255)) * pixelNorm);
 
             BYTE rr = ( rb > rl ? ( ( BYTE )(  weight * ( rb - rl ) + rl ) ) : ( ( BYTE )( weight * ( rl - rb ) + rb ) ) );
             BYTE gr = ( gb > gl ? ( ( BYTE )( weight * ( gb - gl ) + gl ) ) : ( ( BYTE )( weight * ( gl - gb ) + gb ) ) );
@@ -159,7 +160,7 @@ void DrawWuLine( Surface *screen, int X0, int Y0, int X1, int Y1, uint clrLine )
 
 //            grayb = rb * 0.299 + gb * 0.587 + bb * 0.114;
             grayb = (rb * 299 + gb * 587 + bb * 114) >> 10;
-        	weight = (double)((grayl < grayb ? (Weighting ^ 255) : Weighting) / 255.0);
+        	weight = (double)((grayl < grayb ? (Weighting ^ 255) : Weighting) * pixelNorm);
 
             rr = ( rb > rl ? ( ( BYTE )( weight * ( rb - rl ) + rl ) ) : ( ( BYTE )( weight * ( rl - rb ) + rb ) ) );
             gr = ( gb > gl ? ( ( BYTE )( weight * ( gb - gl ) + gl ) ) : ( ( BYTE )( weight * ( gl - gb ) + gb ) ) );
@@ -196,7 +197,7 @@ void DrawWuLine( Surface *screen, int X0, int Y0, int X1, int Y1, uint clrLine )
 
 //        double grayb = rb * 0.299 + gb * 0.587 + bb * 0.114;
         int grayb = (rb * 299 + gb * 587 + bb * 114) >> 10;
-		double weight = (double)((grayl < grayb ? Weighting : (Weighting ^ 255)) / 255.0);
+		double weight = (double)((grayl < grayb ? Weighting : (Weighting ^ 255)) * pixelNorm);
 
         BYTE rr = ( rb > rl ? ( ( BYTE )( weight * ( rb - rl ) + rl ) ) : ( ( BYTE )( weight * ( rl - rb ) + rb ) ) );
         BYTE gr = ( gb > gl ? ( ( BYTE )( weight * ( gb - gl ) + gl ) ) : ( ( BYTE )( weight * ( gl - gb ) + gb ) ) );
@@ -211,7 +212,7 @@ void DrawWuLine( Surface *screen, int X0, int Y0, int X1, int Y1, uint clrLine )
 
 //        grayb = rb * 0.299 + gb * 0.587 + bb * 0.114;
         grayb = (rb * 299 + gb * 587 + bb * 114) >> 10;
-		weight = (double)((grayl < grayb ? (Weighting ^ 255) : Weighting) / 255.0);
+		weight = (double)((grayl < grayb ? (Weighting ^ 255) : Weighting) * pixelNorm);
 
         rr = ( rb > rl ? ( ( BYTE )( weight * ( rb - rl ) + rl ) ) : ( ( BYTE )( weight * ( rl - rb ) + rb ) ) );
         gr = ( gb > gl ? ( ( BYTE )( weight * ( gb - gl ) + gl ) ) : ( ( BYTE )( weight * ( gl - gb ) + gb ) ) );
