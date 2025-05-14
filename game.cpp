@@ -144,12 +144,12 @@ void DrawWuLine( Surface *screen, int X0, int Y0, int X1, int Y1, uint clrLine )
 //            double grayb = rb * 0.299 + gb * 0.587 + bb * 0.114;
 //            int grayb = (rb * 299 + gb * 587 + bb * 114) >> 10;
 
-            int grayb = (299 * rb + 587 * gb + 114 * bb) >> 8;  // Keep precision
+            int grayb = (299 * rb + 587 * gb + 114 * bb) >> 10;  // Keep precision
             bool isLight = grayl < grayb;
 			WeightingXOR = Weighting ^ 255;
 
-			double weight = (double)((grayl < grayb) ? Weighting : WeightingXOR) * weightNorm;
-			//double weight = (isLight * Weighting + (1 - isLight) * (Weighting ^ 255)) * weightNorm;
+			//double weight = (double)((grayl < grayb) ? Weighting : WeightingXOR) * weightNorm;
+			double weight = (isLight * Weighting + (1 - isLight) * (Weighting ^ 255)) * weightNorm;
 
 //            BYTE rr = ( rb > rl ? ( ( BYTE )( weight * ( rb - rl ) + rl ) ) : ( ( BYTE )( weight * ( rl - rb ) + rb ) ) );
 //            BYTE gr = ( gb > gl ? ( ( BYTE )( weight * ( gb - gl ) + gl ) ) : ( ( BYTE )( weight * ( gl - gb ) + gb ) ) );
@@ -167,7 +167,7 @@ void DrawWuLine( Surface *screen, int X0, int Y0, int X1, int Y1, uint clrLine )
             bb = GetBValue( clrBackGround );
 
 //            grayb = rb * 0.299 + gb * 0.587 + bb * 0.114;
-            grayb = (rb * 299 + gb * 587 + bb * 114) >> 8;
+            grayb = (rb * 299 + gb * 587 + bb * 114) >> 10;
         	weight = (double)((grayl < grayb) ? WeightingXOR : Weighting) * weightNorm;
             //weight = (isLight * (Weighting ^ 255) + (1 - isLight) * Weighting) * weightNorm;
 
@@ -200,7 +200,7 @@ void DrawWuLine( Surface *screen, int X0, int Y0, int X1, int Y1, uint clrLine )
             X0 += XDir; /* X-major, so always advance X */
             /* The IntensityBits most significant bits of ErrorAcc give us the
             intensity weighting for this pixel, and the complement of the
-weighting for the paired pixel */
+			weighting for the paired pixel */
             Weighting = ErrorAcc >> 8;
 
             COLORREF clrBackGround = screen->pixels[X0 + Y0 * SCRWIDTH];
@@ -208,13 +208,13 @@ weighting for the paired pixel */
             BYTE gb = GetGValue( clrBackGround );
             BYTE bb = GetBValue( clrBackGround );
 
-//        double grayb = rb * 0.299 + gb * 0.587 + bb * 0.114;
-            int grayb = (rb * 299 + gb * 587 + bb * 114) >> 8;
+//        	double grayb = rb * 0.299 + gb * 0.587 + bb * 0.114;
+            int grayb = (rb * 299 + gb * 587 + bb * 114) >> 10;
             bool isLight = grayl < grayb;
 			WeightingXOR = Weighting ^ 255;
 
-            double weight = (double)((grayl < grayb) ? Weighting : WeightingXOR) * weightNorm;
-            //double weight = (isLight * Weighting + (1 - isLight) * (Weighting ^ 255)) * weightNorm;
+            //double weight = (double)((grayl < grayb) ? Weighting : WeightingXOR) * weightNorm;
+            double weight = (isLight * Weighting + (1 - isLight) * (Weighting ^ 255)) * weightNorm;
 
 //            BYTE rr = ( rb > rl ? ( ( BYTE )( weight * ( rb - rl ) + rl ) ) : ( ( BYTE )( weight * ( rl - rb ) + rb ) ) );
 //            BYTE gr = ( gb > gl ? ( ( BYTE )( weight * ( gb - gl ) + gl ) ) : ( ( BYTE )( weight * ( gl - gb ) + gb ) ) );
@@ -232,9 +232,9 @@ weighting for the paired pixel */
             bb = GetBValue( clrBackGround );
 
 //        grayb = rb * 0.299 + gb * 0.587 + bb * 0.114;
-            grayb = (rb * 299 + gb * 587 + bb * 114) >> 8;
-            weight = (double)((grayl < grayb) ? WeightingXOR : Weighting) * weightNorm;
-            //weight = (isLight * (Weighting ^ 255) + (1 - isLight) * Weighting) * weightNorm;
+            grayb = (rb * 299 + gb * 587 + bb * 114) >> 10;
+            //weight = (double)((grayl < grayb) ? WeightingXOR : Weighting) * weightNorm;
+            weight = (isLight * (Weighting ^ 255) + (1 - isLight) * Weighting) * weightNorm;
 
 //            rr = ( rb > rl ? ( ( BYTE )( weight * ( rb - rl ) + rl ) ) : ( ( BYTE )( weight * ( rl - rb ) + rb ) ) );
 //            gr = ( gb > gl ? ( ( BYTE )( weight * ( gb - gl ) + gl ) ) : ( ( BYTE )( weight * ( gl - gb ) + gb ) ) );
