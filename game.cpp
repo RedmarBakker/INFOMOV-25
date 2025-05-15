@@ -241,7 +241,7 @@ void DrawWuLine(Surface *screen, int X0, int Y0, int X1, int Y1, uint clrLine) {
 
             COLORREF clrBackGround = screen->pixels[current_pixel_index];
 
-            int intWeight = (grayl < ((GetRValue(clrBackGround) * 299 + GetGValue(clrBackGround) * 587 + GetBValue(clrBackGround) * 114) >> 10) ? Weighting : Weighting ^ 255);
+            int intWeight = Weighting ^ (-(grayl < ((GetRValue(clrBackGround) * 299 + GetGValue(clrBackGround) * 587 + GetBValue(clrBackGround) * 114) >> 10)) & 255);
 
             screen->Plot(X0, Y0, RGB(
                 rl + ((GetRValue(clrBackGround) - rl) & -(GetRValue(clrBackGround) < rl)) + ((intWeight * abs(GetRValue(clrBackGround) - rl)) >> 8),
@@ -251,7 +251,7 @@ void DrawWuLine(Surface *screen, int X0, int Y0, int X1, int Y1, uint clrLine) {
 
             clrBackGround = screen->pixels[current_pixel_index + XDir];
 
-            intWeight = (grayl < ((GetRValue(clrBackGround) * 299 + GetGValue(clrBackGround) * 587 + GetBValue(clrBackGround) * 114) >> 10) ? Weighting ^ 255 : Weighting);
+            intWeight = Weighting ^ ((grayl < ((GetRValue(clrBackGround) * 299 + GetGValue(clrBackGround) * 587 + GetBValue(clrBackGround) * 114) >> 10)) & 255);
 
             screen->Plot(X0 + XDir, Y0, RGB(
                 rl + ((GetRValue(clrBackGround) - rl) & -(GetRValue(clrBackGround) < rl)) + ((intWeight * abs(GetRValue(clrBackGround) - rl)) >> 8),
@@ -290,7 +290,7 @@ void DrawWuLine(Surface *screen, int X0, int Y0, int X1, int Y1, uint clrLine) {
 
             COLORREF clrBackGround = screen->pixels[current_pixel_index];
 
-            int intWeight = (grayl < ((GetRValue(clrBackGround) * 299 + GetGValue(clrBackGround) * 587 + GetBValue(clrBackGround) * 114) >> 10) ? Weighting : Weighting ^ 255);
+            int intWeight = Weighting ^ (-(grayl < ((GetRValue(clrBackGround) * 299 + GetGValue(clrBackGround) * 587 + GetBValue(clrBackGround) * 114) >> 10)) & 255);
 
             screen->Plot(X0, Y0, RGB(
                 rl + ((GetRValue(clrBackGround) - rl) & -(GetRValue(clrBackGround) < rl)) + ((intWeight * abs(GetRValue(clrBackGround) - rl)) >> 8),
@@ -300,7 +300,7 @@ void DrawWuLine(Surface *screen, int X0, int Y0, int X1, int Y1, uint clrLine) {
 
             clrBackGround = screen->pixels[current_pixel_index + SCRWIDTH];
 
-            intWeight = (grayl < ((GetRValue(clrBackGround) * 299 + GetGValue(clrBackGround) * 587 + GetBValue(clrBackGround) * 114) >> 10) ? Weighting ^ 255 : Weighting);
+            intWeight = Weighting ^ ((grayl < ((GetRValue(clrBackGround) * 299 + GetGValue(clrBackGround) * 587 + GetBValue(clrBackGround) * 114) >> 10)) & 255);
 
             screen->Plot(X0, Y0 + 1, RGB(
                 rl + ((GetRValue(clrBackGround) - rl) & -(GetRValue(clrBackGround) < rl)) + ((intWeight * abs(GetRValue(clrBackGround) - rl)) >> 8),
