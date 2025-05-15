@@ -242,23 +242,26 @@ void DrawWuLine(Surface *screen, int X0, int Y0, int X1, int Y1, uint clrLine) {
 
             COLORREF clrBackGround = screen->pixels[current_pixel_index];
 
-            int intWeight = Weighting ^ (-(grayl >= ((GetRValue(clrBackGround) * 299 + GetGValue(clrBackGround) * 587 + GetBValue(clrBackGround) * 114) >> 10)) & 255);
+            // Using arithmatic to lose branch statement, to or use the Weighting or inverse Weighting.
+            int grayb = ((GetRValue(clrBackGround) * 299 + GetGValue(clrBackGround) * 587 + GetBValue(clrBackGround) * 114) >> 10);
+            //int intWeight = ;
 
             screen->Plot(X0, Y0, RGB(
-                rl + ((GetRValue(clrBackGround) - rl) & -(GetRValue(clrBackGround) < rl)) + ((intWeight * abs(GetRValue(clrBackGround) - rl)) >> 8),
-                gl + ((GetGValue(clrBackGround) - gl) & -(GetGValue(clrBackGround) < gl)) + ((intWeight * abs(GetGValue(clrBackGround) - gl)) >> 8),
-                bl + ((GetBValue(clrBackGround) - bl) & -(GetBValue(clrBackGround) < bl)) + ((intWeight * abs(GetBValue(clrBackGround) - bl)) >> 8)
+                rl + ((GetRValue(clrBackGround) - rl) & -(GetRValue(clrBackGround) < rl)) + (((Weighting ^ (-(grayl >= grayb) & 255)) * abs(GetRValue(clrBackGround) - rl)) >> 8),
+                gl + ((GetGValue(clrBackGround) - gl) & -(GetGValue(clrBackGround) < gl)) + (((Weighting ^ (-(grayl >= grayb) & 255)) * abs(GetGValue(clrBackGround) - gl)) >> 8),
+                bl + ((GetBValue(clrBackGround) - bl) & -(GetBValue(clrBackGround) < bl)) + (((Weighting ^ (-(grayl >= grayb) & 255)) * abs(GetBValue(clrBackGround) - bl)) >> 8)
             ));
 
             clrBackGround = screen->pixels[current_pixel_index + XDir];
 
-            intWeight = Weighting ^ (-(grayl < ((GetRValue(clrBackGround) * 299 + GetGValue(clrBackGround) * 587 + GetBValue(clrBackGround) * 114) >> 10)) & 255);
+            grayb = ((GetRValue(clrBackGround) * 299 + GetGValue(clrBackGround) * 587 + GetBValue(clrBackGround) * 114) >> 10);
+            //intWeight = Weighting ^ (-(grayl < ((GetRValue(clrBackGround) * 299 + GetGValue(clrBackGround) * 587 + GetBValue(clrBackGround) * 114) >> 10)) & 255);
             //intWeight = Weighting ^ (isLighter & 255);
 
             screen->Plot(X0 + XDir, Y0, RGB(
-                rl + ((GetRValue(clrBackGround) - rl) & -(GetRValue(clrBackGround) < rl)) + ((intWeight * abs(GetRValue(clrBackGround) - rl)) >> 8),
-                gl + ((GetGValue(clrBackGround) - gl) & -(GetGValue(clrBackGround) < gl)) + ((intWeight * abs(GetGValue(clrBackGround) - gl)) >> 8),
-                bl + ((GetBValue(clrBackGround) - bl) & -(GetBValue(clrBackGround) < bl)) + ((intWeight * abs(GetBValue(clrBackGround) - bl)) >> 8)
+                rl + ((GetRValue(clrBackGround) - rl) & -(GetRValue(clrBackGround) < rl)) + (((Weighting ^ (-(grayl >= grayb) & 255)) * abs(GetRValue(clrBackGround) - rl)) >> 8),
+                gl + ((GetGValue(clrBackGround) - gl) & -(GetGValue(clrBackGround) < gl)) + (((Weighting ^ (-(grayl >= grayb) & 255)) * abs(GetGValue(clrBackGround) - gl)) >> 8),
+                bl + ((GetBValue(clrBackGround) - bl) & -(GetBValue(clrBackGround) < bl)) + (((Weighting ^ (-(grayl >= grayb) & 255)) * abs(GetBValue(clrBackGround) - bl)) >> 8)
             ));
         }
 
@@ -292,27 +295,29 @@ void DrawWuLine(Surface *screen, int X0, int Y0, int X1, int Y1, uint clrLine) {
 
             COLORREF clrBackGround = screen->pixels[current_pixel_index];
 
-            int intWeight = Weighting ^ (-(grayl >= ((GetRValue(clrBackGround) * 299 + GetGValue(clrBackGround) * 587 + GetBValue(clrBackGround) * 114) >> 10)) & 255);
+            int grayb = ((GetRValue(clrBackGround) * 299 + GetGValue(clrBackGround) * 587 + GetBValue(clrBackGround) * 114) >> 10);
+            //int intWeight = Weighting ^ (-(grayl >= ((GetRValue(clrBackGround) * 299 + GetGValue(clrBackGround) * 587 + GetBValue(clrBackGround) * 114) >> 10)) & 255);
 
 //            bool isLighter = grayl < ((GetRValue(clrBackGround) * 299 + GetGValue(clrBackGround) * 587 + GetBValue(clrBackGround) * 114) >> 10);
 //            int intWeight = isLighter ? Weighting : Weighting ^ 255;
             //int intWeight = Weighting ^ (-isLighter & 255);
 
             screen->Plot(X0, Y0, RGB(
-                rl + ((GetRValue(clrBackGround) - rl) & -(GetRValue(clrBackGround) < rl)) + ((intWeight * abs(GetRValue(clrBackGround) - rl)) >> 8),
-                gl + ((GetGValue(clrBackGround) - gl) & -(GetGValue(clrBackGround) < gl)) + ((intWeight * abs(GetGValue(clrBackGround) - gl)) >> 8),
-                bl + ((GetBValue(clrBackGround) - bl) & -(GetBValue(clrBackGround) < bl)) + ((intWeight * abs(GetBValue(clrBackGround) - bl)) >> 8)
+                rl + ((GetRValue(clrBackGround) - rl) & -(GetRValue(clrBackGround) < rl)) + (((Weighting ^ (-(grayl >= grayb) & 255)) * abs(GetRValue(clrBackGround) - rl)) >> 8),
+                gl + ((GetGValue(clrBackGround) - gl) & -(GetGValue(clrBackGround) < gl)) + (((Weighting ^ (-(grayl >= grayb) & 255)) * abs(GetGValue(clrBackGround) - gl)) >> 8),
+                bl + ((GetBValue(clrBackGround) - bl) & -(GetBValue(clrBackGround) < bl)) + (((Weighting ^ (-(grayl >= grayb) & 255)) * abs(GetBValue(clrBackGround) - bl)) >> 8)
             ));
 
             clrBackGround = screen->pixels[current_pixel_index + SCRWIDTH];
 
-            intWeight = Weighting ^ (-(grayl < ((GetRValue(clrBackGround) * 299 + GetGValue(clrBackGround) * 587 + GetBValue(clrBackGround) * 114) >> 10)) & 255);
+            grayb = ((GetRValue(clrBackGround) * 299 + GetGValue(clrBackGround) * 587 + GetBValue(clrBackGround) * 114) >> 10);
+            //intWeight = Weighting ^ (-(grayl < ((GetRValue(clrBackGround) * 299 + GetGValue(clrBackGround) * 587 + GetBValue(clrBackGround) * 114) >> 10)) & 255);
             //intWeight = Weighting ^ (isLighter & 255);
 
             screen->Plot(X0, Y0 + 1, RGB(
-                rl + ((GetRValue(clrBackGround) - rl) & -(GetRValue(clrBackGround) < rl)) + ((intWeight * abs(GetRValue(clrBackGround) - rl)) >> 8),
-                gl + ((GetGValue(clrBackGround) - gl) & -(GetGValue(clrBackGround) < gl)) + ((intWeight * abs(GetGValue(clrBackGround) - gl)) >> 8),
-                bl + ((GetBValue(clrBackGround) - bl) & -(GetBValue(clrBackGround) < bl)) + ((intWeight * abs(GetBValue(clrBackGround) - bl)) >> 8)
+                rl + ((GetRValue(clrBackGround) - rl) & -(GetRValue(clrBackGround) < rl)) + (((Weighting ^ (-(grayl >= grayb) & 255)) * abs(GetRValue(clrBackGround) - rl)) >> 8),
+                gl + ((GetGValue(clrBackGround) - gl) & -(GetGValue(clrBackGround) < gl)) + (((Weighting ^ (-(grayl >= grayb) & 255)) * abs(GetGValue(clrBackGround) - gl)) >> 8),
+                bl + ((GetBValue(clrBackGround) - bl) & -(GetBValue(clrBackGround) < bl)) + (((Weighting ^ (-(grayl >= grayb) & 255)) * abs(GetBValue(clrBackGround) - bl)) >> 8)
             ));
         }
 
