@@ -91,6 +91,38 @@ void UndoMutation( int i )
 
     return RGB( rr, gr, br );
 }*/
+// BlendColorNEON: SIMD-accelerated color blending for Wu lines using NEON
+/*inline uint BlendColorNEON(uint lineClr, uint bgClr, int grayl, unsigned short Weighting, unsigned short WeightingXOR)
+{
+	BYTE rl = GetRValue(lineClr);
+	BYTE gl = GetGValue(lineClr);
+	BYTE bl = GetBValue(lineClr);
+
+	BYTE rb = GetRValue(bgClr);
+	BYTE gb = GetGValue(bgClr);
+	BYTE bb = GetBValue(bgClr);
+
+	int16x4_t rgbLine = { rl, gl, bl, (BYTE)0 };
+	int16x4_t rgbBackground = { rb, gb, bb, (BYTE)0 };
+
+	int16x4_t rgbDelta = vsub_s16(rgbBackground, rgbLine);
+	int16x4_t neg_mask = vshr_n_s16(rgbDelta, 15);
+	int16x4_t abs_diff = vsub_s16(veor_s16(rgbDelta, neg_mask), neg_mask);
+
+	int grayb = (299 * rb + 587 * gb + 114 * bb) >> 10;
+	BYTE intWeight = ((grayl < grayb) ? Weighting : WeightingXOR);
+
+	int16x4_t weight_vec = vdup_n_s16(intWeight);
+	int16x4_t scaled = vmul_s16(abs_diff, weight_vec);
+	int16x4_t shifted = vshr_n_s16(scaled, 8);
+	int16x4_t blended = vadd_s16(rgbLine, shifted);
+
+	BYTE rr = vget_lane_s16(blended, 0);
+	BYTE gr = vget_lane_s16(blended, 1);
+	BYTE br = vget_lane_s16(blended, 2);
+
+	return RGB(rr, gr, br);
+}*/
 
 // -----------------------------------------------------------
 // DrawWuLine
@@ -100,7 +132,7 @@ void UndoMutation( int i )
 // -----------------------------------------------------------
 void DrawWuLine( Surface *screen, int X0, int Y0, int X1, int Y1, uint clrLine )
 {
-	const float weightNorm = 1.f / 255.f;
+	//const float weightNorm = 1.f / 255.f;
     /* Make sure the line runs top to bottom */
     if (Y0 > Y1)
     {
@@ -159,15 +191,17 @@ void DrawWuLine( Surface *screen, int X0, int Y0, int X1, int Y1, uint clrLine )
             Weighting = ErrorAcc >> 8;
             WeightingXOR = Weighting ^ 255;
 
+
+
             COLORREF clrBackGround = screen->pixels[X0 + Y0 * SCRWIDTH];
             BYTE rb = GetRValue( clrBackGround );
             BYTE gb = GetGValue( clrBackGround );
             BYTE bb = GetBValue( clrBackGround );
 
 //            double grayb = rb * 0.299 + gb * 0.587 + bb * 0.114;
-//            int grayb = (rb * 299 + gb * 587 + bb * 114) >> 10;
+            int grayb = (rb * 299 + gb * 587 + bb * 114) >> 10;
 
-            int grayb = (299 * rb + 587 * gb + 114 * bb) >> 10;  // Keep precision
+            //int grayb = (299 * rb + 587 * gb + 114 * bb) >> 10;  // Keep precision
 //			double weight = (double)(grayl < grayb ? Weighting : WeightingXOR) * weightNorm;
 			//double weight = (isLight * Weighting + (1 - isLight) * (Weighting ^ 255)) * weightNorm;
 
@@ -183,7 +217,7 @@ void DrawWuLine( Surface *screen, int X0, int Y0, int X1, int Y1, uint clrLine )
 //            BYTE rr = (BYTE)(weight * abs(rb - rl) + std::min<int>((int)rb, (int)rl));
 //            BYTE gr = (BYTE)(weight * abs(gb - gl) + std::min<int>((int)gb, (int)gl));
 //            BYTE br = (BYTE)(weight * abs(bb - bl) + std::min<int>((int)bb, (int)bl));
-
+			//screen->Plot( X0, Y0, BlendColorNEON(clrLine, clrBackGround, grayl, Weighting, WeightingXOR));
             screen->Plot( X0, Y0, RGB( rr, gr, br ) );
 
             clrBackGround = screen->pixels[X0 + XDir + Y0 * SCRWIDTH];
@@ -209,6 +243,8 @@ void DrawWuLine( Surface *screen, int X0, int Y0, int X1, int Y1, uint clrLine )
 //            gr = (BYTE)(weight * abs(gb - gl) + std::min<int>((int)gb, (int)gl));
 //            br = (BYTE)(weight * abs(bb - bl) + std::min<int>((int)bb, (int)bl));
 
+        	//screen->Plot( X0 + XDir, Y0, BlendColorNEON(clrLine, clrBackGround, grayl, WeightingXOR, Weighting));
+
             screen->Plot( X0 + XDir, Y0, RGB( rr, gr, br ) );
         }
         /* Draw the final pixel, which is always exactly intersected by the line
@@ -230,7 +266,7 @@ void DrawWuLine( Surface *screen, int X0, int Y0, int X1, int Y1, uint clrLine )
             X0 += XDir; /* X-major, so always advance X */
             /* The IntensityBits most significant bits of ErrorAcc give us the
             intensity weighting for this pixel, and the complement of the
-weighting for the paired pixel */
+			weighting for the paired pixel */
             Weighting = ErrorAcc >> 8;
             WeightingXOR = Weighting ^ 255;
 
@@ -257,6 +293,7 @@ weighting for the paired pixel */
 //            BYTE gr = (BYTE)(weight * abs(gb - gl) + std::min<int>((int)gb, (int)gl));
 //            BYTE br = (BYTE)(weight * abs(bb - bl) + std::min<int>((int)bb, (int)bl));
 
+        	//screen->Plot( X0, Y0, BlendColorNEON(clrLine, clrBackGround, grayl, Weighting, WeightingXOR));
             screen->Plot( X0, Y0, RGB( rr, gr, br ) );
 
             clrBackGround = screen->pixels[X0 + (Y0 + 1) * SCRWIDTH];
@@ -284,6 +321,7 @@ weighting for the paired pixel */
 //            gr = (BYTE)(weight * abs(gb - gl) + std::min<int>((int)gb, (int)gl));
 //            br = (BYTE)(weight * abs(bb - bl) + std::min<int>((int)bb, (int)bl));
 
+        	//screen->Plot( X0, Y0 + 1, BlendColorNEON(clrLine, clrBackGround, grayl, WeightingXOR, Weighting));
             screen->Plot( X0, Y0 + 1, RGB( rr, gr, br ) );
         }
 
@@ -300,12 +338,17 @@ weighting for the paired pixel */
 // -----------------------------------------------------------
 int Game::Evaluate()
 {
-	const uint count = SCRWIDTH * SCRHEIGHT;
 	__int64 diff = 0;
-	for( uint i = 0; i < count; i++ )
+	const uint count = SCRWIDTH * SCRHEIGHT;
+	uint* srcSet = screen->pixels;
+	uint* refSet = reference->pixels;
+	uint* end = srcSet + count;
+	while (srcSet < end)
+	//for( uint i = 0; i < count; i++ )
 	{
-		uint src = screen->pixels[i];
-		uint ref = reference->pixels[i];
+		uint src = *srcSet++, ref = *refSet++;
+		//uint src = screen->pixels[i];
+		//uint ref = reference->pixels[i];
 		int r0 = (src >> 16) & 255, g0 = (src >> 8) & 255, b0 = src & 255;
 		int r1 = ref >> 16, g1 = (ref >> 8) & 255, b1 = ref & 255;
 		int dr = r0 - r1, dg = g0 - g1, db = b0 - b1;
