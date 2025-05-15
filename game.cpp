@@ -333,7 +333,7 @@ int Game::Evaluate()
 	__int64 diff = 0;
 	uint* srcSet = screen->pixels;
 	uint* refSet = reference->pixels;
-	uint* end = srcSet + screenSize;
+	uint* end = srcSet + SCRHEIGHT * SCRWIDTH;
 
 	while (srcSet < end)
 	{
@@ -367,7 +367,7 @@ void Game::Init() {
 //    }
     reference = new Surface( "assets/bird.png" );
     backup = new Surface( SCRWIDTH, SCRHEIGHT );
-    memset( screen->pixels, 255, screenSize * 4 );
+    memset( screen->pixels, 255, SCRHEIGHT * SCRWIDTH * 4 );
     for (int j = 0; j < LINES; j++)
     {
         DrawWuLine( screen, lx1[j], ly1[j], lx2[j], ly2[j], lc[j] );
@@ -383,7 +383,7 @@ void Game::Tick(float /* deltaTime */) {
     int lineCount = 0;
     int iterCount = 0;
     // draw up to lidx
-    memset( screen->pixels, 255, screenSize * 4 );
+    memset( screen->pixels, 255, SCRHEIGHT * SCRWIDTH * 4 );
     for (int j = 0; j < lidx; j++, lineCount++)
     {
         DrawWuLine( screen, lx1[j], ly1[j], lx2[j], ly2[j], lc[j] );
