@@ -12,7 +12,7 @@ uint c_;                                                    // line color backup
 int fitness;                                                // similarity to reference image
 int lidx = 0;                                                // current line to be mutated
 float peak = 0;                                                // peak line rendering performance
-//int count = SCRWIDTH * SCRHEIGHT;
+
 Surface *reference, *backup;                                // surfaces
 Timer timer;
 const uint screenSize = SCRHEIGHT * SCRWIDTH;
@@ -241,28 +241,22 @@ void DrawWuLine(Surface *screen, int X0, int Y0, int X1, int Y1, uint clrLine) {
             Weighting = ErrorAcc >> 8;
 
             COLORREF clrBackGround = screen->pixels[current_pixel_index];
-            BYTE rb = GetRValue(clrBackGround);
-            BYTE gb = GetGValue(clrBackGround);
-            BYTE bb = GetBValue(clrBackGround);
 
-            int intWeight = (grayl < ((rb * 299 + gb * 587 + bb * 114) >> 10) ? Weighting : Weighting ^ 255);
+            int intWeight = (grayl < ((GetRValue(clrBackGround) * 299 + GetGValue(clrBackGround) * 587 + GetBValue(clrBackGround) * 114) >> 10) ? Weighting : Weighting ^ 255);
 
-            BYTE rr = rl + ((rb - rl) & -(rb < rl)) + ((intWeight * abs(rb - rl)) >> 8);
-            BYTE gr = gl + ((gb - gl) & -(gb < gl)) + ((intWeight * abs(gb - gl)) >> 8);
-            BYTE br = bl + ((bb - bl) & -(bb < bl)) + ((intWeight * abs(bb - bl)) >> 8);
+            BYTE rr = rl + ((GetRValue(clrBackGround) - rl) & -(GetRValue(clrBackGround) < rl)) + ((intWeight * abs(GetRValue(clrBackGround) - rl)) >> 8);
+            BYTE gr = gl + ((GetGValue(clrBackGround) - gl) & -(GetGValue(clrBackGround) < gl)) + ((intWeight * abs(GetGValue(clrBackGround) - gl)) >> 8);
+            BYTE br = bl + ((GetBValue(clrBackGround) - bl) & -(GetBValue(clrBackGround) < bl)) + ((intWeight * abs(GetBValue(clrBackGround) - bl)) >> 8);
 
             screen->Plot(X0, Y0, RGB(rr, gr, br));
 
             clrBackGround = screen->pixels[current_pixel_index + XDir];
-            rb = GetRValue(clrBackGround);
-            gb = GetGValue(clrBackGround);
-            bb = GetBValue(clrBackGround);
 
-            intWeight = (grayl < ((rb * 299 + gb * 587 + bb * 114) >> 10) ? Weighting ^ 255 : Weighting);
+            intWeight = (grayl < ((GetRValue(clrBackGround) * 299 + GetGValue(clrBackGround) * 587 + GetBValue(clrBackGround) * 114) >> 10) ? Weighting ^ 255 : Weighting);
 
-            rr = rl + ((rb - rl) & -(rb < rl)) + ((intWeight * abs(rb - rl)) >> 8);
-            gr = gl + ((gb - gl) & -(gb < gl)) + ((intWeight * abs(gb - gl)) >> 8);
-            br = bl + ((bb - bl) & -(bb < bl)) + ((intWeight * abs(bb - bl)) >> 8);
+            rr = rl + ((GetRValue(clrBackGround) - rl) & -(GetRValue(clrBackGround) < rl)) + ((intWeight * abs(GetRValue(clrBackGround) - rl)) >> 8);
+            gr = gl + ((GetGValue(clrBackGround) - gl) & -(GetGValue(clrBackGround) < gl)) + ((intWeight * abs(GetGValue(clrBackGround) - gl)) >> 8);
+            br = bl + ((GetBValue(clrBackGround) - bl) & -(GetBValue(clrBackGround) < bl)) + ((intWeight * abs(GetBValue(clrBackGround) - bl)) >> 8);
 
             screen->Plot(X0 + XDir, Y0, RGB(rr, gr, br));
         }
@@ -296,28 +290,22 @@ void DrawWuLine(Surface *screen, int X0, int Y0, int X1, int Y1, uint clrLine) {
             Weighting = ErrorAcc >> 8;
 
             COLORREF clrBackGround = screen->pixels[current_pixel_index];
-            BYTE rb = GetRValue(clrBackGround);
-            BYTE gb = GetGValue(clrBackGround);
-            BYTE bb = GetBValue(clrBackGround);
 
-            int intWeight = (grayl < ((rb * 299 + gb * 587 + bb * 114) >> 10) ? Weighting : Weighting ^ 255);
+            int intWeight = (grayl < ((GetRValue(clrBackGround) * 299 + GetGValue(clrBackGround) * 587 + GetBValue(clrBackGround) * 114) >> 10) ? Weighting : Weighting ^ 255);
 
-            BYTE rr = rl + ((rb - rl) & -(rb < rl)) + ((intWeight * abs(rb - rl)) >> 8);
-            BYTE gr = gl + ((gb - gl) & -(gb < gl)) + ((intWeight * abs(gb - gl)) >> 8);
-            BYTE br = bl + ((bb - bl) & -(bb < bl)) + ((intWeight * abs(bb - bl)) >> 8);
+            BYTE rr = rl + ((GetRValue(clrBackGround) - rl) & -(GetRValue(clrBackGround) < rl)) + ((intWeight * abs(GetRValue(clrBackGround) - rl)) >> 8);
+            BYTE gr = gl + ((GetGValue(clrBackGround) - gl) & -(GetGValue(clrBackGround) < gl)) + ((intWeight * abs(GetGValue(clrBackGround) - gl)) >> 8);
+            BYTE br = bl + ((GetBValue(clrBackGround) - bl) & -(GetBValue(clrBackGround) < bl)) + ((intWeight * abs(GetBValue(clrBackGround) - bl)) >> 8);
 
             screen->Plot(X0, Y0, RGB(rr, gr, br));
 
             clrBackGround = screen->pixels[current_pixel_index + SCRWIDTH];
-            rb = GetRValue(clrBackGround);
-            gb = GetGValue(clrBackGround);
-            bb = GetBValue(clrBackGround);
 
-            intWeight = (grayl < ((rb * 299 + gb * 587 + bb * 114) >> 10) ? Weighting ^ 255 : Weighting);
+            intWeight = (grayl < ((GetRValue(clrBackGround) * 299 + GetGValue(clrBackGround) * 587 + GetBValue(clrBackGround) * 114) >> 10) ? Weighting ^ 255 : Weighting);
 
-            rr = rl + ((rb - rl) & -(rb < rl)) + ((intWeight * abs(rb - rl)) >> 8);
-            gr = gl + ((gb - gl) & -(gb < gl)) + ((intWeight * abs(gb - gl)) >> 8);
-            br = bl + ((bb - bl) & -(bb < bl)) + ((intWeight * abs(bb - bl)) >> 8);
+            rr = rl + ((GetRValue(clrBackGround) - rl) & -(GetRValue(clrBackGround) < rl)) + ((intWeight * abs(GetRValue(clrBackGround) - rl)) >> 8);
+            gr = gl + ((GetGValue(clrBackGround) - gl) & -(GetGValue(clrBackGround) < gl)) + ((intWeight * abs(GetGValue(clrBackGround) - gl)) >> 8);
+            br = bl + ((GetBValue(clrBackGround) - bl) & -(GetBValue(clrBackGround) < bl)) + ((intWeight * abs(GetBValue(clrBackGround) - bl)) >> 8);
 
             screen->Plot(X0, Y0 + 1, RGB(rr, gr, br));
         }
@@ -412,7 +400,7 @@ void Game::Tick(float /* deltaTime */) {
     screen->Print(t, 2, SCRHEIGHT - 24, 0xffffff);
     sprintf(t, "lps:     %5.2fK", lps);
     screen->Print(t, 2, SCRHEIGHT - 16, 0xffffff);
-    sprintf(t, "ips:     %5.2f", (iterCount << 10) / elapsed);
+    sprintf(t, "ips:     %5.2f", (iterCount * 1000) / elapsed);
     screen->Print(t, 2, SCRHEIGHT - 8, 0xffffff);
     sprintf(t, "peak:    %5.2f", peak);
     screen->Print(t, 2, SCRHEIGHT - 32, 0xffffff);
