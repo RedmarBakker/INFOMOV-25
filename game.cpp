@@ -36,6 +36,7 @@ void MutateLine(int i) {
     x1_ = lx1[i], y1_ = ly1[i];
     x2_ = lx2[i], y2_ = ly2[i];
     c_ = lc[i];
+    //int mutate = rand();
     do {
         if (rand() & 1) {
             // color mutation (50% probability)
