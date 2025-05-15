@@ -192,14 +192,12 @@ void DrawWuLine( Surface *screen, int X0, int Y0, int X1, int Y1, uint clrLine )
             Weighting = ErrorAcc >> 8;
             WeightingXOR = Weighting ^ 255;
 
-
-
             COLORREF clrBackGround = screen->pixels[current_pixel_index];
             BYTE rb = GetRValue( clrBackGround );
             BYTE gb = GetGValue( clrBackGround );
             BYTE bb = GetBValue( clrBackGround );
 
-//            double grayb = rb * 0.299 + gb * 0.587 + bb * 0.114;
+//          double grayb = rb * 0.299 + gb * 0.587 + bb * 0.114;
             int grayb = (rb * 299 + gb * 587 + bb * 114) >> 10;
 
             //int grayb = (299 * rb + 587 * gb + 114 * bb) >> 10;  // Keep precision
