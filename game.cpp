@@ -186,12 +186,14 @@ void DrawWuLine(Surface *screen, int X0, int Y0, int X1, int Y1, uint clrLine) {
     the line and so needs no weighting */
     screen->Plot(X0, Y0, clrLine);
 
-    int XDir = 1;
     int DeltaX = X1 - X0;
-    if (DeltaX < 0) {
-        XDir = -1;
-        DeltaX = -DeltaX; /* make DeltaX positive */
-    }
+
+    // XDir = 1 if DeltaX >= 0, -1 if DeltaX < 0
+    int XDir = 1 | (DeltaX >> 31);
+
+    // absolute value of DeltaX
+    //DeltaX = abs(DeltaX);
+    DeltaX = (DeltaX ^ (DeltaX >> 31)) - (DeltaX >> 31);
 
     /* Special-case horizontal, vertical, and diagonal lines, which
     require no weighting because they go right through the center of
