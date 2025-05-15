@@ -178,8 +178,8 @@ inline BYTE blend_channel(BYTE line, BYTE bg, int weight) {
 void DrawWuLine(Surface *screen, int X0, int Y0, int X1, int Y1, uint clrLine) {
     /* Make sure the line runs top to bottom */
     if (Y0 > Y1) {
-        int Temp = Y0; Y0 = Y1; Y1 = Temp;
-        Temp = X0; X0 = X1; X1 = Temp;
+        std::swap( Y0, Y1 );
+        std::swap( X0, X1 );
     }
 
     /* Draw the initial pixel, which is always exactly intersected by
@@ -409,7 +409,7 @@ void Game::Tick(float /* deltaTime */) {
         if (diff < fitness) {
             fitness = diff;
         } else {
-            UndoMutation(lidx)
+            UndoMutation(lidx);
         }
 
         lidx = (lidx + 1) % LINES;
