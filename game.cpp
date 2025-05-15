@@ -408,7 +408,7 @@ void Game::Tick( float /* deltaTime */ )
 	{
 		backup->CopyTo( screen, 0, 0 );
 		MutateLine( lidx );
-		for (int j = lidx; j < LINES; j++, lineCount++)
+		for (int j = base; j < LINES; j++, lineCount++)
 		{
 			DrawWuLine( screen, lx1[j], ly1[j], lx2[j], ly2[j], lc[j] );
 		}
