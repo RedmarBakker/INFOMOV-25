@@ -229,8 +229,8 @@ void DrawWuLine( Surface *screen, int X0, int Y0, int X1, int Y1, uint clrLine )
         /* Y-major line; calculate 16-bit fixed-point fractional part of a
         pixel that X advances each time Y advances 1 pixel, truncating the
         result so that we won't overrun the endpoint along the X axis */
-
         ErrorAdj = ((unsigned long) DeltaX << 16) / (unsigned long) DeltaY;
+
         /* Draw all pixels other than the first and last */
         while (--DeltaY) {
             /* remember currrent accumulated error */
@@ -337,7 +337,6 @@ void DrawWuLine( Surface *screen, int X0, int Y0, int X1, int Y1, uint clrLine )
 
             screen->Plot( X0, Y0 + 1, RGB( rr, gr, br ) );
         }
-
 
         /* Draw the final pixel, which is always exactly intersected by the line
         and so needs no weighting */
