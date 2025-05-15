@@ -207,11 +207,11 @@ void DrawWuLine(Surface *screen, int X0, int Y0, int X1, int Y1, uint clrLine) {
     /* initialize the line error accumulator to 0 */
     unsigned short ErrorAcc = 0;
 
-//    BYTE rl = GetRValue(clrLine);
-//    BYTE gl = GetGValue(clrLine);
-//    BYTE bl = GetBValue(clrLine);
+    BYTE rl = GetRValue(clrLine);
+    BYTE gl = GetGValue(clrLine);
+    BYTE bl = GetBValue(clrLine);
 
-    int grayl = (GetRValue(clrLine) * 299 + GetGValue(clrLine) * 587 + GetBValue(clrLine) * 114) >> 10;
+    int grayl = (rl * 299 + gl * 587 + bl * 114) >> 10;
     uint current_pixel_index = X0 + Y0 * SCRWIDTH;
 
     /* Is this an X-major or Y-major line? */
@@ -236,16 +236,15 @@ void DrawWuLine(Surface *screen, int X0, int Y0, int X1, int Y1, uint clrLine) {
 
             Weighting = ErrorAcc >> 8;
 
-            COLORREF lineColor = clrLine;
             COLORREF clrBackGround = screen->pixels[current_pixel_index];
 
             // Using arithmatic to lose branch statement, to or use the Weighting or inverse Weighting.
             int intWeight = Weighting ^ (-(grayl >= ((GetRValue(clrBackGround) * 299 + GetGValue(clrBackGround) * 587 + GetBValue(clrBackGround) * 114) >> 10)) & 255);
 
             screen->Plot(X0, Y0, RGB(
-                GetRValue(lineColor) + ((GetRValue(clrBackGround) - GetRValue(lineColor)) & -(GetRValue(clrBackGround) < GetRValue(lineColor))) + ((intWeight * abs(GetRValue(clrBackGround) - GetRValue(lineColor))) >> 8),
-                GetGValue(lineColor) + ((GetGValue(clrBackGround) - GetGValue(lineColor)) & -(GetGValue(clrBackGround) < GetGValue(lineColor))) + ((intWeight * abs(GetGValue(clrBackGround) - GetGValue(lineColor))) >> 8),
-                GetBValue(lineColor) + ((GetBValue(clrBackGround) - GetBValue(lineColor)) & -(GetBValue(clrBackGround) < GetBValue(lineColor))) + ((intWeight * abs(GetBValue(clrBackGround) - GetBValue(lineColor))) >> 8)
+                rl + ((GetRValue(clrBackGround) - rl) & -(GetRValue(clrBackGround) < rl)) + ((intWeight * abs(GetRValue(clrBackGround) - rl)) >> 8),
+                gl + ((GetGValue(clrBackGround) - gl) & -(GetGValue(clrBackGround) < gl)) + ((intWeight * abs(GetGValue(clrBackGround) - gl)) >> 8),
+                bl + ((GetBValue(clrBackGround) - bl) & -(GetBValue(clrBackGround) < bl)) + ((intWeight * abs(GetBValue(clrBackGround) - bl)) >> 8)
             ));
 
             clrBackGround = screen->pixels[current_pixel_index + XDir];
@@ -253,9 +252,9 @@ void DrawWuLine(Surface *screen, int X0, int Y0, int X1, int Y1, uint clrLine) {
             intWeight = Weighting ^ (-(grayl < ((GetRValue(clrBackGround) * 299 + GetGValue(clrBackGround) * 587 + GetBValue(clrBackGround) * 114) >> 10)) & 255);
 
             screen->Plot(X0 + XDir, Y0, RGB(
-                GetRValue(lineColor) + ((GetRValue(clrBackGround) - GetRValue(lineColor)) & -(GetRValue(clrBackGround) < GetRValue(lineColor))) + ((intWeight * abs(GetRValue(clrBackGround) - GetRValue(lineColor))) >> 8),
-                GetGValue(lineColor) + ((GetGValue(clrBackGround) - GetGValue(lineColor)) & -(GetGValue(clrBackGround) < GetGValue(lineColor))) + ((intWeight * abs(GetGValue(clrBackGround) - GetGValue(lineColor))) >> 8),
-                GetBValue(lineColor) + ((GetBValue(clrBackGround) - GetBValue(lineColor)) & -(GetBValue(clrBackGround) < GetBValue(lineColor))) + ((intWeight * abs(GetBValue(clrBackGround) - GetBValue(lineColor))) >> 8)
+                rl + ((GetRValue(clrBackGround) - rl) & -(GetRValue(clrBackGround) < rl)) + ((intWeight * abs(GetRValue(clrBackGround) - rl)) >> 8),
+                gl + ((GetGValue(clrBackGround) - gl) & -(GetGValue(clrBackGround) < gl)) + ((intWeight * abs(GetGValue(clrBackGround) - gl)) >> 8),
+                bl + ((GetBValue(clrBackGround) - bl) & -(GetBValue(clrBackGround) < bl)) + ((intWeight * abs(GetBValue(clrBackGround) - bl)) >> 8)
             ));
         }
 
@@ -282,15 +281,14 @@ void DrawWuLine(Surface *screen, int X0, int Y0, int X1, int Y1, uint clrLine) {
 
             Weighting = ErrorAcc >> 8;
 
-            COLORREF lineColor = clrLine;
             COLORREF clrBackGround = screen->pixels[current_pixel_index];
 
             int intWeight = Weighting ^ (-(grayl >= ((GetRValue(clrBackGround) * 299 + GetGValue(clrBackGround) * 587 + GetBValue(clrBackGround) * 114) >> 10)) & 255);
 
             screen->Plot(X0, Y0, RGB(
-                GetRValue(lineColor) + ((GetRValue(clrBackGround) - GetRValue(lineColor)) & -(GetRValue(clrBackGround) < GetRValue(lineColor))) + ((intWeight * abs(GetRValue(clrBackGround) - GetRValue(lineColor))) >> 8),
-                GetGValue(lineColor) + ((GetGValue(clrBackGround) - GetGValue(lineColor)) & -(GetGValue(clrBackGround) < GetGValue(lineColor))) + ((intWeight * abs(GetGValue(clrBackGround) - GetGValue(lineColor))) >> 8),
-                GetBValue(lineColor) + ((GetBValue(clrBackGround) - GetBValue(lineColor)) & -(GetBValue(clrBackGround) < GetBValue(lineColor))) + ((intWeight * abs(GetBValue(clrBackGround) - GetBValue(lineColor))) >> 8)
+                rl + ((GetRValue(clrBackGround) - rl) & -(GetRValue(clrBackGround) < rl)) + ((intWeight * abs(GetRValue(clrBackGround) - rl)) >> 8),
+                gl + ((GetGValue(clrBackGround) - gl) & -(GetGValue(clrBackGround) < gl)) + ((intWeight * abs(GetGValue(clrBackGround) - gl)) >> 8),
+                bl + ((GetBValue(clrBackGround) - bl) & -(GetBValue(clrBackGround) < bl)) + ((intWeight * abs(GetBValue(clrBackGround) - bl)) >> 8)
             ));
 
             clrBackGround = screen->pixels[current_pixel_index + SCRWIDTH];
@@ -298,9 +296,9 @@ void DrawWuLine(Surface *screen, int X0, int Y0, int X1, int Y1, uint clrLine) {
             intWeight = Weighting ^ (-(grayl < ((GetRValue(clrBackGround) * 299 + GetGValue(clrBackGround) * 587 + GetBValue(clrBackGround) * 114) >> 10)) & 255);
 
             screen->Plot(X0, Y0 + 1, RGB(
-                GetRValue(lineColor) + ((GetRValue(clrBackGround) - GetRValue(lineColor)) & -(GetRValue(clrBackGround) < GetRValue(lineColor))) + ((intWeight * abs(GetRValue(clrBackGround) - GetRValue(lineColor))) >> 8),
-                GetGValue(lineColor) + ((GetGValue(clrBackGround) - GetGValue(lineColor)) & -(GetGValue(clrBackGround) < GetGValue(lineColor))) + ((intWeight * abs(GetGValue(clrBackGround) - GetGValue(lineColor))) >> 8),
-                GetBValue(lineColor) + ((GetBValue(clrBackGround) - GetBValue(lineColor)) & -(GetBValue(clrBackGround) < GetBValue(lineColor))) + ((intWeight * abs(GetBValue(clrBackGround) - GetBValue(lineColor))) >> 8)
+                rl + ((GetRValue(clrBackGround) - rl) & -(GetRValue(clrBackGround) < rl)) + ((intWeight * abs(GetRValue(clrBackGround) - rl)) >> 8),
+                gl + ((GetGValue(clrBackGround) - gl) & -(GetGValue(clrBackGround) < gl)) + ((intWeight * abs(GetGValue(clrBackGround) - gl)) >> 8),
+                bl + ((GetBValue(clrBackGround) - bl) & -(GetBValue(clrBackGround) < bl)) + ((intWeight * abs(GetBValue(clrBackGround) - bl)) >> 8)
             ));
         }
 
