@@ -356,26 +356,23 @@ int Game::Evaluate()
 // Load a previously saved generation, if available.
 // -----------------------------------------------------------
 void Game::Init() {
-    for (int i = 0; i < LINES; i++) {
-        MutateLine(i);
-    }
-
-    /*FILE *f = fopen(LINEFILE, "rb");
-    if (f)
+    for (int i = 0; i < LINES; i++) MutateLine( i );
+//    FILE* f = fopen( LINEFILE, "rb" );
+//    if (f)
+//    {
+//        fread( lx1, 4, LINES, f );
+//        fread( ly1, 4, LINES, f );
+//        fread( lx2, 4, LINES, f );
+//        fread( ly2, 4, LINES, f );
+//        fread( lc, 4, LINES, f );
+//        fclose( f );
+//    }
+    reference = new Surface( "assets/bird.png" );
+    backup = new Surface( SCRWIDTH, SCRHEIGHT );
+    memset( screen->pixels, 255, SCRWIDTH * SCRHEIGHT * 4 );
+    for (int j = 0; j < LINES; j++)
     {
-        fread( lx1, 4, LINES, f );
-        fread( ly1, 4, LINES, f );
-        fread( lx2, 4, LINES, f );
-        fread( ly2, 4, LINES, f );
-        fread( lc, 4, LINES, f );
-        fclose( f );
-    }*/
-
-    reference = new Surface("assets/bird.png");
-    backup = new Surface(SCRWIDTH, SCRHEIGHT);
-    memset(screen->pixels, 255, SCRWIDTH * SCRHEIGHT * 4);
-    for (int j = 0; j < LINES; j++) {
-        DrawWuLine(screen, lx1[j], ly1[j], lx2[j], ly2[j], lc[j]);
+        DrawWuLine( screen, lx1[j], ly1[j], lx2[j], ly2[j], lc[j] );
     }
     fitness = Evaluate();
 }
