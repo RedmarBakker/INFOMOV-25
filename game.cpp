@@ -192,8 +192,8 @@ void DrawWuLine(Surface *screen, int X0, int Y0, int X1, int Y1, uint clrLine) {
     int XDir = 1 | (DeltaX >> 31);
 
     // absolute value of DeltaX
-    //DeltaX = abs(DeltaX);
-    DeltaX = (DeltaX ^ (DeltaX >> 31)) - (DeltaX >> 31);
+    DeltaX = abs(DeltaX);
+    //DeltaX = (DeltaX ^ (DeltaX >> 31)) - (DeltaX >> 31);
 
     /* Special-case horizontal, vertical, and diagonal lines, which
     require no weighting because they go right through the center of
