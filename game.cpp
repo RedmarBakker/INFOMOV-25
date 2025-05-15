@@ -223,9 +223,6 @@ void DrawWuLine(Surface *screen, int X0, int Y0, int X1, int Y1, uint clrLine) {
 
         /* Draw all pixels other than the first and last */
         while (--DeltaY) {
-            /* remember currrent accumulated error */
-            //ErrorAccTemp = ErrorAcc;
-
             if ((unsigned short)(ErrorAcc + ErrorAdj) <= ErrorAcc) {
                 /* The error accumulator turned over, so advance the X coord */
                 X0 += XDir;
@@ -272,9 +269,6 @@ void DrawWuLine(Surface *screen, int X0, int Y0, int X1, int Y1, uint clrLine) {
 
         /* Draw all pixels other than the first and last */
         while (--DeltaX) {
-            /* remember currrent accumulated error */
-            //ErrorAccTemp = ErrorAcc;
-
             if ((unsigned short)(ErrorAcc + ErrorAdj) <= ErrorAcc) {
                 Y0++;
                 current_pixel_index += SCRWIDTH;
