@@ -65,9 +65,7 @@ void UndoMutation(int i) {
 // -----------------------------------------------------------
 // Branchless color blending for Wu lines (extracted from DrawWuLine)
 // -----------------------------------------------------------
-inline uint
-BlendColorBranchless(uint lineClr, uint bgClr, int grayl, unsigned short Weighting, unsigned short WeightingXOR,
-                     bool inverse = false) {
+inline uint BlendColorBranchless(uint lineClr, uint bgClr, int grayl, unsigned short Weighting, unsigned short WeightingXOR) {
     BYTE rl = GetRValue(lineClr);
     BYTE gl = GetGValue(lineClr);
     BYTE bl = GetBValue(lineClr);
@@ -209,7 +207,7 @@ void DrawWuLine(Surface *screen, int X0, int Y0, int X1, int Y1, uint clrLine) {
     BYTE bl = GetBValue(clrLine);
 
     int grayl = (rl * 299 + gl * 587 + bl * 114) >> 10;
-    uint current_pixel_index = X0 + (Y0 >> 9);
+    uint current_pixel_index = X0 + (Y0 * SCRWIDTH);
 
     /* Is this an X-major or Y-major line? */
     if (DeltaY > DeltaX) {
@@ -332,7 +330,7 @@ void DrawWuLine(Surface *screen, int X0, int Y0, int X1, int Y1, uint clrLine) {
 int Game::Evaluate()
 {
 	__int64 diff = 0;
-	const uint count = SCRHEIGHT >> 9;
+	const uint count = SCRHEIGHT * SCRWIDTH;
 	uint* srcSet = screen->pixels;
 	uint* refSet = reference->pixels;
 	uint* end = srcSet + count;
@@ -369,7 +367,7 @@ void Game::Init() {
 //    }
     reference = new Surface( "assets/bird.png" );
     backup = new Surface( SCRWIDTH, SCRHEIGHT );
-    memset( screen->pixels, 255, (SCRHEIGHT >> 9) * 4 );
+    memset( screen->pixels, 255, (SCRHEIGHT * SCRWIDTH) * 4 );
     for (int j = 0; j < LINES; j++)
     {
         DrawWuLine( screen, lx1[j], ly1[j], lx2[j], ly2[j], lc[j] );
@@ -385,7 +383,7 @@ void Game::Tick(float /* deltaTime */) {
     int lineCount = 0;
     int iterCount = 0;
     // draw up to lidx
-    memset( screen->pixels, 255, (SCRHEIGHT >> 9) * 4 );
+    memset( screen->pixels, 255, (SCRHEIGHT * SCRWIDTH) * 4 );
     for (int j = 0; j < lidx; j++, lineCount++)
     {
         DrawWuLine( screen, lx1[j], ly1[j], lx2[j], ly2[j], lc[j] );
