@@ -226,13 +226,12 @@ void DrawWuLine(Surface *screen, int X0, int Y0, int X1, int Y1, uint clrLine) {
             /* remember currrent accumulated error */
             //ErrorAccTemp = ErrorAcc;
 
-            if ((ErrorAcc + ErrorAdj) <= ErrorAcc) {
+            if ((unsigned short)(ErrorAcc + ErrorAdj) <= ErrorAcc) {
                 /* The error accumulator turned over, so advance the X coord */
                 X0 += XDir;
                 current_pixel_index += XDir;
             }
 
-            /* calculate error for next pixel */
             ErrorAcc += ErrorAdj;
 
             Y0++;
@@ -276,13 +275,11 @@ void DrawWuLine(Surface *screen, int X0, int Y0, int X1, int Y1, uint clrLine) {
             /* remember currrent accumulated error */
             //ErrorAccTemp = ErrorAcc;
 
-            if ((ErrorAcc + ErrorAdj) <= ErrorAcc) {
-                /* The error accumulator turned over, so advance the Y coord */
+            if ((unsigned short)(ErrorAcc + ErrorAdj) <= ErrorAcc) {
                 Y0++;
                 current_pixel_index += SCRWIDTH;
             }
 
-            /* calculate error for next pixel */
             ErrorAcc += ErrorAdj;
 
             X0 += XDir;
