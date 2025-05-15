@@ -330,21 +330,23 @@ void DrawWuLine(Surface *screen, int X0, int Y0, int X1, int Y1, uint clrLine) {
 // -----------------------------------------------------------
 int Game::Evaluate()
 {
-    __int64 diff = 0;
-    for (int x = 0; x < SCRWIDTH; x++) {
-        for (int y = 0; y < SCRHEIGHT; y++) {
-            int index = y * SCRWIDTH + x;
-            uint src = screen->pixels[index];
-            uint ref = reference->pixels[index];
+	__int64 diff = 0;
+	uint* srcSet = screen->pixels;
+	uint* refSet = reference->pixels;
+	uint* end = srcSet + SCRHEIGHT * SCRWIDTH;
 
-            int dr = ((src >> 16) & 255) - (ref >> 16);
-            int dg = ((src >> 8) & 255) - ((ref >> 8) & 255);
-            int db = (src & 255) - (ref & 255);
+	while (srcSet < end)
+	{
+		uint src = *srcSet++, ref = *refSet++;
 
-            diff += 3 * dr * dr + 6 * dg * dg + db * db;
-        }
-    }
-    return (int)(diff >> 5);
+        int dr = ((src >> 16) & 255) - (ref >> 16),
+			dg = ((src >> 8) & 255) - ((ref >> 8) & 255),
+			db = (src & 255) - (ref & 255);
+
+		diff += 3 * dr * dr + 6 * dg * dg + db * db;
+	}
+
+	return (int)(diff >> 5);
 }
 
 // -----------------------------------------------------------
