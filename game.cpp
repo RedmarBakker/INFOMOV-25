@@ -259,9 +259,9 @@ void DrawWuLine( Surface *screen, int X0, int Y0, int X1, int Y1, uint clrLine )
             float grayb = (rb * 299 + gb * 587 + bb * 114) >> 10;
             int intWeight = (grayl < grayb ? Weighting : WeightingXOR);
 
-            BYTE rr = rl + ((rb - rl) & -(rb < rl)) + ((intWeight * fast_abs(rb - rl)) >> 8);
-            BYTE gr = gl + ((gb - gl) & -(gb < gl)) + ((intWeight * fast_abs(gb - gl)) >> 8);
-            BYTE br = bl + ((bb - bl) & -(bb < bl)) + ((intWeight * fast_abs(bb - bl)) >> 8);
+            BYTE rr = rl + ((rb - rl) & -(rb < rl)) + ((intWeight * abs(rb - rl)) >> 8);
+            BYTE gr = gl + ((gb - gl) & -(gb < gl)) + ((intWeight * abs(gb - gl)) >> 8);
+            BYTE br = bl + ((bb - bl) & -(bb < bl)) + ((intWeight * abs(bb - bl)) >> 8);
 
             screen->Plot( X0, Y0, RGB( rr, gr, br ) );
 
@@ -273,9 +273,9 @@ void DrawWuLine( Surface *screen, int X0, int Y0, int X1, int Y1, uint clrLine )
             grayb = (rb * 299 + gb * 587 + bb * 114) >> 10;
         	intWeight = (grayl < grayb ? WeightingXOR : Weighting);
 
-            rr = rl + ((rb - rl) & -(rb < rl)) + ((intWeight * fast_abs(rb - rl)) >> 8);
-            gr = gl + ((gb - gl) & -(gb < gl)) + ((intWeight * fast_abs(gb - gl)) >> 8);
-            br = bl + ((bb - bl) & -(bb < bl)) + ((intWeight * fast_abs(bb - bl)) >> 8);
+            rr = rl + ((rb - rl) & -(rb < rl)) + ((intWeight * abs(rb - rl)) >> 8);
+            gr = gl + ((gb - gl) & -(gb < gl)) + ((intWeight * abs(gb - gl)) >> 8);
+            br = bl + ((bb - bl) & -(bb < bl)) + ((intWeight * abs(bb - bl)) >> 8);
 
             screen->Plot( X0 + XDir, Y0, RGB( rr, gr, br ) );
         }
@@ -317,9 +317,9 @@ void DrawWuLine( Surface *screen, int X0, int Y0, int X1, int Y1, uint clrLine )
             float grayb = (rb * 299 + gb * 587 + bb * 114) >> 10;
             int intWeight = (grayl < grayb ? Weighting : WeightingXOR);
 
-            BYTE rr = rl + ((rb - rl) & -(rb < rl)) + ((intWeight * fast_abs(rb - rl)) >> 8);
-            BYTE gr = gl + ((gb - gl) & -(gb < gl)) + ((intWeight * fast_abs(gb - gl)) >> 8);
-            BYTE br = bl + ((bb - bl) & -(bb < bl)) + ((intWeight * fast_abs(bb - bl)) >> 8);
+            BYTE rr = rl + ((rb - rl) & -(rb < rl)) + ((intWeight * abs(rb - rl)) >> 8);
+            BYTE gr = gl + ((gb - gl) & -(gb < gl)) + ((intWeight * abs(gb - gl)) >> 8);
+            BYTE br = bl + ((bb - bl) & -(bb < bl)) + ((intWeight * abs(bb - bl)) >> 8);
 
             screen->Plot( X0, Y0, RGB( rr, gr, br ) );
 
@@ -331,9 +331,9 @@ void DrawWuLine( Surface *screen, int X0, int Y0, int X1, int Y1, uint clrLine )
             grayb = (rb * 299 + gb * 587 + bb * 114) >> 10;
             intWeight = (grayl < grayb ? WeightingXOR : Weighting);
 
-            rr = rl + ((rb - rl) & -(rb < rl)) + ((intWeight * fast_abs(rb - rl)) >> 8);
-            gr = gl + ((gb - gl) & -(gb < gl)) + ((intWeight * fast_abs(gb - gl)) >> 8);
-            br = bl + ((bb - bl) & -(bb < bl)) + ((intWeight * fast_abs(bb - bl)) >> 8);
+            rr = rl + ((rb - rl) & -(rb < rl)) + ((intWeight * abs(rb - rl)) >> 8);
+            gr = gl + ((gb - gl) & -(gb < gl)) + ((intWeight * abs(gb - gl)) >> 8);
+            br = bl + ((bb - bl) & -(bb < bl)) + ((intWeight * abs(bb - bl)) >> 8);
 
             screen->Plot( X0, Y0 + 1, RGB( rr, gr, br ) );
         }
