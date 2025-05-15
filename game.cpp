@@ -240,24 +240,24 @@ void DrawWuLine(Surface *screen, int X0, int Y0, int X1, int Y1, uint clrLine) {
 
             Weighting = ErrorAcc >> 8;
 
-            //COLORREF clrBackGround = ;
+            COLORREF clrBackGround = screen->pixels[current_pixel_index];
 
-            int intWeight = (grayl < ((GetRValue(screen->pixels[current_pixel_index]) * 299 + GetGValue(screen->pixels[current_pixel_index]) * 587 + GetBValue(screen->pixels[current_pixel_index]) * 114) >> 10) ? Weighting : Weighting ^ 255);
+            int intWeight = (grayl < ((GetRValue(clrBackGround) * 299 + GetGValue(clrBackGround) * 587 + GetBValue(clrBackGround) * 114) >> 10) ? Weighting : Weighting ^ 255);
 
             screen->Plot(X0, Y0, RGB(
-                rl + ((GetRValue(screen->pixels[current_pixel_index]) - rl) & -(GetRValue(screen->pixels[current_pixel_index]) < rl)) + ((intWeight * abs(GetRValue(screen->pixels[current_pixel_index]) - rl)) >> 8),
-                gl + ((GetGValue(screen->pixels[current_pixel_index]) - gl) & -(GetGValue(screen->pixels[current_pixel_index]) < gl)) + ((intWeight * abs(GetGValue(screen->pixels[current_pixel_index]) - gl)) >> 8),
-                bl + ((GetBValue(screen->pixels[current_pixel_index]) - bl) & -(GetBValue(screen->pixels[current_pixel_index]) < bl)) + ((intWeight * abs(GetBValue(screen->pixels[current_pixel_index]) - bl)) >> 8)
+                rl + ((GetRValue(clrBackGround) - rl) & -(GetRValue(clrBackGround) < rl)) + ((intWeight * abs(GetRValue(clrBackGround) - rl)) >> 8),
+                gl + ((GetGValue(clrBackGround) - gl) & -(GetGValue(clrBackGround) < gl)) + ((intWeight * abs(GetGValue(clrBackGround) - gl)) >> 8),
+                bl + ((GetBValue(clrBackGround) - bl) & -(GetBValue(clrBackGround) < bl)) + ((intWeight * abs(GetBValue(clrBackGround) - bl)) >> 8)
             ));
 
-            //clrBackGround = ;
+            clrBackGround = screen->pixels[current_pixel_index + XDir];
 
-            intWeight = (grayl < ((GetRValue(screen->pixels[current_pixel_index + XDir]) * 299 + GetGValue(screen->pixels[current_pixel_index + XDir]) * 587 + GetBValue(screen->pixels[current_pixel_index + XDir]) * 114) >> 10) ? Weighting ^ 255 : Weighting);
+            intWeight = (grayl < ((GetRValue(clrBackGround) * 299 + GetGValue(clrBackGround) * 587 + GetBValue(clrBackGround) * 114) >> 10) ? Weighting ^ 255 : Weighting);
 
             screen->Plot(X0 + XDir, Y0, RGB(
-                rl + ((GetRValue(screen->pixels[current_pixel_index + XDir]) - rl) & -(GetRValue(screen->pixels[current_pixel_index + XDir]) < rl)) + ((intWeight * abs(GetRValue(screen->pixels[current_pixel_index + XDir]) - rl)) >> 8),
-                gl + ((GetGValue(screen->pixels[current_pixel_index + XDir]) - gl) & -(GetGValue(screen->pixels[current_pixel_index + XDir]) < gl)) + ((intWeight * abs(GetGValue(screen->pixels[current_pixel_index + XDir]) - gl)) >> 8),
-                bl + ((GetBValue(screen->pixels[current_pixel_index + XDir]) - bl) & -(GetBValue(screen->pixels[current_pixel_index + XDir]) < bl)) + ((intWeight * abs(GetBValue(screen->pixels[current_pixel_index + XDir]) - bl)) >> 8)
+                rl + ((GetRValue(clrBackGround) - rl) & -(GetRValue(clrBackGround) < rl)) + ((intWeight * abs(GetRValue(clrBackGround) - rl)) >> 8),
+                gl + ((GetGValue(clrBackGround) - gl) & -(GetGValue(clrBackGround) < gl)) + ((intWeight * abs(GetGValue(clrBackGround) - gl)) >> 8),
+                bl + ((GetBValue(clrBackGround) - bl) & -(GetBValue(clrBackGround) < bl)) + ((intWeight * abs(GetBValue(clrBackGround) - bl)) >> 8)
             ));
         }
 
@@ -289,24 +289,24 @@ void DrawWuLine(Surface *screen, int X0, int Y0, int X1, int Y1, uint clrLine) {
 
             Weighting = ErrorAcc >> 8;
 
-            //COLORREF clrBackGround = ;
+            COLORREF clrBackGround = screen->pixels[current_pixel_index];
 
-            int intWeight = (grayl < ((GetRValue(screen->pixels[current_pixel_index]) * 299 + GetGValue(screen->pixels[current_pixel_index]) * 587 + GetBValue(screen->pixels[current_pixel_index]) * 114) >> 10) ? Weighting : Weighting ^ 255);
+            int intWeight = (grayl < ((GetRValue(clrBackGround) * 299 + GetGValue(clrBackGround) * 587 + GetBValue(clrBackGround) * 114) >> 10) ? Weighting : Weighting ^ 255);
 
             screen->Plot(X0, Y0, RGB(
-                rl + ((GetRValue(screen->pixels[current_pixel_index]) - rl) & -(GetRValue(screen->pixels[current_pixel_index]) < rl)) + ((intWeight * abs(GetRValue(screen->pixels[current_pixel_index]) - rl)) >> 8),
-                gl + ((GetGValue(screen->pixels[current_pixel_index]) - gl) & -(GetGValue(screen->pixels[current_pixel_index]) < gl)) + ((intWeight * abs(GetGValue(screen->pixels[current_pixel_index]) - gl)) >> 8),
-                bl + ((GetBValue(screen->pixels[current_pixel_index]) - bl) & -(GetBValue(screen->pixels[current_pixel_index]) < bl)) + ((intWeight * abs(GetBValue(screen->pixels[current_pixel_index]) - bl)) >> 8)
+                rl + ((GetRValue(clrBackGround) - rl) & -(GetRValue(clrBackGround) < rl)) + ((intWeight * abs(GetRValue(clrBackGround) - rl)) >> 8),
+                gl + ((GetGValue(clrBackGround) - gl) & -(GetGValue(clrBackGround) < gl)) + ((intWeight * abs(GetGValue(clrBackGround) - gl)) >> 8),
+                bl + ((GetBValue(clrBackGround) - bl) & -(GetBValue(clrBackGround) < bl)) + ((intWeight * abs(GetBValue(clrBackGround) - bl)) >> 8)
             ));
 
-            //clrBackGround = ;
+            clrBackGround = screen->pixels[current_pixel_index + SCRWIDTH];
 
-            intWeight = (grayl < ((GetRValue(screen->pixels[current_pixel_index + SCRWIDTH]) * 299 + GetGValue(screen->pixels[current_pixel_index + SCRWIDTH]) * 587 + GetBValue(screen->pixels[current_pixel_index + SCRWIDTH]) * 114) >> 10) ? Weighting ^ 255 : Weighting);
+            intWeight = (grayl < ((GetRValue(clrBackGround) * 299 + GetGValue(clrBackGround) * 587 + GetBValue(clrBackGround) * 114) >> 10) ? Weighting ^ 255 : Weighting);
 
             screen->Plot(X0, Y0 + 1, RGB(
-                rl + ((GetRValue(screen->pixels[current_pixel_index + SCRWIDTH]) - rl) & -(GetRValue(screen->pixels[current_pixel_index + SCRWIDTH]) < rl)) + ((intWeight * abs(GetRValue(screen->pixels[current_pixel_index + SCRWIDTH]) - rl)) >> 8),
-                gl + ((GetGValue(screen->pixels[current_pixel_index + SCRWIDTH]) - gl) & -(GetGValue(screen->pixels[current_pixel_index + SCRWIDTH]) < gl)) + ((intWeight * abs(GetGValue(screen->pixels[current_pixel_index + SCRWIDTH]) - gl)) >> 8),
-                bl + ((GetBValue(screen->pixels[current_pixel_index + SCRWIDTH]) - bl) & -(GetBValue(screen->pixels[current_pixel_index + SCRWIDTH]) < bl)) + ((intWeight * abs(GetBValue(screen->pixels[current_pixel_index + SCRWIDTH]) - bl)) >> 8)
+                rl + ((GetRValue(clrBackGround) - rl) & -(GetRValue(clrBackGround) < rl)) + ((intWeight * abs(GetRValue(clrBackGround) - rl)) >> 8),
+                gl + ((GetGValue(clrBackGround) - gl) & -(GetGValue(clrBackGround) < gl)) + ((intWeight * abs(GetGValue(clrBackGround) - gl)) >> 8),
+                bl + ((GetBValue(clrBackGround) - bl) & -(GetBValue(clrBackGround) < bl)) + ((intWeight * abs(GetBValue(clrBackGround) - bl)) >> 8)
             ));
         }
 
