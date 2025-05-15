@@ -184,7 +184,6 @@ inline BYTE blend_channel(BYTE line, BYTE bg, int weight) {
 // -----------------------------------------------------------
 void DrawWuLine( Surface *screen, int X0, int Y0, int X1, int Y1, uint clrLine )
 {
-	//const float weightNorm = 1.f / 255.f;
     /* Make sure the line runs top to bottom */
     if (Y0 > Y1)
     {
@@ -355,13 +354,11 @@ int Game::Evaluate()
 	//for( uint i = 0; i < count; i++ )
 	{
 		uint src = *srcSet++, ref = *refSet++;
-		//uint src = screen->pixels[i];
-		//uint ref = reference->pixels[i];
-		int r0 = (src >> 16) & 255, g0 = (src >> 8) & 255, b0 = src & 255;
-		int r1 = ref >> 16, g1 = (ref >> 8) & 255, b1 = ref & 255;
-		int dr = r0 - r1, dg = g0 - g1, db = b0 - b1;
-		// calculate squared color difference;
-		// take into account eye sensitivity to red, green and blue
+
+		int dr = (int)((src >> 16) & 255) - (int)(ref >> 16),
+            dg = (int)((src >> 8) & 255) - (int)((ref >> 8) & 255),
+            db = (int)(src & 255) - (int)(ref & 255);
+
 		diff += 3 * dr * dr + 6 * dg * dg + db * db;
 	}
 	return (int)(diff >> 5);
