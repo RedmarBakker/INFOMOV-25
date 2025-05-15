@@ -16,7 +16,7 @@ float peak = 0;                                                // peak line rend
 Surface *reference, *backup;                                // surfaces
 Timer timer;
 const uint screenSize = SCRHEIGHT * SCRWIDTH;
-const uint screenMemorySize = screenSize * 4;
+const uint screenMemorySize = screenSize << 2;
 
 #define BYTE unsigned char
 #define DWORD unsigned int
@@ -335,7 +335,7 @@ int Game::Evaluate() {
     __int64 diff = 0;
     uint *srcSet = screen->pixels;
     uint *refSet = reference->pixels;
-    uint *end = srcSet + SCRHEIGHT * SCRWIDTH;
+    uint *end = srcSet + screenSize;
 
     while (srcSet < end) {
         uint src = *srcSet++, ref = *refSet++;
@@ -368,7 +368,7 @@ void Game::Init() {
 //    }
     reference = new Surface("assets/bird.png");
     backup = new Surface(SCRWIDTH, SCRHEIGHT);
-    memset(screen->pixels, 255, SCRHEIGHT * SCRWIDTH * 4);
+    memset(screen->pixels, 255, screenMemorySize);
     for (int j = 0; j < LINES; j++) {
         DrawWuLine(screen, lx1[j], ly1[j], lx2[j], ly2[j], lc[j]);
     }
@@ -411,7 +411,7 @@ void Game::Tick(float /* deltaTime */) {
     screen->Print(t, 2, SCRHEIGHT - 24, 0xffffff);
     sprintf(t, "lps:     %5.2fK", lps);
     screen->Print(t, 2, SCRHEIGHT - 16, 0xffffff);
-    sprintf(t, "ips:     %5.2f", (iterCount * 1000) / elapsed);
+    sprintf(t, "ips:     %5.2f", (iterCount << 10) / elapsed);
     screen->Print(t, 2, SCRHEIGHT - 8, 0xffffff);
     sprintf(t, "peak:    %5.2f", peak);
     screen->Print(t, 2, SCRHEIGHT - 32, 0xffffff);
