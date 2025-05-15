@@ -15,7 +15,8 @@ float peak = 0;                                                // peak line rend
 //int count = SCRWIDTH * SCRHEIGHT;
 Surface *reference, *backup;                                // surfaces
 Timer timer;
-//const uint screenSize = SCRHEIGHT * SCRWIDTH;
+const uint screenSize = SCRHEIGHT * SCRWIDTH;
+const uint screenMemorySize = screenSize * 4;
 
 #define BYTE unsigned char
 #define DWORD unsigned int
@@ -66,7 +67,8 @@ void UndoMutation(int i) {
 // -----------------------------------------------------------
 // Branchless color blending for Wu lines (extracted from DrawWuLine)
 // -----------------------------------------------------------
-inline uint BlendColorBranchless(uint lineClr, uint bgClr, int grayl, unsigned short Weighting, unsigned short WeightingXOR) {
+inline uint
+BlendColorBranchless(uint lineClr, uint bgClr, int grayl, unsigned short Weighting, unsigned short WeightingXOR) {
     BYTE rl = GetRValue(lineClr);
     BYTE gl = GetGValue(lineClr);
     BYTE bl = GetBValue(lineClr);
@@ -177,8 +179,8 @@ inline BYTE blend_channel(BYTE line, BYTE bg, int weight) {
 void DrawWuLine(Surface *screen, int X0, int Y0, int X1, int Y1, uint clrLine) {
     /* Make sure the line runs top to bottom */
     if (Y0 > Y1) {
-        std::swap( Y0, Y1 );
-        std::swap( X0, X1 );
+        std::swap(Y0, Y1);
+        std::swap(X0, X1);
     }
 
     /* Draw the initial pixel, which is always exactly intersected by
@@ -187,9 +189,8 @@ void DrawWuLine(Surface *screen, int X0, int Y0, int X1, int Y1, uint clrLine) {
 
     int XDir = 1;
     int DeltaX = X1 - X0;
-    if( DeltaX < 0 )
-    {
-        XDir   = -1;
+    if (DeltaX < 0) {
+        XDir = -1;
         DeltaX = -DeltaX; /* make DeltaX positive */
     }
 
@@ -330,25 +331,23 @@ void DrawWuLine(Surface *screen, int X0, int Y0, int X1, int Y1, uint clrLine) {
 // Fitness evaluation
 // Compare current generation against reference image.
 // -----------------------------------------------------------
-int Game::Evaluate()
-{
-	__int64 diff = 0;
-	uint* srcSet = screen->pixels;
-	uint* refSet = reference->pixels;
-	uint* end = srcSet + SCRHEIGHT * SCRWIDTH;
+int Game::Evaluate() {
+    __int64 diff = 0;
+    uint *srcSet = screen->pixels;
+    uint *refSet = reference->pixels;
+    uint *end = srcSet + SCRHEIGHT * SCRWIDTH;
 
-	while (srcSet < end)
-	{
-		uint src = *srcSet++, ref = *refSet++;
+    while (srcSet < end) {
+        uint src = *srcSet++, ref = *refSet++;
 
         int dr = ((src >> 16) & 255) - (ref >> 16),
-			dg = ((src >> 8) & 255) - ((ref >> 8) & 255),
-			db = (src & 255) - (ref & 255);
+                dg = ((src >> 8) & 255) - ((ref >> 8) & 255),
+                db = (src & 255) - (ref & 255);
 
-		diff += 3 * dr * dr + 6 * dg * dg + db * db;
-	}
+        diff += 3 * dr * dr + 6 * dg * dg + db * db;
+    }
 
-	return (int)(diff >> 5);
+    return (int) (diff >> 5);
 }
 
 // -----------------------------------------------------------
@@ -356,7 +355,7 @@ int Game::Evaluate()
 // Load a previously saved generation, if available.
 // -----------------------------------------------------------
 void Game::Init() {
-    for (int i = 0; i < LINES; i++) MutateLine( i );
+    for (int i = 0; i < LINES; i++) MutateLine(i);
 //    FILE* f = fopen( LINEFILE, "rb" );
 //    if (f)
 //    {
@@ -367,12 +366,11 @@ void Game::Init() {
 //        fread( lc, 4, LINES, f );
 //        fclose( f );
 //    }
-    reference = new Surface( "assets/bird.png" );
-    backup = new Surface( SCRWIDTH, SCRHEIGHT );
-    memset( screen->pixels, 255, SCRHEIGHT * SCRWIDTH * 4 );
-    for (int j = 0; j < LINES; j++)
-    {
-        DrawWuLine( screen, lx1[j], ly1[j], lx2[j], ly2[j], lc[j] );
+    reference = new Surface("assets/bird.png");
+    backup = new Surface(SCRWIDTH, SCRHEIGHT);
+    memset(screen->pixels, 255, SCRHEIGHT * SCRWIDTH * 4);
+    for (int j = 0; j < LINES; j++) {
+        DrawWuLine(screen, lx1[j], ly1[j], lx2[j], ly2[j], lc[j]);
     }
     fitness = Evaluate();
 }
@@ -385,41 +383,38 @@ void Game::Tick(float /* deltaTime */) {
     int lineCount = 0;
     int iterCount = 0;
     // draw up to lidx
-    memset( screen->pixels, 255, SCRHEIGHT * SCRWIDTH * 4 );
-    for (int j = 0; j < lidx; j++, lineCount++)
-    {
-        DrawWuLine( screen, lx1[j], ly1[j], lx2[j], ly2[j], lc[j] );
+    memset(screen->pixels, 255, screenMemorySize);
+    for (int j = 0; j < lidx; j++, lineCount++) {
+        DrawWuLine(screen, lx1[j], ly1[j], lx2[j], ly2[j], lc[j]);
     }
     int base = lidx;
-    screen->CopyTo( backup, 0, 0 );
+    screen->CopyTo(backup, 0, 0);
     // iterate and draw from lidx to end
-    for (int k = 0; k < ITERATIONS; k++)
-    {
-        backup->CopyTo( screen, 0, 0 );
-        MutateLine( lidx );
-        for (int j = base; j < LINES; j++, lineCount++)
-        {
-            DrawWuLine( screen, lx1[j], ly1[j], lx2[j], ly2[j], lc[j] );
+    for (int k = 0; k < ITERATIONS; k++) {
+        backup->CopyTo(screen, 0, 0);
+        MutateLine(lidx);
+        for (int j = base; j < LINES; j++, lineCount++) {
+            DrawWuLine(screen, lx1[j], ly1[j], lx2[j], ly2[j], lc[j]);
         }
         int diff = Evaluate();
-        if (diff < fitness) fitness = diff; else UndoMutation( lidx );
+        if (diff < fitness) fitness = diff; else UndoMutation(lidx);
         lidx = (lidx + 1) % LINES;
         iterCount++;
     }
     // stats
     char t[128];
     float elapsed = timer.elapsed();
-    float lps = (float)lineCount / elapsed;
-    peak = max( lps, peak );
-    sprintf( t, "fitness: %i", fitness );
-    screen->Bar( 0, SCRHEIGHT - 33, 130, SCRHEIGHT - 1, 0 );
-    screen->Print( t, 2, SCRHEIGHT - 24, 0xffffff );
-    sprintf( t, "lps:     %5.2fK", lps );
-    screen->Print( t, 2, SCRHEIGHT - 16, 0xffffff );
-    sprintf( t, "ips:     %5.2f", (iterCount * 1000) / elapsed );
-    screen->Print( t, 2, SCRHEIGHT - 8, 0xffffff );
-    sprintf( t, "peak:    %5.2f", peak );
-    screen->Print( t, 2, SCRHEIGHT - 32, 0xffffff );
+    float lps = (float) lineCount / elapsed;
+    peak = max(lps, peak);
+    sprintf(t, "fitness: %i", fitness);
+    screen->Bar(0, SCRHEIGHT - 33, 130, SCRHEIGHT - 1, 0);
+    screen->Print(t, 2, SCRHEIGHT - 24, 0xffffff);
+    sprintf(t, "lps:     %5.2fK", lps);
+    screen->Print(t, 2, SCRHEIGHT - 16, 0xffffff);
+    sprintf(t, "ips:     %5.2f", (iterCount * 1000) / elapsed);
+    screen->Print(t, 2, SCRHEIGHT - 8, 0xffffff);
+    sprintf(t, "peak:    %5.2f", peak);
+    screen->Print(t, 2, SCRHEIGHT - 32, 0xffffff);
 }
 
 // -----------------------------------------------------------
