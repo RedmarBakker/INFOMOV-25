@@ -168,6 +168,7 @@ void DrawWuLine( Surface *screen, int X0, int Y0, int X1, int Y1, uint clrLine )
     BYTE bl = GetBValue( clrLine );
 
 	int grayl = (rl * 299 + gl * 587 + bl * 114) >> 10;
+	uint current_pixel_index = X0 + Y0 * SCRWIDTH;
 
     /* Is this an X-major or Y-major line? */
     if (DeltaY > DeltaX)
@@ -183,17 +184,17 @@ void DrawWuLine( Surface *screen, int X0, int Y0, int X1, int Y1, uint clrLine )
             if (ErrorAcc <= ErrorAccTemp) {
                 /* The error accumulator turned over, so advance the X coord */
                 X0 += XDir;
+            	current_pixel_index += XDir;
             }
-            Y0++; /* Y-major, so always advance Y */
-                  /* The IntensityBits most significant bits of ErrorAcc give us the
-                  intensity weighting for this pixel, and the complement of the
-            weighting for the paired pixel */
+            Y0++;
+        	current_pixel_index += SCRWIDTH;
+
             Weighting = ErrorAcc >> 8;
             WeightingXOR = Weighting ^ 255;
 
 
 
-            COLORREF clrBackGround = screen->pixels[X0 + Y0 * SCRWIDTH];
+            COLORREF clrBackGround = screen->pixels[current_pixel_index];
             BYTE rb = GetRValue( clrBackGround );
             BYTE gb = GetGValue( clrBackGround );
             BYTE bb = GetBValue( clrBackGround );
@@ -220,7 +221,7 @@ void DrawWuLine( Surface *screen, int X0, int Y0, int X1, int Y1, uint clrLine )
 			//screen->Plot( X0, Y0, BlendColorNEON(clrLine, clrBackGround, grayl, Weighting, WeightingXOR));
             screen->Plot( X0, Y0, RGB( rr, gr, br ) );
 
-            clrBackGround = screen->pixels[X0 + XDir + Y0 * SCRWIDTH];
+            clrBackGround = screen->pixels[current_pixel_index + XDir];
             rb = GetRValue( clrBackGround );
             gb = GetGValue( clrBackGround );
             bb = GetBValue( clrBackGround );
@@ -262,15 +263,15 @@ void DrawWuLine( Surface *screen, int X0, int Y0, int X1, int Y1, uint clrLine )
             if (ErrorAcc <= ErrorAccTemp) {
                 /* The error accumulator turned over, so advance the Y coord */
                 Y0++;
+            current_pixel_index += SCRWIDTH;
             }
-            X0 += XDir; /* X-major, so always advance X */
-            /* The IntensityBits most significant bits of ErrorAcc give us the
-            intensity weighting for this pixel, and the complement of the
-			weighting for the paired pixel */
+            X0 += XDir;
+        	current_pixel_index += XDir;
+
             Weighting = ErrorAcc >> 8;
             WeightingXOR = Weighting ^ 255;
 
-            COLORREF clrBackGround = screen->pixels[X0 + Y0 * SCRWIDTH];
+            COLORREF clrBackGround = screen->pixels[current_pixel_index];
             BYTE rb = GetRValue( clrBackGround );
             BYTE gb = GetGValue( clrBackGround );
             BYTE bb = GetBValue( clrBackGround );
@@ -296,7 +297,7 @@ void DrawWuLine( Surface *screen, int X0, int Y0, int X1, int Y1, uint clrLine )
         	//screen->Plot( X0, Y0, BlendColorNEON(clrLine, clrBackGround, grayl, Weighting, WeightingXOR));
             screen->Plot( X0, Y0, RGB( rr, gr, br ) );
 
-            clrBackGround = screen->pixels[X0 + (Y0 + 1) * SCRWIDTH];
+            clrBackGround = screen->pixels[current_pixel_index + SCRWIDTH];
             rb = GetRValue( clrBackGround );
             gb = GetGValue( clrBackGround );
             bb = GetBValue( clrBackGround );
