@@ -357,11 +357,17 @@ int Game::Evaluate()
 		uint src = *srcSet++, ref = *refSet++;
 		//uint src = screen->pixels[i];
 		//uint ref = reference->pixels[i];
-		int r0 = (src >> 16) & 255, g0 = (src >> 8) & 255, b0 = src & 255;
-		int r1 = ref >> 16, g1 = (ref >> 8) & 255, b1 = ref & 255;
-		int dr = r0 - r1, dg = g0 - g1, db = b0 - b1;
+		//int r0 = (src >> 16) & 255, g0 = (src >> 8) & 255, b0 = src & 255;
+		//int r1 = ref >> 16, g1 = (ref >> 8) & 255, b1 = ref & 255;
+
+		int dr = ((src >> 16) & 255) - (ref >> 16),
+			dg = ((src >> 8) & 255) - ((ref >> 8) & 255),
+			db = (src & 255) - (ref & 255);
 		// calculate squared color difference;
 		// take into account eye sensitivity to red, green and blue
+		//int dr_sq = dr * dr;
+		//int dg_sq = dg * dg;
+		//diff += (dr * dr << 1) + dr * dr + (dg * dg << 2) + (dg * dg << 1) + db * db;
 		diff += 3 * dr * dr + 6 * dg * dg + db * db;
 	}
 	return (int)(diff >> 5);
