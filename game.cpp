@@ -177,7 +177,7 @@ inline BYTE blend_channel(BYTE line, BYTE bg, int weight) {
 // Straight from:
 // https://www.codeproject.com/Articles/13360/Antialiasing-Wu-Algorithm
 // -----------------------------------------------------------
-void DrawWuLine(Surface *screen, int X0, int Y0, int X1, int Y1, uint clrLine) {
+void DrawWuLine(Surface *screen, int X0, int Y0, int X1, int Y1, COLORREF clrLine) {
     /* Make sure the line runs top to bottom */
     if (Y0 > Y1) {
         std::swap(Y0, Y1);
