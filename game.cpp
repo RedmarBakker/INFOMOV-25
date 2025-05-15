@@ -173,7 +173,7 @@ inline int fast_abs(int x) {
 }
 
 inline BYTE blend_channel(BYTE line, BYTE bg, int weight) {
-    return line + ((bg - line) & -(bg < line)) + ((weight * abs(bg - line)) >> 8)
+    return line + ((bg - line) & -(bg < line)) + ((weight * abs(bg - line)) >> 8);
 }
 
 // -----------------------------------------------------------
@@ -259,9 +259,9 @@ void DrawWuLine( Surface *screen, int X0, int Y0, int X1, int Y1, uint clrLine )
             float grayb = (rb * 299 + gb * 587 + bb * 114) >> 10;
             int intWeight = (grayl < grayb ? Weighting : WeightingXOR);
 
-            BYTE rr = blend_channel(rl, rb, intWeight);
-            BYTE gr = blend_channel(gl, gb, intWeight);
-            BYTE br = blend_channel(bl, bb, intWeight);
+            BYTE rr = rl + ((rb - rl) & -(rb < rl)) + ((intWeight * abs(rb - rl)) >> 8);
+            BYTE gr = gl + ((gb - gl) & -(gb < gl)) + ((intWeight * abs(gb - gl)) >> 8);
+            BYTE br = bl + ((bb - bl) & -(bb < bl)) + ((intWeight * abs(bb - bl)) >> 8);
 
             screen->Plot( X0, Y0, RGB( rr, gr, br ) );
 
@@ -273,9 +273,9 @@ void DrawWuLine( Surface *screen, int X0, int Y0, int X1, int Y1, uint clrLine )
             grayb = (rb * 299 + gb * 587 + bb * 114) >> 10;
         	intWeight = (grayl < grayb ? WeightingXOR : Weighting);
 
-            rr = blend_channel(rl, rb, intWeight);
-            gr = blend_channel(gl, gb, intWeight);
-            br = blend_channel(bl, bb, intWeight);
+            rr = rl + ((rb - rl) & -(rb < rl)) + ((intWeight * abs(rb - rl)) >> 8);
+            gr = gl + ((gb - gl) & -(gb < gl)) + ((intWeight * abs(gb - gl)) >> 8);
+            br = bl + ((bb - bl) & -(bb < bl)) + ((intWeight * abs(bb - bl)) >> 8);
 
             screen->Plot( X0 + XDir, Y0, RGB( rr, gr, br ) );
         }
@@ -317,9 +317,9 @@ void DrawWuLine( Surface *screen, int X0, int Y0, int X1, int Y1, uint clrLine )
             float grayb = (rb * 299 + gb * 587 + bb * 114) >> 10;
             int intWeight = (grayl < grayb ? Weighting : WeightingXOR);
 
-            BYTE rr = blend_channel(rl, rb, intWeight);
-            BYTE gr = blend_channel(gl, gb, intWeight);
-            BYTE br = blend_channel(bl, bb, intWeight);
+            BYTE rr = rl + ((rb - rl) & -(rb < rl)) + ((intWeight * abs(rb - rl)) >> 8);
+            BYTE gr = gl + ((gb - gl) & -(gb < gl)) + ((intWeight * abs(gb - gl)) >> 8);
+            BYTE br = bl + ((bb - bl) & -(bb < bl)) + ((intWeight * abs(bb - bl)) >> 8);
 
             screen->Plot( X0, Y0, RGB( rr, gr, br ) );
 
@@ -331,9 +331,9 @@ void DrawWuLine( Surface *screen, int X0, int Y0, int X1, int Y1, uint clrLine )
             grayb = (rb * 299 + gb * 587 + bb * 114) >> 10;
             intWeight = (grayl < grayb ? WeightingXOR : Weighting);
 
-            rr = blend_channel(rl, rb, intWeight);
-            gr = blend_channel(gl, gb, intWeight);
-            br = blend_channel(bl, bb, intWeight);
+            rr = rl + ((rb - rl) & -(rb < rl)) + ((intWeight * abs(rb - rl)) >> 8);
+            gr = gl + ((gb - gl) & -(gb < gl)) + ((intWeight * abs(gb - gl)) >> 8);
+            br = bl + ((bb - bl) & -(bb < bl)) + ((intWeight * abs(bb - bl)) >> 8);
 
             screen->Plot( X0, Y0 + 1, RGB( rr, gr, br ) );
         }
