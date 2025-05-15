@@ -201,7 +201,7 @@ void DrawWuLine( Surface *screen, int X0, int Y0, int X1, int Y1, uint clrLine )
     if( DeltaX < 0 )
     {
         XDir   = -1;
-        DeltaX = 0 - DeltaX; /* make DeltaX positive */
+        DeltaX = -DeltaX; /* make DeltaX positive */
     }
 
     /* Special-case horizontal, vertical, and diagonal lines, which
@@ -419,7 +419,7 @@ void Game::Tick( float /* deltaTime */ )
 	{
 		backup->CopyTo( screen, 0, 0 );
 		MutateLine( lidx );
-		for (int j = lidx; j < LINES; j++, lineCount++)
+		for (int j = base; j < LINES; j++, lineCount++)
 		{
 			DrawWuLine( screen, lx1[j], ly1[j], lx2[j], ly2[j], lc[j] );
 		}
