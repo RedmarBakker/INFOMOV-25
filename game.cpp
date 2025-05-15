@@ -411,7 +411,7 @@ void Game::Tick(float /* deltaTime */) {
     screen->Print(t, 2, SCRHEIGHT - 24, 0xffffff);
     sprintf(t, "lps:     %5.2fK", lps);
     screen->Print(t, 2, SCRHEIGHT - 16, 0xffffff);
-    sprintf(t, "ips:     %5.2f", (iterCount << 10) / elapsed);
+    sprintf(t, "ips:     %5.2f", (iterCount * 1000) / elapsed);
     screen->Print(t, 2, SCRHEIGHT - 8, 0xffffff);
     sprintf(t, "peak:    %5.2f", peak);
     screen->Print(t, 2, SCRHEIGHT - 32, 0xffffff);
