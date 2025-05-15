@@ -75,7 +75,7 @@ inline uint BlendColorBranchless(uint lineClr, uint bgClr, int grayl, unsigned s
     BYTE bb = GetBValue(bgClr);
 
     int grayb = (rb * 299 + gb * 587 + bb * 114) >> 10;
-    int intWeight = ((grayl < grayb) ^ inverse ? Weighting : WeightingXOR);
+    int intWeight = (grayl < grayb ? Weighting : WeightingXOR);
 
     BYTE rr = rl + ((rb - rl) & -(rb < rl)) + ((intWeight * abs(rb - rl)) >> 8);
     BYTE gr = gl + ((gb - gl) & -(gb < gl)) + ((intWeight * abs(gb - gl)) >> 8);
