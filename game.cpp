@@ -168,6 +168,16 @@ inline uint BlendColorBranchless(uint lineClr, uint bgClr, int grayl, unsigned s
     }
 #endif
 
+inline int fast_abs(int x) {
+    return (x ^ (x >> 31)) - (x >> 31);
+}
+
+inline BYTE blend_channel(BYTE src, BYTE dst, int weight) {
+    int diff = dst - src;
+
+    return src + ((weight * fast_abs(diff)) >> 8);
+}
+
 // -----------------------------------------------------------
 // DrawWuLine
 // Anti-aliased line rendering.
@@ -212,7 +222,7 @@ void DrawWuLine( Surface *screen, int X0, int Y0, int X1, int Y1, uint clrLine )
     BYTE gl = GetGValue( clrLine );
     BYTE bl = GetBValue( clrLine );
 
-	int grayl = (rl * 299 + gl * 587 + bl * 114) >> 10;
+	float grayl = (rl * 299 + gl * 587 + bl * 114) >> 10;
 	uint current_pixel_index = X0 + Y0 * SCRWIDTH;
 
     /* Is this an X-major or Y-major line? */
@@ -248,12 +258,12 @@ void DrawWuLine( Surface *screen, int X0, int Y0, int X1, int Y1, uint clrLine )
             BYTE gb = GetGValue( clrBackGround );
             BYTE bb = GetBValue( clrBackGround );
 
-            int grayb = (rb * 299 + gb * 587 + bb * 114) >> 10;
+            float grayb = (rb * 299 + gb * 587 + bb * 114) >> 10;
             int intWeight = (grayl < grayb ? Weighting : WeightingXOR);
 
-            BYTE rr = rl + ((rb - rl) & -(rb < rl)) + ((intWeight * (((rb - rl) ^ ((rb - rl) >> 31)) - ((rb - rl) >> 31))) >> 8);
-            BYTE gr = gl + ((gb - gl) & -(gb < gl)) + ((intWeight * (((gb - gl) ^ ((gb - gl) >> 31)) - ((gb - gl) >> 31))) >> 8);
-            BYTE br = bl + ((bb - bl) & -(bb < bl)) + ((intWeight * (((bb - bl) ^ ((bb - bl) >> 31)) - ((bb - bl) >> 31))) >> 8);
+            BYTE rr = blend_channel(rl, rb, intWeight);
+            BYTE gr = blend_channel(gl, gb, intWeight);
+            BYTE br = blend_channel(bl, bb, intWeight);
 
             screen->Plot( X0, Y0, RGB( rr, gr, br ) );
 
@@ -265,9 +275,9 @@ void DrawWuLine( Surface *screen, int X0, int Y0, int X1, int Y1, uint clrLine )
             grayb = (rb * 299 + gb * 587 + bb * 114) >> 10;
         	intWeight = (grayl < grayb ? WeightingXOR : Weighting);
 
-            rr = rl + ((rb - rl) & -(rb < rl)) + ((intWeight * (((rb - rl) ^ ((rb - rl) >> 31)) - ((rb - rl) >> 31))) >> 8);
-            gr = gl + ((gb - gl) & -(gb < gl)) + ((intWeight * (((gb - gl) ^ ((gb - gl) >> 31)) - ((gb - gl) >> 31))) >> 8);
-            br = bl + ((bb - bl) & -(bb < bl)) + ((intWeight * (((bb - bl) ^ ((bb - bl) >> 31)) - ((bb - bl) >> 31))) >> 8);
+            rr = blend_channel(rl, rb, intWeight);
+            gr = blend_channel(gl, gb, intWeight);
+            br = blend_channel(bl, bb, intWeight);
 
             screen->Plot( X0 + XDir, Y0, RGB( rr, gr, br ) );
         }
@@ -306,12 +316,12 @@ void DrawWuLine( Surface *screen, int X0, int Y0, int X1, int Y1, uint clrLine )
             BYTE gb = GetGValue( clrBackGround );
             BYTE bb = GetBValue( clrBackGround );
 
-            int grayb = (rb * 299 + gb * 587 + bb * 114) >> 10;
+            float grayb = (rb * 299 + gb * 587 + bb * 114) >> 10;
             int intWeight = (grayl < grayb ? Weighting : WeightingXOR);
 
-            BYTE rr = rl + ((rb - rl) & -(rb < rl)) + ((intWeight * (((rb - rl) ^ ((rb - rl) >> 31)) - ((rb - rl) >> 31))) >> 8);
-            BYTE gr = gl + ((gb - gl) & -(gb < gl)) + ((intWeight * (((gb - gl) ^ ((gb - gl) >> 31)) - ((gb - gl) >> 31))) >> 8);
-            BYTE br = bl + ((bb - bl) & -(bb < bl)) + ((intWeight * (((bb - bl) ^ ((bb - bl) >> 31)) - ((bb - bl) >> 31))) >> 8);
+            BYTE rr = blend_channel(rl, rb, intWeight);
+            BYTE gr = blend_channel(gl, gb, intWeight);
+            BYTE br = blend_channel(bl, bb, intWeight);
 
             screen->Plot( X0, Y0, RGB( rr, gr, br ) );
 
@@ -323,9 +333,9 @@ void DrawWuLine( Surface *screen, int X0, int Y0, int X1, int Y1, uint clrLine )
             grayb = (rb * 299 + gb * 587 + bb * 114) >> 10;
             intWeight = (grayl < grayb ? WeightingXOR : Weighting);
 
-            rr = rl + ((rb - rl) & -(rb < rl)) + ((intWeight * (((rb - rl) ^ ((rb - rl) >> 31)) - ((rb - rl) >> 31))) >> 8);
-            gr = gl + ((gb - gl) & -(gb < gl)) + ((intWeight * (((gb - gl) ^ ((gb - gl) >> 31)) - ((gb - gl) >> 31))) >> 8);
-            br = bl + ((bb - bl) & -(bb < bl)) + ((intWeight * (((bb - bl) ^ ((bb - bl) >> 31)) - ((bb - bl) >> 31))) >> 8);
+            rr = blend_channel(rl, rb, intWeight);
+            gr = blend_channel(gl, gb, intWeight);
+            br = blend_channel(bl, bb, intWeight);
 
             screen->Plot( X0, Y0 + 1, RGB( rr, gr, br ) );
         }
