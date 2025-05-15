@@ -92,7 +92,7 @@ inline uint BlendColorBranchless(uint clrLine, uint clrBackGround, int grayl, un
 
     return RGB(rr, gr, br);
 
-    int rl = GetRValue(lineClr);
+    /*int rl = GetRValue(lineClr);
     int gl = GetGValue(lineClr);
     int bl = GetBValue(lineClr);
 
@@ -107,7 +107,7 @@ inline uint BlendColorBranchless(uint clrLine, uint clrBackGround, int grayl, un
     BYTE gr = gl + ((gb - gl) & -(gb < gl)) + ((intWeight * abs(gb - gl)) >> 8);
     BYTE br = bl + ((bb - bl) & -(bb < bl)) + ((intWeight * abs(bb - bl)) >> 8);
 
-    return RGB(rr, gr, br);
+    return RGB(rr, gr, br);*/
 }
 
 #if defined(USE_SIMD) && defined(__ARM_NEON) && (defined(__APPLE__) || defined(__aarch64__))
