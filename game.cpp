@@ -1,5 +1,6 @@
 #include "precomp.h"
 #include "game.h"
+#include <random>
 
 #define LINES        750
 #define LINEFILE    "lines750.dat"
@@ -27,6 +28,15 @@ const uint screenMemorySize = screenSize << 2;
 #define GetGValue(RGBColor) (BYTE) (((uint)RGBColor) >> 8)
 #define GetBValue(RGBColor) (BYTE) (((uint)RGBColor) >> 16)
 
+// Variables used in MutateLine logic
+std::random_device rd;    //Set the seed in Game::Init
+std::mt19937 rng;
+std::uniform_int_distribution<unsigned int> mutation_type_dist(0, 99);
+std::uniform_int_distribution<unsigned int> color_dist(0, 0xffffff);
+std::uniform_int_distribution<int> small_mut_dist(-3, 3);
+std::uniform_int_distribution<int> x_coord_dist(0, SCRWIDTH - 1);
+std::uniform_int_distribution<int> y_coord_dist(0, SCRHEIGHT - 1);
+
 // -----------------------------------------------------------
 // Mutate
 // Randomly modify or replace one line.
@@ -36,24 +46,34 @@ void MutateLine(int i) {
     x1_ = lx1[i], y1_ = ly1[i];
     x2_ = lx2[i], y2_ = ly2[i];
     c_ = lc[i];
-    //int mutate = rand();
+
     do {
-        if (rand() & 1) {
-            // color mutation (50% probability)
-            lc[i] = RandomUInt() & 0xffffff;
-        } else if (rand() & 1) {
-            // small mutation (25% probability)
-            lx1[i] += RandomUInt() % 6 - 3, ly1[i] += RandomUInt() % 6 - 3;
-            lx2[i] += RandomUInt() % 6 - 3, ly2[i] += RandomUInt() % 6 - 3;
+        // Randomly select number from 0-99
+        int mutation_type = mutation_type_dist(rng);
+
+        if (mutation_type < 50) {
+            // color mutation using distribution
+            lc[i] = color_dist(rng);
+        } else if (mutation_type < 75) {
+            // small mutation
+            // Use the small mutation distribution for offsets
+            lx1[i] += small_mut_dist(rng);
+            ly1[i] += small_mut_dist(rng);
+            lx2[i] += small_mut_dist(rng);
+            ly2[i] += small_mut_dist(rng);
+
             // ensure the line stays on the screen
-            lx1[i] = min(SCRWIDTH - 1, max(0, lx1[i]));
-            lx2[i] = min(SCRWIDTH - 1, max(0, lx2[i]));
-            ly1[i] = min(SCRHEIGHT - 1, max(0, ly1[i]));
-            ly2[i] = min(SCRHEIGHT - 1, max(0, ly2[i]));
+            lx1[i] = std::min(SCRWIDTH - 1, std::max(0, lx1[i]));
+            lx2[i] = std::min(SCRWIDTH - 1, std::max(0, lx2[i]));
+            ly1[i] = std::min(SCRHEIGHT - 1, std::max(0, ly1[i]));
+            ly2[i] = std::min(SCRHEIGHT - 1, std::max(0, ly2[i]));
         } else {
-            // new line (25% probability)
-            lx1[i] = RandomUInt() % SCRWIDTH, lx2[i] = RandomUInt() % SCRWIDTH;
-            ly1[i] = RandomUInt() % SCRHEIGHT, ly2[i] = RandomUInt() % SCRHEIGHT;
+            // new line
+            // Use coordinate distributions for new endpoints
+            lx1[i] = x_coord_dist(rng);
+            lx2[i] = x_coord_dist(rng);
+            ly1[i] = y_coord_dist(rng);
+            ly2[i] = y_coord_dist(rng);
         }
     } while ((abs(lx1[i] - lx2[i]) < 3) || (abs(ly1[i] - ly2[i]) < 3));
 }
@@ -66,6 +86,7 @@ void UndoMutation(int i) {
 }
 
 // -----------------------------------------------------------
+// NOT USED!
 // Branchless color blending for Wu lines (extracted from DrawWuLine)
 // -----------------------------------------------------------
 inline uint BlendColorBranchless(uint lineClr, uint bgClr, int grayl, unsigned short Weighting, unsigned short WeightingXOR) {
@@ -87,6 +108,8 @@ inline uint BlendColorBranchless(uint lineClr, uint bgClr, int grayl, unsigned s
     return RGB(rr, gr, br);
 }
 
+//Logic to apply SIMD
+// NOT USED (in the end)
 #if defined(USE_SIMD) && defined(__ARM_NEON) && (defined(__APPLE__) || defined(__aarch64__))
 #include <arm_neon.h>
 
@@ -210,6 +233,7 @@ void DrawWuLine(Surface *screen, int X0, int Y0, int X1, int Y1, uint clrLine) {
     BYTE gl = GetGValue(clrLine);
     BYTE bl = GetBValue(clrLine);
 
+    //PreCalculate variables
     int grayl = (rl * 299 + gl * 587 + bl * 114) >> 10;
     uint current_pixel_index = X0 + Y0 * SCRWIDTH;
 
@@ -228,18 +252,19 @@ void DrawWuLine(Surface *screen, int X0, int Y0, int X1, int Y1, uint clrLine) {
                 current_pixel_index += XDir;
             }
 
-            ErrorAcc += ErrorAdj;
-
+            ErrorAcc += ErrorAdj; //Adjust the Error
             Y0++;
-            current_pixel_index += SCRWIDTH;
-
+            current_pixel_index += SCRWIDTH; //Increment the pixel index
             Weighting = ErrorAcc >> 8;
 
             COLORREF clrBackGround = screen->pixels[current_pixel_index];
 
-            // Using arithmatic to lose branch statement, to or use the Weighting or inverse Weighting.
+            // Using arithmatic to lose branch statement, to use the Weighting or inverse Weighting.
+            // Division is replaced by bitshifts
             int intWeight = Weighting ^ (-(grayl >= ((GetRValue(clrBackGround) * 299 + GetGValue(clrBackGround) * 587 + GetBValue(clrBackGround) * 114) >> 10)) & 255);
 
+            // Using arithmatic and logic to blend the RGB values with the weighted grayscale
+            // Working without variables to reduce memory fetches
             screen->Plot(X0, Y0, RGB(
                 rl + ((GetRValue(clrBackGround) - rl) & -(GetRValue(clrBackGround) < rl)) + ((intWeight * abs(GetRValue(clrBackGround) - rl)) >> 8),
                 gl + ((GetGValue(clrBackGround) - gl) & -(GetGValue(clrBackGround) < gl)) + ((intWeight * abs(GetGValue(clrBackGround) - gl)) >> 8),
@@ -277,7 +302,6 @@ void DrawWuLine(Surface *screen, int X0, int Y0, int X1, int Y1, uint clrLine) {
 
             X0 += XDir;
             current_pixel_index += XDir;
-
             Weighting = ErrorAcc >> 8;
 
             COLORREF clrBackGround = screen->pixels[current_pixel_index];
@@ -326,7 +350,6 @@ int Game::Evaluate() {
 
         diff += 3 * dr * dr + 6 * dg * dg + db * db;
     }
-
     return (int) (diff >> 5);
 }
 
@@ -336,19 +359,21 @@ int Game::Evaluate() {
 // -----------------------------------------------------------
 void Game::Init() {
     for (int i = 0; i < LINES; i++) MutateLine(i);
-//    FILE* f = fopen( LINEFILE, "rb" );
-//    if (f)
-//    {
-//        fread( lx1, 4, LINES, f );
-//        fread( ly1, 4, LINES, f );
-//        fread( lx2, 4, LINES, f );
-//        fread( ly2, 4, LINES, f );
-//        fread( lc, 4, LINES, f );
-//        fclose( f );
-//    }
+    FILE* f = fopen( LINEFILE, "rb" );
+    if (f)
+    {
+        fread( lx1, 4, LINES, f );
+        fread( ly1, 4, LINES, f );
+        fread( lx2, 4, LINES, f );
+        fread( ly2, 4, LINES, f );
+        fread( lc, 4, LINES, f );
+        fclose( f );
+    }
     reference = new Surface("assets/bird.png");
     backup = new Surface(SCRWIDTH, SCRHEIGHT);
     memset(screen->pixels, 255, screenMemorySize);
+    //Set seed
+    rng.seed(rd());
     for (int j = 0; j < LINES; j++) {
         DrawWuLine(screen, lx1[j], ly1[j], lx2[j], ly2[j], lc[j]);
     }
