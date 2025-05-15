@@ -236,7 +236,6 @@ void DrawWuLine(Surface *screen, int X0, int Y0, int X1, int Y1, uint clrLine) {
             current_pixel_index += SCRWIDTH;
 
             Weighting = ErrorAcc >> 8;
-            //WeightingXOR = Weighting ^ 255;
 
             COLORREF clrBackGround = screen->pixels[current_pixel_index];
             BYTE rb = GetRValue(clrBackGround);
@@ -292,7 +291,6 @@ void DrawWuLine(Surface *screen, int X0, int Y0, int X1, int Y1, uint clrLine) {
             current_pixel_index += XDir;
 
             Weighting = ErrorAcc >> 8;
-            //WeightingXOR = Weighting ^ 255;
 
             COLORREF clrBackGround = screen->pixels[current_pixel_index];
             BYTE rb = GetRValue(clrBackGround);
