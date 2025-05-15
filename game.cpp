@@ -36,6 +36,7 @@ void MutateLine(int i) {
     x1_ = lx1[i], y1_ = ly1[i];
     x2_ = lx2[i], y2_ = ly2[i];
     c_ = lc[i];
+    //int mutate = rand();
     do {
         if (rand() & 1) {
             // color mutation (50% probability)
@@ -211,7 +212,7 @@ void DrawWuLine(Surface *screen, int X0, int Y0, int X1, int Y1, uint clrLine) {
     BYTE bl = GetBValue(clrLine);
 
     int grayl = (rl * 299 + gl * 587 + bl * 114) >> 10;
-    uint current_pixel_index = X0 + (Y0 * SCRWIDTH);
+    uint current_pixel_index = X0 + Y0 * SCRWIDTH;
 
     /* Is this an X-major or Y-major line? */
     if (DeltaY > DeltaX) {
