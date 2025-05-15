@@ -15,7 +15,7 @@ float peak = 0;                                                // peak line rend
 //int count = SCRWIDTH * SCRHEIGHT;
 Surface *reference, *backup;                                // surfaces
 Timer timer;
-const uint screenSize = SCRHEIGHT * SCRWIDTH;
+//const uint screenSize = SCRHEIGHT * SCRWIDTH;
 
 #define BYTE unsigned char
 #define DWORD unsigned int
@@ -331,9 +331,10 @@ void DrawWuLine(Surface *screen, int X0, int Y0, int X1, int Y1, uint clrLine) {
 int Game::Evaluate()
 {
 	__int64 diff = 0;
+    const uint count = SCRHEIGHT * SCRWIDTH;
 	uint* srcSet = screen->pixels;
 	uint* refSet = reference->pixels;
-	uint* end = srcSet + SCRHEIGHT * SCRWIDTH;
+	uint* end = srcSet + count;
 
 	while (srcSet < end)
 	{
