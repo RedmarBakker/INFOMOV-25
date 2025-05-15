@@ -233,10 +233,11 @@ void DrawWuLine( Surface *screen, int X0, int Y0, int X1, int Y1, uint clrLine )
     /* Is this an X-major or Y-major line? */
     if (DeltaY > DeltaX)
     {
-    /* Y-major line; calculate 16-bit fixed-point fractional part of a
-    pixel that X advances each time Y advances 1 pixel, truncating the
+        /* Y-major line; calculate 16-bit fixed-point fractional part of a
+        pixel that X advances each time Y advances 1 pixel, truncating the
         result so that we won't overrun the endpoint along the X axis */
         ErrorAdj = ((unsigned long) DeltaX << 16) / (unsigned long) DeltaY;
+
         /* Draw all pixels other than the first and last */
         while (--DeltaY) {
             ErrorAccTemp = ErrorAcc;   /* remember currrent accumulated error */
@@ -245,37 +246,71 @@ void DrawWuLine( Surface *screen, int X0, int Y0, int X1, int Y1, uint clrLine )
                 /* The error accumulator turned over, so advance the X coord */
                 X0 += XDir;
             }
-            Y0++; /* Y-major, so always advance Y */
-                  /* The IntensityBits most significant bits of ErrorAcc give us the
-                  intensity weighting for this pixel, and the complement of the
+            /* Y-major, so always advance Y */
+            Y0++;
+
+            /* The IntensityBits most significant bits of ErrorAcc give us the
+            intensity weighting for this pixel, and the complement of the
             weighting for the paired pixel */
             Weighting = ErrorAcc >> 8;
             WeightingXOR = Weighting ^ 255;
 
             uint index = X0 + Y0 * SCRWIDTH;
             COLORREF clrBackGround = screen->pixels[index];
-            screen->Plot(X0, Y0, BlendColorBranchless(clrLine, clrBackGround, grayl, Weighting, WeightingXOR));
+            BYTE rb = GetRValue( clrBackGround );
+            BYTE gb = GetGValue( clrBackGround );
+            BYTE bb = GetBValue( clrBackGround );
+
+            int grayb = (rb * 299 + gb * 587 + bb * 114) >> 10;
+            int intWeight = (grayl < grayb ? Weighting : WeightingXOR);
+
+            BYTE rr = rl + ((rb - rl) & -(rb < rl)) + ((intWeight * abs(rb - rl)) >> 8);
+            BYTE gr = gl + ((gb - gl) & -(gb < gl)) + ((intWeight * abs(gb - gl)) >> 8);
+            BYTE br = bl + ((bb - bl) & -(bb < bl)) + ((intWeight * abs(bb - bl)) >> 8);
+
+            screen->Plot(X0, Y0, RGB(rr, gr, br));
 
             clrBackGround = screen->pixels[index + XDir];
-            screen->Plot(X0, Y0, BlendColorBranchless(clrLine, clrBackGround, grayl, WeightingXOR, Weighting));
+            rb = GetRValue( clrBackGround );
+            gb = GetGValue( clrBackGround );
+            bb = GetBValue( clrBackGround );
+
+            grayb = (rb * 299 + gb * 587 + bb * 114) >> 10;
+
+            intWeight = (grayl < grayb ? WeightingXOR : Weighting);
+            rr = rl + ((rb - rl) & -(rb < rl)) + ((intWeight * abs(rb - rl)) >> 8);
+            gr = gl + ((gb - gl) & -(gb < gl)) + ((intWeight * abs(gb - gl)) >> 8);
+            br = bl + ((bb - bl) & -(bb < bl)) + ((intWeight * abs(bb - bl)) >> 8);
+
+            screen->Plot(X0, Y0, RGB(rr, gr, br));
         }
+
         /* Draw the final pixel, which is always exactly intersected by the line
         and so needs no weighting */
         screen->Plot( X1, Y1, clrLine );
     } else {
+
         /* It's an X-major line; calculate 16-bit fixed-point fractional part of a
         pixel that Y advances each time X advances 1 pixel, truncating the
         result to avoid overrunning the endpoint along the X axis */
         ErrorAdj = ((unsigned long) DeltaY << 16) / (unsigned long) DeltaX;
+
         /* Draw all pixels other than the first and last */
         while (--DeltaX) {
-            ErrorAccTemp = ErrorAcc;   /* remember currrent accumulated error */
-            ErrorAcc += ErrorAdj;      /* calculate error for next pixel */
+            /* remember currrent accumulated error */
+            ErrorAccTemp = ErrorAcc;
+
+            /* calculate error for next pixel */
+            ErrorAcc += ErrorAdj;
+
             if (ErrorAcc <= ErrorAccTemp) {
                 /* The error accumulator turned over, so advance the Y coord */
                 Y0++;
             }
-            X0 += XDir; /* X-major, so always advance X */
+
+            /* X-major, so always advance X */
+            X0 += XDir;
+
             /* The IntensityBits most significant bits of ErrorAcc give us the
             intensity weighting for this pixel, and the complement of the
 			weighting for the paired pixel */
@@ -288,25 +323,13 @@ void DrawWuLine( Surface *screen, int X0, int Y0, int X1, int Y1, uint clrLine )
             BYTE gb = GetGValue( clrBackGround );
             BYTE bb = GetBValue( clrBackGround );
 
-//        double grayb = rb * 0.299 + gb * 0.587 + bb * 0.114;
             int grayb = (rb * 299 + gb * 587 + bb * 114) >> 10;
-//            double weight = (double)((grayl < grayb) ? Weighting : WeightingXOR) * weightNorm;
-            //double weight = (isLight * Weighting + (1 - isLight) * (Weighting ^ 255)) * weightNorm;
-
             int intWeight = (grayl < grayb ? Weighting : WeightingXOR);
+
             BYTE rr = rl + ((rb - rl) & -(rb < rl)) + ((intWeight * abs(rb - rl)) >> 8);
             BYTE gr = gl + ((gb - gl) & -(gb < gl)) + ((intWeight * abs(gb - gl)) >> 8);
             BYTE br = bl + ((bb - bl) & -(bb < bl)) + ((intWeight * abs(bb - bl)) >> 8);
 
-//            BYTE rr = ( rb > rl ? ( ( BYTE )( weight * ( rb - rl ) + rl ) ) : ( ( BYTE )( weight * ( rl - rb ) + rb ) ) );
-//            BYTE gr = ( gb > gl ? ( ( BYTE )( weight * ( gb - gl ) + gl ) ) : ( ( BYTE )( weight * ( gl - gb ) + gb ) ) );
-//            BYTE br = ( bb > bl ? ( ( BYTE )( weight * ( bb - bl ) + bl ) ) : ( ( BYTE )( weight * ( bl - bb ) + bb ) ) );
-
-//            BYTE rr = (BYTE)(weight * abs(rb - rl) + std::min<int>((int)rb, (int)rl));
-//            BYTE gr = (BYTE)(weight * abs(gb - gl) + std::min<int>((int)gb, (int)gl));
-//            BYTE br = (BYTE)(weight * abs(bb - bl) + std::min<int>((int)bb, (int)bl));
-
-        	//screen->Plot( X0, Y0, BlendColorNEON(clrLine, clrBackGround, grayl, Weighting, WeightingXOR));
             screen->Plot( X0, Y0, RGB( rr, gr, br ) );
 
             clrBackGround = screen->pixels[index + SCRWIDTH];
@@ -314,30 +337,15 @@ void DrawWuLine( Surface *screen, int X0, int Y0, int X1, int Y1, uint clrLine )
             gb = GetGValue( clrBackGround );
             bb = GetBValue( clrBackGround );
 
-//        grayb = rb * 0.299 + gb * 0.587 + bb * 0.114;
             grayb = (rb * 299 + gb * 587 + bb * 114) >> 10;
-
-//            weight = (double)(grayl < grayb ? WeightingXOR : Weighting) * weightNorm;
 
             intWeight = (grayl < grayb ? WeightingXOR : Weighting);
             rr = rl + ((rb - rl) & -(rb < rl)) + ((intWeight * abs(rb - rl)) >> 8);
             gr = gl + ((gb - gl) & -(gb < gl)) + ((intWeight * abs(gb - gl)) >> 8);
             br = bl + ((bb - bl) & -(bb < bl)) + ((intWeight * abs(bb - bl)) >> 8);
 
-            //weight = (isLight * (Weighting ^ 255) + (1 - isLight) * Weighting) * weightNorm;
-
-//            rr = ( rb > rl ? ( ( BYTE )( weight * ( rb - rl ) + rl ) ) : ( ( BYTE )( weight * ( rl - rb ) + rb ) ) );
-//            gr = ( gb > gl ? ( ( BYTE )( weight * ( gb - gl ) + gl ) ) : ( ( BYTE )( weight * ( gl - gb ) + gb ) ) );
-//            br = ( bb > bl ? ( ( BYTE )( weight * ( bb - bl ) + bl ) ) : ( ( BYTE )( weight * ( bl - bb ) + bb ) ) );
-
-//            rr = (BYTE)(weight * abs(rb - rl) + std::min<int>((int)rb, (int)rl));
-//            gr = (BYTE)(weight * abs(gb - gl) + std::min<int>((int)gb, (int)gl));
-//            br = (BYTE)(weight * abs(bb - bl) + std::min<int>((int)bb, (int)bl));
-
-        	//screen->Plot( X0, Y0 + 1, BlendColorNEON(clrLine, clrBackGround, grayl, WeightingXOR, Weighting));
             screen->Plot( X0, Y0 + 1, RGB( rr, gr, br ) );
         }
-
 
         /* Draw the final pixel, which is always exactly intersected by the line
         and so needs no weighting */
