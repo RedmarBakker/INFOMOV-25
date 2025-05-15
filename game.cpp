@@ -332,22 +332,26 @@ void DrawWuLine(Surface *screen, int X0, int Y0, int X1, int Y1, uint clrLine) {
 // Fitness evaluation
 // Compare current generation against reference image.
 // -----------------------------------------------------------
-int Game::Evaluate() {
-    __int64 diff = 0;
-    const uint count = SCRWIDTH * SCRHEIGHT;
-    uint *srcSet = screen->pixels;
-    uint *refSet = reference->pixels;
-    uint *end = srcSet + count;
-    while (srcSet < end) {
-        uint src = *srcSet++, ref = *refSet++;
+int Game::Evaluate()
+{
+	__int64 diff = 0;
+	const uint count = SCRWIDTH * SCRHEIGHT;
+	uint* srcSet = screen->pixels;
+	uint* refSet = reference->pixels;
+	uint* end = srcSet + count;
+
+	while (srcSet < end)
+	{
+		uint src = *srcSet++, ref = *refSet++;
 
         int dr = ((src >> 16) & 255) - (ref >> 16),
-                dg = ((src >> 8) & 255) - ((ref >> 8) & 255),
-                db = (src & 255) - (ref & 255);
+			dg = ((src >> 8) & 255) - ((ref >> 8) & 255),
+			db = (src & 255) - (ref & 255);
 
-        diff += 3 * dr * dr + 6 * dg * dg + db * db;
-    }
-    return (int) (diff >> 5);
+		diff += 3 * dr * dr + 6 * dg * dg + db * db;
+	}
+
+	return (int)(diff >> 5);
 }
 
 // -----------------------------------------------------------
