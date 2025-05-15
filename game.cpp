@@ -190,10 +190,7 @@ void DrawWuLine(Surface *screen, int X0, int Y0, int X1, int Y1, uint clrLine) {
 
     // XDir = 1 if DeltaX >= 0, -1 if DeltaX < 0
     int XDir = 1 | (DeltaX >> 31);
-
-    // absolute value of DeltaX
     DeltaX = abs(DeltaX);
-    //DeltaX = (DeltaX ^ (DeltaX >> 31)) - (DeltaX >> 31);
 
     /* Special-case horizontal, vertical, and diagonal lines, which
     require no weighting because they go right through the center of
@@ -201,7 +198,7 @@ void DrawWuLine(Surface *screen, int X0, int Y0, int X1, int Y1, uint clrLine) {
     int DeltaY = Y1 - Y0;
 
     unsigned short ErrorAdj;
-    unsigned short ErrorAccTemp, Weighting, WeightingXOR;
+    unsigned short ErrorAccTemp, Weighting;
 
     /* Line is not horizontal, diagonal, or vertical */
     /* initialize the line error accumulator to 0 */
@@ -239,14 +236,14 @@ void DrawWuLine(Surface *screen, int X0, int Y0, int X1, int Y1, uint clrLine) {
             current_pixel_index += SCRWIDTH;
 
             Weighting = ErrorAcc >> 8;
-            WeightingXOR = Weighting ^ 255;
+            //WeightingXOR = Weighting ^ 255;
 
             COLORREF clrBackGround = screen->pixels[current_pixel_index];
             BYTE rb = GetRValue(clrBackGround);
             BYTE gb = GetGValue(clrBackGround);
             BYTE bb = GetBValue(clrBackGround);
 
-            int intWeight = (grayl < ((rb * 299 + gb * 587 + bb * 114) >> 10) ? Weighting : WeightingXOR);
+            int intWeight = (grayl < ((rb * 299 + gb * 587 + bb * 114) >> 10) ? Weighting : Weighting ^ 255);
 
             BYTE rr = rl + ((rb - rl) & -(rb < rl)) + ((intWeight * abs(rb - rl)) >> 8);
             BYTE gr = gl + ((gb - gl) & -(gb < gl)) + ((intWeight * abs(gb - gl)) >> 8);
@@ -259,7 +256,7 @@ void DrawWuLine(Surface *screen, int X0, int Y0, int X1, int Y1, uint clrLine) {
             gb = GetGValue(clrBackGround);
             bb = GetBValue(clrBackGround);
 
-            intWeight = (grayl < ((rb * 299 + gb * 587 + bb * 114) >> 10) ? WeightingXOR : Weighting);
+            intWeight = (grayl < ((rb * 299 + gb * 587 + bb * 114) >> 10) ? Weighting ^ 255 : Weighting);
 
             rr = rl + ((rb - rl) & -(rb < rl)) + ((intWeight * abs(rb - rl)) >> 8);
             gr = gl + ((gb - gl) & -(gb < gl)) + ((intWeight * abs(gb - gl)) >> 8);
@@ -295,14 +292,14 @@ void DrawWuLine(Surface *screen, int X0, int Y0, int X1, int Y1, uint clrLine) {
             current_pixel_index += XDir;
 
             Weighting = ErrorAcc >> 8;
-            WeightingXOR = Weighting ^ 255;
+            //WeightingXOR = Weighting ^ 255;
 
             COLORREF clrBackGround = screen->pixels[current_pixel_index];
             BYTE rb = GetRValue(clrBackGround);
             BYTE gb = GetGValue(clrBackGround);
             BYTE bb = GetBValue(clrBackGround);
 
-            int intWeight = (grayl < ((rb * 299 + gb * 587 + bb * 114) >> 10) ? Weighting : WeightingXOR);
+            int intWeight = (grayl < ((rb * 299 + gb * 587 + bb * 114) >> 10) ? Weighting : Weighting ^ 255);
 
             BYTE rr = rl + ((rb - rl) & -(rb < rl)) + ((intWeight * abs(rb - rl)) >> 8);
             BYTE gr = gl + ((gb - gl) & -(gb < gl)) + ((intWeight * abs(gb - gl)) >> 8);
@@ -315,7 +312,7 @@ void DrawWuLine(Surface *screen, int X0, int Y0, int X1, int Y1, uint clrLine) {
             gb = GetGValue(clrBackGround);
             bb = GetBValue(clrBackGround);
 
-            intWeight = (grayl < ((rb * 299 + gb * 587 + bb * 114) >> 10) ? WeightingXOR : Weighting);
+            intWeight = (grayl < ((rb * 299 + gb * 587 + bb * 114) >> 10) ? Weighting ^ 255 : Weighting);
 
             rr = rl + ((rb - rl) & -(rb < rl)) + ((intWeight * abs(rb - rl)) >> 8);
             gr = gl + ((gb - gl) & -(gb < gl)) + ((intWeight * abs(gb - gl)) >> 8);
