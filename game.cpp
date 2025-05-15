@@ -244,37 +244,63 @@ void DrawWuLine(Surface *screen, int X0, int Y0, int X1, int Y1, uint clrLine) {
             /* The IntensityBits most significant bits of ErrorAcc give us the
             intensity weighting for this pixel, and the complement of the
             weighting for the paired pixel */
+
             Weighting = ErrorAcc >> 8;
             WeightingXOR = Weighting ^ 255;
 
-            //uint index = X0 + Y0 * SCRWIDTH;
             COLORREF clrBackGround = screen->pixels[current_pixel_index];
             BYTE rb = GetRValue( clrBackGround );
             BYTE gb = GetGValue( clrBackGround );
             BYTE bb = GetBValue( clrBackGround );
 
+//            double grayb = rb * 0.299 + gb * 0.587 + bb * 0.114;
             int grayb = (rb * 299 + gb * 587 + bb * 114) >> 10;
-            int intWeight = (grayl < grayb ? Weighting : WeightingXOR);
 
+            //int grayb = (299 * rb + 587 * gb + 114 * bb) >> 10;  // Keep precision
+//			double weight = (double)(grayl < grayb ? Weighting : WeightingXOR) * weightNorm;
+            //double weight = (isLight * Weighting + (1 - isLight) * (Weighting ^ 255)) * weightNorm;
+
+            int intWeight = (grayl < grayb ? Weighting : WeightingXOR);
             BYTE rr = rl + ((rb - rl) & -(rb < rl)) + ((intWeight * abs(rb - rl)) >> 8);
             BYTE gr = gl + ((gb - gl) & -(gb < gl)) + ((intWeight * abs(gb - gl)) >> 8);
             BYTE br = bl + ((bb - bl) & -(bb < bl)) + ((intWeight * abs(bb - bl)) >> 8);
 
-            screen->Plot(X0, Y0, RGB(rr, gr, br));
+//            BYTE rr = ( rb > rl ? ( ( BYTE )( weight * ( rb - rl ) + rl ) ) : ( ( BYTE )( weight * ( rl - rb ) + rb ) ) );
+//            BYTE gr = ( gb > gl ? ( ( BYTE )( weight * ( gb - gl ) + gl ) ) : ( ( BYTE )( weight * ( gl - gb ) + gb ) ) );
+//            BYTE br = ( bb > bl ? ( ( BYTE )( weight * ( bb - bl ) + bl ) ) : ( ( BYTE )( weight * ( bl - bb ) + bb ) ) );
+
+//            BYTE rr = (BYTE)(weight * abs(rb - rl) + std::min<int>((int)rb, (int)rl));
+//            BYTE gr = (BYTE)(weight * abs(gb - gl) + std::min<int>((int)gb, (int)gl));
+//            BYTE br = (BYTE)(weight * abs(bb - bl) + std::min<int>((int)bb, (int)bl));
+            //screen->Plot( X0, Y0, BlendColorNEON(clrLine, clrBackGround, grayl, Weighting, WeightingXOR));
+            screen->Plot( X0, Y0, RGB( rr, gr, br ) );
 
             clrBackGround = screen->pixels[current_pixel_index + XDir];
             rb = GetRValue( clrBackGround );
             gb = GetGValue( clrBackGround );
             bb = GetBValue( clrBackGround );
 
+//            grayb = rb * 0.299 + gb * 0.587 + bb * 0.114;
             grayb = (rb * 299 + gb * 587 + bb * 114) >> 10;
+//        	weight = (double)(grayl < grayb ? WeightingXOR : Weighting) * weightNorm;
+            //weight = (isLight * (Weighting ^ 255) + (1 - isLight) * Weighting) * weightNorm;
 
             intWeight = (grayl < grayb ? WeightingXOR : Weighting);
             rr = rl + ((rb - rl) & -(rb < rl)) + ((intWeight * abs(rb - rl)) >> 8);
             gr = gl + ((gb - gl) & -(gb < gl)) + ((intWeight * abs(gb - gl)) >> 8);
             br = bl + ((bb - bl) & -(bb < bl)) + ((intWeight * abs(bb - bl)) >> 8);
 
-            screen->Plot(X0, Y0, RGB(rr, gr, br));
+//            rr = ( rb > rl ? ( ( BYTE )( weight * ( rb - rl ) + rl ) ) : ( ( BYTE )( weight * ( rl - rb ) + rb ) ) );
+//            gr = ( gb > gl ? ( ( BYTE )( weight * ( gb - gl ) + gl ) ) : ( ( BYTE )( weight * ( gl - gb ) + gb ) ) );
+//            br = ( bb > bl ? ( ( BYTE )( weight * ( bb - bl ) + bl ) ) : ( ( BYTE )( weight * ( bl - bb ) + bb ) ) );
+
+//            rr = (BYTE)(weight * abs(rb - rl) + std::min<int>((int)rb, (int)rl));
+//            gr = (BYTE)(weight * abs(gb - gl) + std::min<int>((int)gb, (int)gl));
+//            br = (BYTE)(weight * abs(bb - bl) + std::min<int>((int)bb, (int)bl));
+
+            //screen->Plot( X0 + XDir, Y0, BlendColorNEON(clrLine, clrBackGround, grayl, WeightingXOR, Weighting));
+
+            screen->Plot( X0 + XDir, Y0, RGB( rr, gr, br ) );
         }
 
         /* Draw the final pixel, which is always exactly intersected by the line
@@ -308,34 +334,59 @@ void DrawWuLine(Surface *screen, int X0, int Y0, int X1, int Y1, uint clrLine) {
             Weighting = ErrorAcc >> 8;
             WeightingXOR = Weighting ^ 255;
 
-            //uint index = X0 + Y0 * SCRWIDTH;
             COLORREF clrBackGround = screen->pixels[current_pixel_index];
             BYTE rb = GetRValue( clrBackGround );
             BYTE gb = GetGValue( clrBackGround );
             BYTE bb = GetBValue( clrBackGround );
 
+//            double grayb = rb * 0.299 + gb * 0.587 + bb * 0.114;
             int grayb = (rb * 299 + gb * 587 + bb * 114) >> 10;
-            int intWeight = (grayl < grayb ? Weighting : WeightingXOR);
 
+            //int grayb = (299 * rb + 587 * gb + 114 * bb) >> 10;  // Keep precision
+//			double weight = (double)(grayl < grayb ? Weighting : WeightingXOR) * weightNorm;
+            //double weight = (isLight * Weighting + (1 - isLight) * (Weighting ^ 255)) * weightNorm;
+
+            int intWeight = (grayl < grayb ? Weighting : WeightingXOR);
             BYTE rr = rl + ((rb - rl) & -(rb < rl)) + ((intWeight * abs(rb - rl)) >> 8);
             BYTE gr = gl + ((gb - gl) & -(gb < gl)) + ((intWeight * abs(gb - gl)) >> 8);
             BYTE br = bl + ((bb - bl) & -(bb < bl)) + ((intWeight * abs(bb - bl)) >> 8);
 
-            screen->Plot(X0, Y0, RGB(rr, gr, br));
+//            BYTE rr = ( rb > rl ? ( ( BYTE )( weight * ( rb - rl ) + rl ) ) : ( ( BYTE )( weight * ( rl - rb ) + rb ) ) );
+//            BYTE gr = ( gb > gl ? ( ( BYTE )( weight * ( gb - gl ) + gl ) ) : ( ( BYTE )( weight * ( gl - gb ) + gb ) ) );
+//            BYTE br = ( bb > bl ? ( ( BYTE )( weight * ( bb - bl ) + bl ) ) : ( ( BYTE )( weight * ( bl - bb ) + bb ) ) );
+
+//            BYTE rr = (BYTE)(weight * abs(rb - rl) + std::min<int>((int)rb, (int)rl));
+//            BYTE gr = (BYTE)(weight * abs(gb - gl) + std::min<int>((int)gb, (int)gl));
+//            BYTE br = (BYTE)(weight * abs(bb - bl) + std::min<int>((int)bb, (int)bl));
+            //screen->Plot( X0, Y0, BlendColorNEON(clrLine, clrBackGround, grayl, Weighting, WeightingXOR));
+            screen->Plot( X0, Y0, RGB( rr, gr, br ) );
 
             clrBackGround = screen->pixels[current_pixel_index + SCRWIDTH];
             rb = GetRValue( clrBackGround );
             gb = GetGValue( clrBackGround );
             bb = GetBValue( clrBackGround );
 
+//            grayb = rb * 0.299 + gb * 0.587 + bb * 0.114;
             grayb = (rb * 299 + gb * 587 + bb * 114) >> 10;
+//        	weight = (double)(grayl < grayb ? WeightingXOR : Weighting) * weightNorm;
+            //weight = (isLight * (Weighting ^ 255) + (1 - isLight) * Weighting) * weightNorm;
 
             intWeight = (grayl < grayb ? WeightingXOR : Weighting);
             rr = rl + ((rb - rl) & -(rb < rl)) + ((intWeight * abs(rb - rl)) >> 8);
             gr = gl + ((gb - gl) & -(gb < gl)) + ((intWeight * abs(gb - gl)) >> 8);
             br = bl + ((bb - bl) & -(bb < bl)) + ((intWeight * abs(bb - bl)) >> 8);
 
-            screen->Plot(X0, Y0 + 1, RGB(rr, gr, br));
+//            rr = ( rb > rl ? ( ( BYTE )( weight * ( rb - rl ) + rl ) ) : ( ( BYTE )( weight * ( rl - rb ) + rb ) ) );
+//            gr = ( gb > gl ? ( ( BYTE )( weight * ( gb - gl ) + gl ) ) : ( ( BYTE )( weight * ( gl - gb ) + gb ) ) );
+//            br = ( bb > bl ? ( ( BYTE )( weight * ( bb - bl ) + bl ) ) : ( ( BYTE )( weight * ( bl - bb ) + bb ) ) );
+
+//            rr = (BYTE)(weight * abs(rb - rl) + std::min<int>((int)rb, (int)rl));
+//            gr = (BYTE)(weight * abs(gb - gl) + std::min<int>((int)gb, (int)gl));
+//            br = (BYTE)(weight * abs(bb - bl) + std::min<int>((int)bb, (int)bl));
+
+            //screen->Plot( X0 + XDir, Y0, BlendColorNEON(clrLine, clrBackGround, grayl, WeightingXOR, Weighting));
+
+            screen->Plot( X0 + XDir, Y0, RGB( rr, gr, br ) );
         }
 
         /* Draw the final pixel, which is always exactly intersected by the line
