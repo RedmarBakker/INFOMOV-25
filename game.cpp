@@ -73,7 +73,7 @@ void UndoMutation( int i )
 // -----------------------------------------------------------
 // Branchless color blending for Wu lines (extracted from DrawWuLine)
 // -----------------------------------------------------------
-inline uint BlendColorBranchless(uint clrLine, uint clrBackGround, int grayl, unsigned short Weighting, unsigned short WeightingXOR)
+inline uint BlendColorBranchless(uint clrLine, COLORREF clrBackGround, int grayl, unsigned short Weighting, unsigned short WeightingXOR)
 {
     BYTE rl = GetRValue(clrLine);
     BYTE gl = GetGValue(clrLine);
