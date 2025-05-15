@@ -178,8 +178,8 @@ inline BYTE blend_channel(BYTE line, BYTE bg, int weight) {
 void DrawWuLine(Surface *screen, int X0, int Y0, int X1, int Y1, uint clrLine) {
     /* Make sure the line runs top to bottom */
     if (Y0 > Y1) {
-        std::swap(Y0, Y1);
-        std::swap(X0, X1);
+        int Temp = Y0; Y0 = Y1; Y1 = Temp;
+        Temp = X0; X0 = X1; X1 = Temp;
     }
 
     /* Draw the initial pixel, which is always exactly intersected by
@@ -356,9 +356,12 @@ int Game::Evaluate()
 // Load a previously saved generation, if available.
 // -----------------------------------------------------------
 void Game::Init() {
-    for (int i = 0; i < LINES; i++) MutateLine(i);
-    FILE *f = fopen(LINEFILE, "rb");
-    /*if (f)
+    for (int i = 0; i < LINES; i++) {
+        MutateLine(i);
+    }
+
+    /*FILE *f = fopen(LINEFILE, "rb");
+    if (f)
     {
         fread( lx1, 4, LINES, f );
         fread( ly1, 4, LINES, f );
@@ -367,6 +370,7 @@ void Game::Init() {
         fread( lc, 4, LINES, f );
         fclose( f );
     }*/
+
     reference = new Surface("assets/bird.png");
     backup = new Surface(SCRWIDTH, SCRHEIGHT);
     memset(screen->pixels, 255, SCRWIDTH * SCRHEIGHT * 4);
@@ -396,11 +400,18 @@ void Game::Tick(float /* deltaTime */) {
     for (int k = 0; k < ITERATIONS; k++) {
         backup->CopyTo(screen, 0, 0);
         MutateLine(lidx);
+
         for (int j = base; j < LINES; j++, lineCount++) {
             DrawWuLine(screen, lx1[j], ly1[j], lx2[j], ly2[j], lc[j]);
         }
+
         int diff = Evaluate();
-        if (diff < fitness) fitness = diff; else UndoMutation(lidx);
+        if (diff < fitness) {
+            fitness = diff;
+        } else {
+            UndoMutation(lidx)
+        }
+
         lidx = (lidx + 1) % LINES;
         iterCount++;
     }
