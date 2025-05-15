@@ -175,7 +175,7 @@ inline int fast_abs(int x) {
 inline BYTE blend_channel(BYTE src, BYTE dst, int weight) {
     int diff = dst - src;
 
-    return src + ((weight * fast_abs(diff)) >> 8);
+    return src + ((weight * abs(diff)) >> 8);
 }
 
 // -----------------------------------------------------------
