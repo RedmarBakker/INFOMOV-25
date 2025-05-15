@@ -15,6 +15,7 @@ float peak = 0;                                                // peak line rend
 //int count = SCRWIDTH * SCRHEIGHT;
 Surface *reference, *backup;                                // surfaces
 Timer timer;
+const uint screenSize = SCRHEIGHT * SCRWIDTH;
 
 #define BYTE unsigned char
 #define DWORD unsigned int
@@ -330,10 +331,9 @@ void DrawWuLine(Surface *screen, int X0, int Y0, int X1, int Y1, uint clrLine) {
 int Game::Evaluate()
 {
 	__int64 diff = 0;
-	const uint count = SCRHEIGHT * SCRWIDTH;
 	uint* srcSet = screen->pixels;
 	uint* refSet = reference->pixels;
-	uint* end = srcSet + count;
+	uint* end = srcSet + screenSize;
 
 	while (srcSet < end)
 	{
@@ -367,7 +367,7 @@ void Game::Init() {
 //    }
     reference = new Surface( "assets/bird.png" );
     backup = new Surface( SCRWIDTH, SCRHEIGHT );
-    memset( screen->pixels, 255, (SCRHEIGHT * SCRWIDTH) * 4 );
+    memset( screen->pixels, 255, screenSize * 4 );
     for (int j = 0; j < LINES; j++)
     {
         DrawWuLine( screen, lx1[j], ly1[j], lx2[j], ly2[j], lc[j] );
@@ -383,7 +383,7 @@ void Game::Tick(float /* deltaTime */) {
     int lineCount = 0;
     int iterCount = 0;
     // draw up to lidx
-    memset( screen->pixels, 255, (SCRHEIGHT * SCRWIDTH) * 4 );
+    memset( screen->pixels, 255, screenSize * 4 );
     for (int j = 0; j < lidx; j++, lineCount++)
     {
         DrawWuLine( screen, lx1[j], ly1[j], lx2[j], ly2[j], lc[j] );

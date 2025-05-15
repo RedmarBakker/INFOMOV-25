@@ -6,8 +6,8 @@
 // global settings and defines.
 
 // default screen resolution
-#define SCRWIDTH	512
-#define SCRHEIGHT	512
+#define SCRWIDTH	600
+#define SCRHEIGHT	600
 
 // constants
 #define PI			3.14159265358979323846264f
