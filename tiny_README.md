@@ -26,9 +26,9 @@ Averages:
 - [174.710 - 191.758]
 
 *Speedup:*<br>
-Start = 174.710/78.511 = **2,23** <br>
-After 60s = 191.758/84.993 = **2,26** <br>
-The expected speedup is therefore **2,25** (rounded up) 
+Start = 174.710/78.511 = **2,2253** <br>
+After 60s = 191.758/84.993 = **2,2562** <br>
+The expected speedup is therefore **2,2408** or x1.2408  
 
 *Notes on the assignment:* <br>
 SIMD <br>
