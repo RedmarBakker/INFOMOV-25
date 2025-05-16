@@ -1,6 +1,6 @@
 Assignment 1 by <br>
 Bjarne Daems (SNR: 6138748) <br>
-Redmar Bakker (SNR:)
+Redmar Bakker (SNR: 1431595)
 
 *Build instructions:*
 - First bootstrap (as per the assignment)
