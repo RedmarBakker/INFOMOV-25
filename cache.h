@@ -6,6 +6,10 @@ namespace Tmpl8 {
 
 #define CACHELINEWIDTH	64
 #define CACHESIZE		4096				// in bytes
+#define OFFSET_BIT_SIZE 6
+#define N_SETS		    16				    // in bytes
+#define SET_BIT_SIZE  4
+#define N_SLOTS		    4				    // in bytes
 #define DRAMSIZE		3276800				// 3.125MB; 1024x800 pixels
 
     struct CacheLine
@@ -29,9 +33,9 @@ namespace Tmpl8 {
     public:
         void WriteLine( uint address, CacheLine line );
         CacheLine ReadLine( uint address );
-        CacheLine& backdoor( int i ) { return slot[i]; } /* for visualization without side effects */
+        CacheLine& backdoor( int i ) { return slot[(int)floor(i / N_SETS)][i % N_SLOTS]; } /* for visualization without side effects */
     private:
-        CacheLine slot[CACHESIZE / CACHELINEWIDTH];
+        CacheLine slot[N_SETS][N_SLOTS];
     };
 
     class Memory : public Level // DRAM level for the memory hierarchy
@@ -55,7 +59,9 @@ namespace Tmpl8 {
         MemHierarchy()
         {
             l1 = new Cache();
-            l1->nextLevel = l2 = new Memory();
+            l1->nextLevel = l2 = new Cache();
+            l2->nextLevel = l3 = new Cache();
+            l3->nextLevel = l4 = new Memory();
         }
         void WriteByte( uint address, uchar value );
         uchar ReadByte( uint address );
@@ -65,8 +71,10 @@ namespace Tmpl8 {
         {
             l1->r_hit = l1->w_hit = l1->r_miss = l1->r_hit = 0;
             l2->r_hit = l2->w_hit = l2->r_miss = l2->r_hit = 0;
+            l3->r_hit = l3->w_hit = l3->r_miss = l3->r_hit = 0;
+            l4->r_hit = l4->w_hit = l4->r_miss = l4->r_hit = 0;
         }
-        Level* l1, *l2;
+        Level* l1, *l2, *l3, *l4;
     };
 
 } // namespace Tmpl8
