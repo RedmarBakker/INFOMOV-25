@@ -2,24 +2,25 @@ cmake_minimum_required(VERSION 3.18...3.27.8)
 
 option(USE_ARM "Use ARM architecture" OFF)
 
+set(CMAKE_OSX_ARCHITECTURES "arm64")
 project(INFOMOV VERSION 1.0
         DESCRIPTION "Exercises for the INFOMOV lecture"
         LANGUAGES CXX)
-    
+
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 # Setup executable
 add_executable(
-    GAME game.cpp
-    cache.cpp
-    template/opencl.cpp
-    template/opengl.cpp
-    template/sprite.cpp
-    template/surface.cpp
-    template/template.cpp
-    template/tmpl8math.cpp
+        GAME game.cpp
+        cache.cpp
+        template/opencl.cpp
+        template/opengl.cpp
+        template/sprite.cpp
+        template/surface.cpp
+        template/template.cpp
+        template/tmpl8math.cpp
 )
 
 # ARM specific code
@@ -39,6 +40,7 @@ find_package(OpenGL REQUIRED)
 target_link_libraries(GAME PRIVATE OpenGL::GL)
 
 # Find and link GLAD
+set(glad_DIR "/Users/redmarbakker/Code/C++/optimization_vectorization/INFOMOV-25/vcpkg/installed/arm64-osx/share/glad")
 find_package(glad CONFIG REQUIRED)
 target_link_libraries(GAME PRIVATE glad::glad)
 
@@ -47,6 +49,7 @@ find_package(ZLIB REQUIRED)
 target_link_libraries(GAME PUBLIC ZLIB::ZLIB)
 
 # Find and link GLFW
+set(glfw3_DIR "/Users/redmarbakker/Code/C++/optimization_vectorization/INFOMOV-25/vcpkg/installed/arm64-osx/share/glfw3")
 find_package(glfw3 REQUIRED)
 target_link_libraries(GAME PUBLIC glfw)
 

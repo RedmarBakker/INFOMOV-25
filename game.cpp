@@ -1,3 +1,28 @@
+/*
+
+Additional points beyond the base 5 may be obtained by completing additional challenges:
+
+1. Besides the spiral and the fractal, add a third algorithm to assess cache behaviour
+performance. Try to come up with an access pattern that reveals other characteristics than
+the existing two algorithms (up to 1pt).
+
+2. Add support to the code for setting per-level associativity, cache size and cache line width.
+These may be compile-time parameters. Use this functionality to answer the following
+research question: What is the optimal set of parameters for the spiral, and what parameters
+are optimal for the fractal? Which set of parameters do you recommend for general use and
+why? (up to 1pt)
+
+3. Implementing LRU, LFU and random eviction for your cache levels and comparing these using
+the provided access patterns (spiral + fractal), as well as your own (up to 1pt).
+
+4. Implement a comparison of the implemented eviction policies against the Clairvoyant
+algorithm (Bélády's algorithm) (+1pt).
+
+5. Add the option to make the cache inclusive or exclusive. Add a comparison of the efficiency of
+both schemes, or include this in the experiments for challenge 2 (up to 1pt).
+
+*/
+
 #include "precomp.h"
 #include "game.h"
 
