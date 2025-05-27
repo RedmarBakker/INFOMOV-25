@@ -60,26 +60,26 @@ void Cache::WriteLine( uint address, CacheLine line )
     }
 
     // address not found; choose a victim line to evict
-    int slotToEvict = 0;
+    int blockToEvict = 0;
 
     switch (currentPolicy)
     {
         case RANDOM:
         {
             uint rand = RandomUInt();
-            slotToEvict = rand % n_blocks;
+            blockToEvict = rand % n_blocks;
             break;
         }
         case LRU:
         {
             int oldestTime = this->accessCounter[set][0];
-            slotToEvict = 0;
+            blockToEvict = 0;
             for (int i = 1; i < n_blocks; i++)
             {
                 if (this->accessCounter[set][i] < oldestTime)
                 {
                     oldestTime = this->accessCounter[set][i];
-                    slotToEvict = i;
+                    blockToEvict = i;
                 }
             }
             break;
@@ -87,33 +87,33 @@ void Cache::WriteLine( uint address, CacheLine line )
         case LFU:
         {
             int minFreq = this->accessFrequency[set][0];
-            slotToEvict = 0;
+            blockToEvict = 0;
             for (int i = 1; i < n_blocks; i++)
             {
                 if (this->accessFrequency[set][i] < minFreq)
                 {
                     minFreq = this->accessFrequency[set][i];
-                    slotToEvict = i;
+                    blockToEvict = i;
                 }
             }
             break;
         }
         case CLAIRVOYANT:
         {
-            slotToEvict = RandomUInt() % n_blocks;
+            blockToEvict = RandomUInt() % n_blocks;
             break;
         }
     }
 
-    if (slot[set][slotToEvict].dirty)
+    if (slot[set][blockToEvict].dirty)
     {
         nextLevel->WriteLine(
-            (slot[set][slotToEvict].tag << (SET_BIT_SIZE + OFFSET_BIT_SIZE)) + (set << OFFSET_BIT_SIZE),
-            slot[set][slotToEvict]
+            (slot[set][blockToEvict].tag << (SET_BIT_SIZE + OFFSET_BIT_SIZE)) + (set << OFFSET_BIT_SIZE),
+            slot[set][blockToEvict]
         );
     }
 
-    slot[set][slotToEvict] = line;
+    slot[set][blockToEvict] = line;
     w_miss++;
 }
 

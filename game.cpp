@@ -40,24 +40,24 @@ void Game::VisualizeMem()
 {
     // draw the contents of the simulated DRAM; every pixel is 4 bytes
     // we bypass the Read/Write functions so we don't pollute the cache.
-    for (int y = 0; y < 700; y++) for (int x = 0; x < 1024; x++)
-    {
-        int value = *((uint*)&((Memory*)mem.dram)->backdoor()[(x + y * 1024) * 4]);
-        //screen->Plot( x + 10, y + 10, (value >> 1) & 0x7f7f7f /* 50% */ );
-    }
+//    for (int y = 0; y < 700; y++) for (int x = 0; x < 1024; x++)
+//    {
+//        int value = *((uint*)&((Memory*)mem.dram)->backdoor()[(x + y * 1024) * 4]);
+//        screen->Plot( x + 10, y + 10, (value >> 1) & 0x7f7f7f /* 50% */ );
+//    }
 
     // draw the contents of the first cache level over the DRAM contents
     // fully hardcoded for the sample cache (size, associative, 1 layer)
-    for (int i = 0; i < L1_SIZE; i++)
+    for (int i = 0; i < L3_SIZE; i++)
     {
-        CacheLine& line = ((Cache*)mem.l1)->backdoor( i );
+        CacheLine& line = ((Cache*)mem.l3)->backdoor( i );
 
-        int set = (i / (L1_SIZE / N_SETS)) % N_SETS;
+        int set = (i / (L3_SIZE / N_SETS)) % N_SETS;
         int lineAddress = ((line.tag << SET_BIT_SIZE) + set) << OFFSET_BIT_SIZE;
 
         int x = (lineAddress / 4) & 1023, y = (lineAddress / 4) / 1024;
         for (int j = 0; j < 16; j++) {
-            screen->Plot( x + 10 + j, y + 10, ((uint*)line.bytes)[j] );
+            screen->Plot( x + 10 + j, y + 10, ((uint*)line.bytes)[j] >> 16 );
         }
     }
 
@@ -78,16 +78,16 @@ void Game::VisualizeMem()
 
     // draw the contents of the first cache level over the DRAM contents
     // fully hardcoded for the sample cache (size, associative, 1 layer)
-    for (int i = 0; i < L3_SIZE; i++)
+    for (int i = 0; i < L1_SIZE; i++)
     {
-        CacheLine& line = ((Cache*)mem.l3)->backdoor( i );
+        CacheLine& line = ((Cache*)mem.l1)->backdoor( i );
 
-        int set = (i / (L3_SIZE / N_SETS)) % N_SETS;
+        int set = (i / (L1_SIZE / N_SETS)) % N_SETS;
         int lineAddress = ((line.tag << SET_BIT_SIZE) + set) << OFFSET_BIT_SIZE;
 
         int x = (lineAddress / 4) & 1023, y = (lineAddress / 4) / 1024;
         for (int j = 0; j < 16; j++) {
-            screen->Plot( x + 10 + j, y + 10, ((uint*)line.bytes)[j] >> 16 );
+            screen->Plot( x + 10 + j, y + 10, ((uint*)line.bytes)[j] );
         }
     }
 
