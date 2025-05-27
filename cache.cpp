@@ -3,7 +3,7 @@
 
 enum EvictionPolicy { RANDOM, LRU, LFU, CLAIRVOYANT };
 
-EvictionPolicy currentPolicy = LRU;
+EvictionPolicy currentPolicy = LFU;
 
 int globalAccessTime = 0;
 

@@ -10,6 +10,10 @@ namespace Tmpl8 {
     #define N_SETS		    16				    // in bytes
     #define SET_BIT_SIZE    4
     #define OFFSET_BIT_SIZE 6
+
+    #define L1_SIZE         64
+    #define L2_SIZE         512
+    #define L3_SIZE         8192
     #define DRAMSIZE		3276800				// 3.125MB; 1024x800 pixels
 
     struct CacheLine
@@ -46,7 +50,15 @@ namespace Tmpl8 {
         void WriteLine( uint address, CacheLine line );
         CacheLine ReadLine( uint address );
         CacheLine& backdoor( int i ) {
-            return slot[(i / N_SETS) % N_SETS][i % n_blocks];
+            int set = (i / n_blocks) % N_SETS;
+            int block = i % n_blocks;
+
+            assert(set >= 0 && set <= N_SETS);
+            assert(block >= 0 && block < n_blocks);
+
+            //printf("%u: %u, %u\n", i, set, block);
+
+            return slot[set][block];
         } /* for visualization without side effects */
     private:
         std::vector<std::vector<CacheLine>> slot;
@@ -76,9 +88,9 @@ namespace Tmpl8 {
     public:
         MemHierarchy()
         {
-            l1 = new Cache(64);
-            l1->nextLevel = l2 = new Cache(64 * 8);
-            l2->nextLevel = l3 = new Cache(64 * 8 * 16);
+            l1 = new Cache(L1_SIZE);
+            l1->nextLevel = l2 = new Cache(L2_SIZE);
+            l2->nextLevel = l3 = new Cache(L3_SIZE);
             l3->nextLevel = dram = new Memory(DRAMSIZE);
         }
         void WriteByte( uint address, uchar value );

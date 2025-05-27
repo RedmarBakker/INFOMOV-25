@@ -48,10 +48,11 @@ void Game::VisualizeMem()
 
     // draw the contents of the first cache level over the DRAM contents
     // fully hardcoded for the sample cache (size, associative, 1 layer)
-    for (int i = 0; i < 64; i++)
+    for (int i = 0; i < L1_SIZE; i++)
     {
         CacheLine& line = ((Cache*)mem.l1)->backdoor( i );
-        int set = (i / N_SETS) - 1;
+        int set = (i / (L1_SIZE / N_SETS)) % N_SETS;
+
         int lineAddress = ((line.tag << SET_BIT_SIZE) + set) << OFFSET_BIT_SIZE;
 
         int x = (lineAddress / 4) & 1023, y = (lineAddress / 4) / 1024;
