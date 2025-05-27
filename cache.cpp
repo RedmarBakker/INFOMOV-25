@@ -3,7 +3,7 @@
 
 enum EvictionPolicy { RANDOM, LRU, LFU, CLAIRVOYANT };
 
-EvictionPolicy currentPolicy = LFU;
+EvictionPolicy currentPolicy = RANDOM;
 
 int globalAccessTime = 0;
 
@@ -59,7 +59,17 @@ void Cache::WriteLine( uint address, CacheLine line )
         return;
     }
 
-    // address not found; choose a victim line to evict
+    // address not found; check for a free slot
+    for (int i = 0; i < n_blocks; i++) {
+        if (! slot[set][i].valid) {
+            slot[set][i] = line;
+            slot[set][i].valid = true;
+            w_miss++;
+            return;
+        }
+    }
+
+    // no free slot; choose a victim line to evict
     int blockToEvict = 0;
 
     switch (currentPolicy)
@@ -82,6 +92,9 @@ void Cache::WriteLine( uint address, CacheLine line )
                     blockToEvict = i;
                 }
             }
+
+            this->accessCounter[set][blockToEvict] = globalAccessTime;
+
             break;
         }
         case LFU:
@@ -96,6 +109,9 @@ void Cache::WriteLine( uint address, CacheLine line )
                     blockToEvict = i;
                 }
             }
+
+            this->accessFrequency[set][blockToEvict] = 1;
+
             break;
         }
         case CLAIRVOYANT:
@@ -114,6 +130,7 @@ void Cache::WriteLine( uint address, CacheLine line )
     }
 
     slot[set][blockToEvict] = line;
+
     w_miss++;
 }
 
@@ -127,7 +144,7 @@ CacheLine Cache::ReadLine( uint address )
 
     for (int i = 0; i < n_blocks; i++)
     {
-        if (slot[set][i].tag == tag)
+        if (slot[set][i].valid && slot[set][i].tag == tag)
         {
             // cacheline is in the cache; return data
             this->accessCounter[set][i] = ++globalAccessTime;

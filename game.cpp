@@ -40,11 +40,11 @@ void Game::VisualizeMem()
 {
     // draw the contents of the simulated DRAM; every pixel is 4 bytes
     // we bypass the Read/Write functions so we don't pollute the cache.
-//    for (int y = 0; y < 700; y++) for (int x = 0; x < 1024; x++)
-//    {
+    for (int y = 0; y < 700; y++) for (int x = 0; x < 1024; x++)
+    {
 //        int value = *((uint*)&((Memory*)mem.dram)->backdoor()[(x + y * 1024) * 4]);
-//        screen->Plot( x + 10, y + 10, (value >> 1) & 0x7f7f7f /* 50% */ );
-//    }
+        screen->Plot( x + 10, y + 10, (0x000000 >> 1) & 0x7f7f7f /* 50% */ );
+    }
 
     // draw the contents of the first cache level over the DRAM contents
     // fully hardcoded for the sample cache (size, associative, 1 layer)

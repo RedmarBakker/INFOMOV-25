@@ -21,6 +21,7 @@ namespace Tmpl8 {
         uchar bytes[CACHELINEWIDTH] = {};
         uint tag;
         bool dirty = false;
+        bool valid = false;
     };
 
     class Level // abstract base class for a level in the memory hierarchy
