@@ -1,6 +1,14 @@
 #include "precomp.h"
 #include "cache.h"
 
+enum EvictionPolicy { RANDOM, LRU, LFU, CLAIRVOYANT };
+
+EvictionPolicy currentPolicy = RANDOM;
+
+int accessFrequency[N_SETS][N_BLOCKS] = {0};
+int accessCounter[N_SETS][N_BLOCKS] = {0};
+int globalAccessTime = 0;
+
 void Memory::WriteLine( uint address, CacheLine line )
 {
     // verify that the address is a multiple of the cacheline width
@@ -54,17 +62,60 @@ void Cache::WriteLine( uint address, CacheLine line )
         }
 
     // address not found; choose a victim line to evict
-    uint rand = RandomUInt();
-    int setToEvict  = rand % N_SETS;
-    int slotToEvict = rand % N_BLOCKS;
-    assert(setToEvict >= 0 && setToEvict < N_SETS);
-    assert(slotToEvict >= 0 && slotToEvict < N_BLOCKS);
+    int slotToEvict = 0;
 
-    if (slot[setToEvict][slotToEvict].dirty)
+    switch (currentPolicy)
     {
-        nextLevel->WriteLine( slot[setToEvict][slotToEvict].tag << (SET_BIT_SIZE + OFFSET_BIT_SIZE), slot[setToEvict][slotToEvict] );
+        case RANDOM:
+        {
+            uint rand = RandomUInt();
+            slotToEvict = rand % N_BLOCKS;
+            break;
+        }
+        case LRU:
+        {
+            int oldestTime = accessCounter[set][0];
+            slotToEvict = 0;
+            for (int i = 1; i < N_BLOCKS; i++)
+            {
+                if (accessCounter[set][i] < oldestTime)
+                {
+                    oldestTime = accessCounter[set][i];
+                    slotToEvict = i;
+                }
+            }
+            break;
+        }
+        case LFU:
+        {
+            int minFreq = accessFrequency[set][0];
+            slotToEvict = 0;
+            for (int i = 1; i < N_BLOCKS; i++)
+            {
+                if (accessFrequency[set][i] < minFreq)
+                {
+                    minFreq = accessFrequency[set][i];
+                    slotToEvict = i;
+                }
+            }
+            break;
+        }
+        case CLAIRVOYANT:
+        {
+            slotToEvict = RandomUInt() % N_BLOCKS;
+            break;
+        }
     }
-    slot[setToEvict][slotToEvict] = line;
+
+    if (slot[set][slotToEvict].dirty)
+    {
+        nextLevel->WriteLine(
+            (slot[set][slotToEvict].tag << (SET_BIT_SIZE + OFFSET_BIT_SIZE)) + (set << OFFSET_BIT_SIZE),
+            slot[set][slotToEvict]
+        );
+    }
+
+    slot[set][slotToEvict] = line;
     w_miss++;
 }
 
@@ -81,6 +132,8 @@ CacheLine Cache::ReadLine( uint address )
         if (slot[set][i].tag == tag)
         {
             // cacheline is in the cache; return data
+            accessCounter[set][i] = ++globalAccessTime;
+            accessFrequency[set][i]++;
             r_hit++;
             return slot[set][i]; // by value
         }
