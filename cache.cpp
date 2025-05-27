@@ -5,8 +5,6 @@ enum EvictionPolicy { RANDOM, LRU, LFU, CLAIRVOYANT };
 
 EvictionPolicy currentPolicy = RANDOM;
 
-int accessFrequency[N_SETS][N_BLOCKS] = {0};
-int accessCounter[N_SETS][N_BLOCKS] = {0};
 int globalAccessTime = 0;
 
 void Memory::WriteLine( uint address, CacheLine line )
@@ -53,7 +51,7 @@ void Cache::WriteLine( uint address, CacheLine line )
     // verify that the provided cacheline has the right tag
     assert( tag == line.tag );
 
-    for (int i = 0; i < N_BLOCKS; i++) if (slot[set][i].tag == line.tag)
+    for (int i = 0; i < n_blocks; i++) if (slot[set][i].tag == line.tag)
         {
             // cacheline is already in the cache; overwrite
             slot[set][i] = line;
@@ -69,18 +67,18 @@ void Cache::WriteLine( uint address, CacheLine line )
         case RANDOM:
         {
             uint rand = RandomUInt();
-            slotToEvict = rand % N_BLOCKS;
+            slotToEvict = rand % n_blocks;
             break;
         }
         case LRU:
         {
-            int oldestTime = accessCounter[set][0];
+            int oldestTime = this->accessCounter[set][0];
             slotToEvict = 0;
-            for (int i = 1; i < N_BLOCKS; i++)
+            for (int i = 1; i < n_blocks; i++)
             {
-                if (accessCounter[set][i] < oldestTime)
+                if (this->accessCounter[set][i] < oldestTime)
                 {
-                    oldestTime = accessCounter[set][i];
+                    oldestTime = this->accessCounter[set][i];
                     slotToEvict = i;
                 }
             }
@@ -88,13 +86,13 @@ void Cache::WriteLine( uint address, CacheLine line )
         }
         case LFU:
         {
-            int minFreq = accessFrequency[set][0];
+            int minFreq = this->accessFrequency[set][0];
             slotToEvict = 0;
-            for (int i = 1; i < N_BLOCKS; i++)
+            for (int i = 1; i < n_blocks; i++)
             {
-                if (accessFrequency[set][i] < minFreq)
+                if (this->accessFrequency[set][i] < minFreq)
                 {
-                    minFreq = accessFrequency[set][i];
+                    minFreq = this->accessFrequency[set][i];
                     slotToEvict = i;
                 }
             }
@@ -102,7 +100,7 @@ void Cache::WriteLine( uint address, CacheLine line )
         }
         case CLAIRVOYANT:
         {
-            slotToEvict = RandomUInt() % N_BLOCKS;
+            slotToEvict = RandomUInt() % n_blocks;
             break;
         }
     }
@@ -127,13 +125,13 @@ CacheLine Cache::ReadLine( uint address )
     int tag = address >> (OFFSET_BIT_SIZE + SET_BIT_SIZE);
     int set = (address >> OFFSET_BIT_SIZE) & (N_SETS - 1);
 
-    for (int i = 0; i < N_BLOCKS; i++)
+    for (int i = 0; i < n_blocks; i++)
     {
         if (slot[set][i].tag == tag)
         {
             // cacheline is in the cache; return data
-            accessCounter[set][i] = ++globalAccessTime;
-            accessFrequency[set][i]++;
+            this->accessCounter[set][i] = ++globalAccessTime;
+            this->accessFrequency[set][i]++;
             r_hit++;
             return slot[set][i]; // by value
         }

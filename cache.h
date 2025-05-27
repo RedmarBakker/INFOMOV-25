@@ -34,7 +34,12 @@ namespace Tmpl8 {
         Cache(int total_cache_lines)
         {
             n_blocks = total_cache_lines / N_SETS;
+
             slot.resize(N_SETS, std::vector<CacheLine>(n_blocks));
+            accessFrequency.resize(N_SETS, std::vector<int>(n_blocks, 0));
+            accessCounter.resize(N_SETS, std::vector<int>(n_blocks, 0));
+
+            printf("%u blocks", n_blocks);
         }
         void WriteLine( uint address, CacheLine line );
         CacheLine ReadLine( uint address );
@@ -42,6 +47,9 @@ namespace Tmpl8 {
     private:
         std::vector<std::vector<CacheLine>> slot;
         int n_blocks;
+
+        std::vector<std::vector<int>> accessFrequency;
+        std::vector<std::vector<int>> accessCounter;
     };
 
     class Memory : public Level // DRAM level for the memory hierarchy
@@ -68,7 +76,6 @@ namespace Tmpl8 {
             l1->nextLevel = l2 = new Cache(64 * 8);
             l2->nextLevel = l3 = new Cache(64 * 8 * 16);
             l3->nextLevel = dram = new Memory(DRAMSIZE);
-
         }
         void WriteByte( uint address, uchar value );
         uchar ReadByte( uint address );
