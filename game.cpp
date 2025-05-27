@@ -28,8 +28,7 @@ both schemes, or include this in the experiments for challenge 2 (up to 1pt).
 
 // static variables for graph / fractal drawing / obfuscation
 static float a = 0, r = 300;
-// TODO: extend the array gr to [8] to include r and w hits & misses
-static Graph gr[4];
+static Graph gr[8];
 #define _oOo_oOo_ (O>=V|N>=800?0:(((N<<10)+O)*4)
 uint* image[4], I,N,F,O,M,_O,V=2019; double K[999], Q[999];
 float R(){I^=I<<13;I^=I>>17;I^=I<<5;return I*2.3283064365387e-10f*6-3;} // rng
@@ -43,7 +42,7 @@ void Game::VisualizeMem()
     // we bypass the Read/Write functions so we don't pollute the cache.
     for (int y = 0; y < 700; y++) for (int x = 0; x < 1024; x++)
     {
-        int value = *((uint*)&((Memory*)mem.l2)->backdoor()[(x + y * 1024) * 4]);
+        int value = *((uint*)&((Memory*)mem.dram)->backdoor()[(x + y * 1024) * 4]);
         screen->Plot( x + 10, y + 10, (value >> 1) & 0x7f7f7f /* 50% */ );
     }
 
@@ -63,17 +62,21 @@ void Game::VisualizeMem()
 
     // draw hit/miss graphs
     screen->Print( "level 1 R/W", 1050, 10, 0xffffff );
-    //TODO screen->Print( "level 2 R/W", 1050, 90, 0xffffff );
-    //TODO screen->Print( "level 3 R/W", 1050, 170, 0xffffff );
-    screen->Print( "DRAM R/W", 1050, 90 , 0xffffff ); // 90 = 250
+    screen->Print( "level 2 R/W", 1050, 90 , 0xffffff );
+    screen->Print( "level 3 R/W", 1050, 170 , 0xffffff );
+    screen->Print( "DRAM R/W", 1050, 250 , 0xffffff );
     //screen updates for l1:
     gr[0].Update( screen, 1050, 20, mem.l1->r_hit, mem.l1->r_miss );
     gr[1].Update( screen, 1170, 20, mem.l1->w_hit, mem.l1->w_miss );
     //l2
-    //l3
-    //DRAM
     gr[2].Update( screen, 1050, 100, mem.l2->r_hit, mem.l2->r_miss );
     gr[3].Update( screen, 1170, 100, mem.l2->w_hit, mem.l2->w_miss );
+    //l3
+    gr[4].Update( screen, 1050, 180, mem.l3->r_hit, mem.l3->r_miss );
+    gr[5].Update( screen, 1170, 180, mem.l3->w_hit, mem.l3->w_miss );
+    //DRAM
+    gr[6].Update( screen, 1050, 260, mem.dram->r_hit, mem.dram->r_miss );
+    gr[7].Update( screen, 1170, 260, mem.dram->w_hit, mem.dram->w_miss );
 }
 
 // -----------------------------------------------------------
@@ -97,7 +100,7 @@ void Game::Tick( float )
 
     // update memory contents
 
-#if 1
+#if 0
     // simple spiral							ACCESS PATTERN: STRUCTURED
     for (int i = 0; i < 10; i++)
     {

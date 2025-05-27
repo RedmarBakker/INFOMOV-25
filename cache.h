@@ -59,7 +59,10 @@ namespace Tmpl8 {
         MemHierarchy()
         {
             l1 = new Cache();
-            l1->nextLevel = l2 = new Memory();
+            l1->nextLevel = l2 = new Cache();
+            l2->nextLevel = l3 = new Cache();
+            l3->nextLevel = dram = new Memory();
+
         }
         void WriteByte( uint address, uchar value );
         uchar ReadByte( uint address );
@@ -68,10 +71,11 @@ namespace Tmpl8 {
         void ResetCounters()
         {
             l1->r_hit = l1->w_hit = l1->r_miss = l1->w_miss = 0;
-            //TODO: RESET FOR L2, L3 AND DRAM
             l2->r_hit = l2->w_hit = l2->r_miss = l2->w_miss = 0;
+            l3->r_hit = l3->w_hit = l3->r_miss = l3->w_miss = 0;
+            dram->r_hit = dram->w_hit = dram->r_miss = dram->w_miss = 0;
         }
-        Level* l1, *l2;
+        Level* l1, *l2, *l3, *dram;
     };
 
 } // namespace Tmpl8
