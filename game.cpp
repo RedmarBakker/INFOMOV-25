@@ -28,6 +28,7 @@ both schemes, or include this in the experiments for challenge 2 (up to 1pt).
 
 // static variables for graph / fractal drawing / obfuscation
 static float a = 0, r = 300;
+// TODO: extend the array gr to [8] to include r and w hits & misses
 static Graph gr[4];
 #define _oOo_oOo_ (O>=V|N>=800?0:(((N<<10)+O)*4)
 uint* image[4], I,N,F,O,M,_O,V=2019; double K[999], Q[999];
@@ -62,9 +63,15 @@ void Game::VisualizeMem()
 
     // draw hit/miss graphs
     screen->Print( "level 1 R/W", 1050, 10, 0xffffff );
-    screen->Print( "DRAM R/W", 1050, 90, 0xffffff );
+    //TODO screen->Print( "level 2 R/W", 1050, 90, 0xffffff );
+    //TODO screen->Print( "level 3 R/W", 1050, 170, 0xffffff );
+    screen->Print( "DRAM R/W", 1050, 90 , 0xffffff ); // 90 = 250
+    //screen updates for l1:
     gr[0].Update( screen, 1050, 20, mem.l1->r_miss, mem.l1->r_hit );
     gr[1].Update( screen, 1170, 20, mem.l1->w_miss, mem.l1->w_hit );
+    //l2
+    //l3
+    //DRAM
     gr[2].Update( screen, 1050, 100, mem.l2->r_miss, mem.l2->r_hit );
     gr[3].Update( screen, 1170, 100, mem.l2->w_miss, mem.l2->w_hit );
 }

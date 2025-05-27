@@ -33,7 +33,8 @@ namespace Tmpl8 {
     public:
         void WriteLine( uint address, CacheLine line );
         CacheLine ReadLine( uint address );
-        CacheLine& backdoor( int i ) { return slot[((i / N_SETS) - 1) % N_SETS][i % N_SETS]; } /* for visualization without side effects */
+        //Todo: moet j in slot[i][j] niet % N_blocks? Omdat het max 4 mag zijn?
+        CacheLine& backdoor( int i ) { return slot[((i / N_SETS) - 1) % N_SETS][i % N_BLOCKS]; } /* for visualization without side effects */
     private:
         CacheLine slot[N_SETS][N_BLOCKS];
     };
@@ -68,6 +69,7 @@ namespace Tmpl8 {
         void ResetCounters()
         {
             l1->r_hit = l1->w_hit = l1->r_miss = l1->r_hit = 0;
+            //TODO: RESET FOR L2, L3 AND DRAM
             l2->r_hit = l2->w_hit = l2->r_miss = l2->r_hit = 0;
         }
         Level* l1, *l2;
