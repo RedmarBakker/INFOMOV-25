@@ -7,7 +7,7 @@ void Memory::WriteLine( uint address, CacheLine line )
     assert( (address & CACHELINEWIDTH - 1) == 0 );
     assert( address + CACHELINEWIDTH <= DRAMSIZE ); // prevent out‑of‑bounds mem access
 
-    uint tag = address >> (SET_BIT_SIZE + OFFSET_BIT_SIZE);
+    int tag = address >> (SET_BIT_SIZE + OFFSET_BIT_SIZE);
 
     // verify that the provided cacheline has the right tag
     assert( tag == line.tag );
@@ -39,13 +39,13 @@ void Cache::WriteLine( uint address, CacheLine line )
     // verify that the address is a multiple of the cacheline width
     assert( (address & CACHELINEWIDTH - 1) == 0 );
 
-    uint tag = address >> (SET_BIT_SIZE + OFFSET_BIT_SIZE);
-    uint set = (address >> OFFSET_BIT_SIZE) & (N_SETS - 1);
+    int tag = address >> (SET_BIT_SIZE + OFFSET_BIT_SIZE);
+    int set = (address >> OFFSET_BIT_SIZE) & (N_SETS - 1);
 
     // verify that the provided cacheline has the right tag
     assert( tag == line.tag );
 
-    for (int i = 0; i < N_SLOTS; i++) if (slot[set][i].tag == line.tag)
+    for (int i = 0; i < N_BLOCKS; i++) if (slot[set][i].tag == line.tag)
         {
             // cacheline is already in the cache; overwrite
             slot[set][i] = line;
@@ -56,9 +56,9 @@ void Cache::WriteLine( uint address, CacheLine line )
     // address not found; choose a victim line to evict
     uint rand = RandomUInt();
     int setToEvict  = rand % N_SETS;
-    int slotToEvict = rand % N_SLOTS;
+    int slotToEvict = rand % N_BLOCKS;
     assert(setToEvict >= 0 && setToEvict < N_SETS);
-    assert(slotToEvict >= 0 && slotToEvict < N_SLOTS);
+    assert(slotToEvict >= 0 && slotToEvict < N_BLOCKS);
 
     if (slot[setToEvict][slotToEvict].dirty)
     {
@@ -73,10 +73,10 @@ CacheLine Cache::ReadLine( uint address )
     // verify that the address is a multiple of the cacheline width
     assert( (address & CACHELINEWIDTH - 1) == 0 );
 
-    uint tag = address >> (OFFSET_BIT_SIZE + SET_BIT_SIZE);
-    uint set = (address >> OFFSET_BIT_SIZE) & (N_SETS - 1);
+    int tag = address >> (OFFSET_BIT_SIZE + SET_BIT_SIZE);
+    int set = (address >> OFFSET_BIT_SIZE) & (N_SETS - 1);
 
-    for (int i = 0; i < N_SLOTS; i++)
+    for (int i = 0; i < N_BLOCKS; i++)
     {
         if (slot[set][i].tag == tag)
         {
@@ -97,25 +97,25 @@ CacheLine Cache::ReadLine( uint address )
     return line;
 }
 
-//void MemHierarchy::WriteByte( uint address, uchar value )
-//{
-//    // fetch the cacheline for the specified address
-//    int offsetInLine = address & (CACHELINEWIDTH - 1);
-//    int lineAddress = address - offsetInLine;
-//    CacheLine line = l1->ReadLine( lineAddress );
-//    line.bytes[offsetInLine] = value;
-//    line.dirty = true;
-//    l1->WriteLine( lineAddress, line );
-//}
-//
-//uchar MemHierarchy::ReadByte( uint address )
-//{
-//    // fetch the cacheline for the specified address
-//    int offsetInLine = address & (CACHELINEWIDTH - 1);
-//    int lineAddress = address - offsetInLine;
-//    CacheLine line = l1->ReadLine( lineAddress );
-//    return line.bytes[offsetInLine];
-//}
+void MemHierarchy::WriteByte( uint address, uchar value )
+{
+    // fetch the cacheline for the specified address
+    int offsetInLine = address & (CACHELINEWIDTH - 1);
+    int lineAddress = address - offsetInLine;
+    CacheLine line = l1->ReadLine( lineAddress );
+    line.bytes[offsetInLine] = value;
+    line.dirty = true;
+    l1->WriteLine( lineAddress, line );
+}
+
+uchar MemHierarchy::ReadByte( uint address )
+{
+    // fetch the cacheline for the specified address
+    int offsetInLine = address & (CACHELINEWIDTH - 1);
+    int lineAddress = address - offsetInLine;
+    CacheLine line = l1->ReadLine( lineAddress );
+    return line.bytes[offsetInLine];
+}
 
 void MemHierarchy::WriteUint( uint address, uint value )
 {
