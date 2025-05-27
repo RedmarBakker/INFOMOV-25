@@ -35,15 +35,19 @@ namespace Tmpl8 {
         {
             n_blocks = total_cache_lines / N_SETS;
 
+            assert(n_blocks >= 1);
+
             slot.resize(N_SETS, std::vector<CacheLine>(n_blocks));
             accessFrequency.resize(N_SETS, std::vector<int>(n_blocks, 0));
             accessCounter.resize(N_SETS, std::vector<int>(n_blocks, 0));
 
-            printf("%u blocks", n_blocks);
+            printf("Cache: %u sets, %u blocks\n", N_SETS, n_blocks);
         }
         void WriteLine( uint address, CacheLine line );
         CacheLine ReadLine( uint address );
-        CacheLine& backdoor( int i ) { return slot[((i / N_SETS) - 1) % N_SETS][i % n_blocks]; } /* for visualization without side effects */
+        CacheLine& backdoor( int i ) {
+            return slot[(i / N_SETS) % N_SETS][i % n_blocks];
+        } /* for visualization without side effects */
     private:
         std::vector<std::vector<CacheLine>> slot;
         int n_blocks;

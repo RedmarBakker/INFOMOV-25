@@ -3,7 +3,7 @@
 
 enum EvictionPolicy { RANDOM, LRU, LFU, CLAIRVOYANT };
 
-EvictionPolicy currentPolicy = RANDOM;
+EvictionPolicy currentPolicy = LRU;
 
 int globalAccessTime = 0;
 
@@ -52,12 +52,12 @@ void Cache::WriteLine( uint address, CacheLine line )
     assert( tag == line.tag );
 
     for (int i = 0; i < n_blocks; i++) if (slot[set][i].tag == line.tag)
-        {
-            // cacheline is already in the cache; overwrite
-            slot[set][i] = line;
-            w_hit++;
-            return;
-        }
+    {
+        // cacheline is already in the cache; overwrite
+        slot[set][i] = line;
+        w_hit++;
+        return;
+    }
 
     // address not found; choose a victim line to evict
     int slotToEvict = 0;

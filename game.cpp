@@ -100,7 +100,7 @@ void Game::Tick( float )
 
     // update memory contents
 
-#if 0
+#if 1
     // simple spiral							ACCESS PATTERN: STRUCTURED
     for (int i = 0; i < 10; i++)
     {
