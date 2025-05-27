@@ -43,7 +43,7 @@ void Game::VisualizeMem()
     for (int y = 0; y < 700; y++) for (int x = 0; x < 1024; x++)
     {
         int value = *((uint*)&((Memory*)mem.dram)->backdoor()[(x + y * 1024) * 4]);
-        screen->Plot( x + 10, y + 10, (value >> 1) & 0x7f7f7f /* 50% */ );
+        //screen->Plot( x + 10, y + 10, (value >> 1) & 0x7f7f7f /* 50% */ );
     }
 
     // draw the contents of the first cache level over the DRAM contents
@@ -51,13 +51,43 @@ void Game::VisualizeMem()
     for (int i = 0; i < L1_SIZE; i++)
     {
         CacheLine& line = ((Cache*)mem.l1)->backdoor( i );
-        int set = (i / (L1_SIZE / N_SETS)) % N_SETS;
 
+        int set = (i / (L1_SIZE / N_SETS)) % N_SETS;
         int lineAddress = ((line.tag << SET_BIT_SIZE) + set) << OFFSET_BIT_SIZE;
 
         int x = (lineAddress / 4) & 1023, y = (lineAddress / 4) / 1024;
         for (int j = 0; j < 16; j++) {
             screen->Plot( x + 10 + j, y + 10, ((uint*)line.bytes)[j] );
+        }
+    }
+
+    // draw the contents of the first cache level over the DRAM contents
+    // fully hardcoded for the sample cache (size, associative, 1 layer)
+    for (int i = 0; i < L2_SIZE; i++)
+    {
+        CacheLine& line = ((Cache*)mem.l2)->backdoor( i );
+
+        int set = (i / (L2_SIZE / N_SETS)) % N_SETS;
+        int lineAddress = ((line.tag << SET_BIT_SIZE) + set) << OFFSET_BIT_SIZE;
+
+        int x = (lineAddress / 4) & 1023, y = (lineAddress / 4) / 1024;
+        for (int j = 0; j < 16; j++) {
+            screen->Plot( x + 10 + j, y + 10, ((uint*)line.bytes)[j] >> 8 );
+        }
+    }
+
+    // draw the contents of the first cache level over the DRAM contents
+    // fully hardcoded for the sample cache (size, associative, 1 layer)
+    for (int i = 0; i < L3_SIZE; i++)
+    {
+        CacheLine& line = ((Cache*)mem.l3)->backdoor( i );
+
+        int set = (i / (L3_SIZE / N_SETS)) % N_SETS;
+        int lineAddress = ((line.tag << SET_BIT_SIZE) + set) << OFFSET_BIT_SIZE;
+
+        int x = (lineAddress / 4) & 1023, y = (lineAddress / 4) / 1024;
+        for (int j = 0; j < 16; j++) {
+            screen->Plot( x + 10 + j, y + 10, ((uint*)line.bytes)[j] >> 16 );
         }
     }
 
@@ -108,7 +138,7 @@ void Game::Tick( float )
         int x = (int)(sinf( a ) * r + 512), y = (int)(cosf( a ) * r + 350);
         a += 0.01f; r -= 0.005f;
         if (r < -300) r = -300;
-        mem.WriteUint( (x + y * 1024) * 4, 0xffff77 );
+        mem.WriteUint( (x + y * 1024) * 4, 0xff0000 );
     }
 #else
     // the buddhabrot based on Paul Bourke		ACCESS PATTERN: MOSTLY RANDOM
