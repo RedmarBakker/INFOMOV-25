@@ -14,7 +14,7 @@ namespace Tmpl8
         void Update( Surface* screen, float x, float y, int hit, int miss )
         {
             memcpy( &ratio[0], &ratio[1], 99 * sizeof( float ) );
-            ratio[99] = min( 1.0f, miss / max( 0.001f, (float)(hit + miss) ) );
+            ratio[99] = min( 1.0f, hit / max( 0.001f, (float)(hit + miss) ) );
             screen->Bar( (int)x, (int)y, (int)x + 99, (int)y + 50, 0xff0000 );
             for (int i = 0; i < 100; i++) if (ratio[i] > 0)
                     screen->Line( i + x, y, i + x, y + ratio[i] * 50, 0xff00 );

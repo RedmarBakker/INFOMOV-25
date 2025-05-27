@@ -67,13 +67,13 @@ void Game::VisualizeMem()
     //TODO screen->Print( "level 3 R/W", 1050, 170, 0xffffff );
     screen->Print( "DRAM R/W", 1050, 90 , 0xffffff ); // 90 = 250
     //screen updates for l1:
-    gr[0].Update( screen, 1050, 20, mem.l1->r_miss, mem.l1->r_hit );
-    gr[1].Update( screen, 1170, 20, mem.l1->w_miss, mem.l1->w_hit );
+    gr[0].Update( screen, 1050, 20, mem.l1->r_hit, mem.l1->r_miss );
+    gr[1].Update( screen, 1170, 20, mem.l1->w_hit, mem.l1->w_miss );
     //l2
     //l3
     //DRAM
-    gr[2].Update( screen, 1050, 100, mem.l2->r_miss, mem.l2->r_hit );
-    gr[3].Update( screen, 1170, 100, mem.l2->w_miss, mem.l2->w_hit );
+    gr[2].Update( screen, 1050, 100, mem.l2->r_hit, mem.l2->r_miss );
+    gr[3].Update( screen, 1170, 100, mem.l2->w_hit, mem.l2->w_miss );
 }
 
 // -----------------------------------------------------------
