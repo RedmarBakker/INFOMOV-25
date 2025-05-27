@@ -1,13 +1,13 @@
 #pragma once
 
+#include <vector>
+
 namespace Tmpl8 {
 
     // single-level fully associative cache
 
     #define CACHELINEWIDTH	64
-    #define CACHESIZE		4096				// in bytes
     #define N_SETS		    16				    // in bytes
-    #define N_BLOCKS		4				    // in bytes
     #define SET_BIT_SIZE    4
     #define OFFSET_BIT_SIZE 6
     #define DRAMSIZE		3276800				// 3.125MB; 1024x800 pixels
@@ -31,20 +31,26 @@ namespace Tmpl8 {
     class Cache : public Level // cache level for the memory hierarchy
     {
     public:
+        Cache(int total_cache_lines)
+        {
+            n_blocks = total_cache_lines / N_SETS;
+            slot.resize(N_SETS, std::vector<CacheLine>(n_blocks));
+        }
         void WriteLine( uint address, CacheLine line );
         CacheLine ReadLine( uint address );
-        CacheLine& backdoor( int i ) { return slot[((i / N_SETS) - 1) % N_SETS][i % N_BLOCKS]; } /* for visualization without side effects */
+        CacheLine& backdoor( int i ) { return slot[((i / N_SETS) - 1) % N_SETS][i % n_blocks]; } /* for visualization without side effects */
     private:
-        CacheLine slot[N_SETS][N_BLOCKS];
+        std::vector<std::vector<CacheLine>> slot;
+        int n_blocks;
     };
 
     class Memory : public Level // DRAM level for the memory hierarchy
     {
     public:
-        Memory()
+        Memory(uint dramSize)
         {
-            mem = new uchar[DRAMSIZE];
-            memset( mem, 0, DRAMSIZE );
+            mem = new uchar[dramSize];
+            memset( mem, 0, dramSize );
         }
         void WriteLine( uint address, CacheLine line );
         CacheLine ReadLine( uint address );
@@ -58,10 +64,10 @@ namespace Tmpl8 {
     public:
         MemHierarchy()
         {
-            l1 = new Cache();
-            l1->nextLevel = l2 = new Cache();
-            l2->nextLevel = l3 = new Cache();
-            l3->nextLevel = dram = new Memory();
+            l1 = new Cache(64);
+            l1->nextLevel = l2 = new Cache(64 * 8);
+            l2->nextLevel = l3 = new Cache(64 * 8 * 16);
+            l3->nextLevel = dram = new Memory(DRAMSIZE);
 
         }
         void WriteByte( uint address, uchar value );
