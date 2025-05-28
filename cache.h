@@ -2,7 +2,7 @@
 
 #include <vector>
 
-enum EvictionPolicy { RANDOM, LRU, LFU, CLAIRVOYANT };
+enum EvictionPolicy { RANDOM, LRU, LFU, CLAIRVOYANT, PLRU };
 
 namespace Tmpl8 {
 
@@ -29,6 +29,7 @@ namespace Tmpl8 {
         virtual void WriteLine( uint address, CacheLine line ) = 0;
         virtual CacheLine ReadLine( uint address ) = 0;
         Level* nextLevel = 0;
+        std::vector<std::vector<int>> plruTreeState;
         uint r_hit = 0, r_miss = 0, w_hit = 0, w_miss = 0;
         uint total_r_hit = 0, total_r_miss = 0, total_w_hit = 0, total_w_miss = 0;
         int cacheLineWidth;
@@ -54,6 +55,13 @@ namespace Tmpl8 {
             assert(n_blocks >= 1);
 
             n_sets = nSets;
+
+            int plruBitsPerSet = n_blocks - 1;
+            plruTreeState.resize(n_sets);
+
+            for (int i = 0; i < n_sets; i++) {
+                plruTreeState[i] = std::vector<int>(plruBitsPerSet, 0); // initialize to all 0s
+            }
 
             // Construct slot with CacheLine(cacheLineWidth)
             slot.resize(nSets);

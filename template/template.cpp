@@ -182,7 +182,7 @@ int main()
 	// initialize application
 	InitRenderTarget(SCRWIDTH, SCRHEIGHT);
 	Surface *screen = new Surface(SCRWIDTH, SCRHEIGHT);
-	app = new Game(64, 512, 8192, 16, 64, LRU);
+	app = new Game(64, 512, 8192, 16, 64, PLRU);
 	app->screen = screen;
 	app->Init();
 	// done, enter main loop
@@ -393,6 +393,11 @@ int main()
 			glfwSwapBuffers(window);
 			glfwPollEvents();
 		}
+
+        if (frameNr > 13000) {
+            break;
+        }
+
 		if (!running)
 			break;
 	}

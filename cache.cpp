@@ -154,6 +154,28 @@ void Cache::WriteLine( uint address, CacheLine line )
             }
             break;
         }
+        case PLRU:
+        {
+            // Tree-based PLRU using binary tree representation for any n_blocks (assume n_blocks is power of 2)
+            // plruState[set] represents a vector of bits for the tree nodes
+            int levels = log2(n_blocks);
+            int node = 0;
+
+            for (int l = 0; l < levels; l++) {
+                int bit = plruTreeState[set][node];
+                node = 2 * node + 1 + bit;
+            }
+
+            blockToEvict = node - (n_blocks - 1);
+
+            int leaf = blockToEvict + (n_blocks - 1);
+            for (int l = levels - 1; l >= 0; l--) {
+                int parent = (leaf - 1) / 2;
+                int direction = (leaf % 2 == 0) ? 1 : 0;
+                plruTreeState[set][parent] = direction;
+                leaf = parent;
+            }
+        }
     }
 
     if (slot[set][blockToEvict].dirty)
