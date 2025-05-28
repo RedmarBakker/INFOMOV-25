@@ -178,10 +178,11 @@ int main()
 	// For linux and mac need platform specific implementation,
 	// but from what I've seen this isn't *really* necessary
 #endif
+
 	// initialize application
 	InitRenderTarget(SCRWIDTH, SCRHEIGHT);
 	Surface *screen = new Surface(SCRWIDTH, SCRHEIGHT);
-	app = new Game();
+	app = new Game(64, 512, 8192, 16, 64, LRU);
 	app->screen = screen;
 	app->Init();
 	// done, enter main loop
@@ -395,6 +396,26 @@ int main()
 		if (!running)
 			break;
 	}
+    printf("Level 1 Read Hits: %u\n", ((Game*)app)->mem.l1->total_r_hit);
+    printf("Level 1 Read Misses: %u\n", ((Game*)app)->mem.l1->total_r_miss);
+    printf("Level 1 Write Hits: %u\n", ((Game*)app)->mem.l1->total_w_hit);
+    printf("Level 1 Write Misses: %u\n", ((Game*)app)->mem.l1->total_w_miss);
+
+    printf("Level 2 Read Hits: %u\n", ((Game*)app)->mem.l2->total_r_hit);
+    printf("Level 2 Read Misses: %u\n", ((Game*)app)->mem.l2->total_r_miss);
+    printf("Level 2 Write Hits: %u\n", ((Game*)app)->mem.l2->total_w_hit);
+    printf("Level 2 Write Misses: %u\n", ((Game*)app)->mem.l2->total_w_miss);
+
+    printf("Level 3 Read Hits: %u\n", ((Game*)app)->mem.l3->total_r_hit);
+    printf("Level 3 Read Misses: %u\n", ((Game*)app)->mem.l3->total_r_miss);
+    printf("Level 3 Write Hits: %u\n", ((Game*)app)->mem.l3->total_w_hit);
+    printf("Level 3 Write Misses: %u\n", ((Game*)app)->mem.l3->total_w_miss);
+
+    printf("DRAM Read Hits: %u\n", ((Game*)app)->mem.dram->total_r_hit);
+    printf("DRAM Read Misses: %u\n", ((Game*)app)->mem.dram->total_r_miss);
+    printf("DRAM Write Hits: %u\n", ((Game*)app)->mem.dram->total_w_hit);
+    printf("DRAM Write Misses: %u\n", ((Game*)app)->mem.dram->total_w_miss);
+
 	// close down
 	app->Shutdown();
 	Kernel::KillCL();

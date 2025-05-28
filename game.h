@@ -25,6 +25,7 @@ namespace Tmpl8
     class Game : public TheApp
     {
     public:
+        Game(int l1Size, int l2Size, int l3Size, int nSets, int cacheLineWidth, EvictionPolicy evictionPolicy) : mem(l1Size, l2Size, l3Size, nSets, cacheLineWidth, evictionPolicy) {}
         // game flow methods
         void Init();
         void Tick( float deltaTime );
