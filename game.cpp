@@ -26,10 +26,6 @@ both schemes, or include this in the experiments for challenge 2 (up to 1pt).
 #include "precomp.h"
 #include "game.h"
 
-enum CacheVisualization { SPIRAL, BUDDHA, LINE };
-
-CacheVisualization currentVisualization = SPIRAL;
-
 // static variables for graph / fractal drawing / obfuscation
 static float a = 0, r = 300;
 static Graph gr[8];
@@ -51,48 +47,50 @@ void Game::VisualizeMem()
         screen->Plot( x + 10, y + 10, (value >> 1) & 0x4f4f4f /* 50% */ );
     }
 
-    // draw the contents of the first cache level over the DRAM contents
-    // fully hardcoded for the sample cache (size, associative, 1 layer)
-    for (int i = 0; i < ((Cache*)mem.l3)->size; i++)
-    {
-        CacheLine& line = ((Cache*)mem.l3)->backdoor( i );
+    if (currentVisualization == SPIRAL) {
+        // draw the contents of the first cache level over the DRAM contents
+        // fully hardcoded for the sample cache (size, associative, 1 layer)
+        for (int i = 0; i < ((Cache*)mem.l3)->size; i++)
+        {
+            CacheLine& line = ((Cache*)mem.l3)->backdoor( i );
 
-        int set = (i / (((Cache*)mem.l3)->size / ((Cache*)mem.l3)->n_sets)) % ((Cache*)mem.l3)->n_sets;
-        int lineAddress = ((line.tag << ((Cache*)mem.l3)->setBitSize) + set) << ((Cache*)mem.l3)->offsetBitSize;
+            int set = (i / (((Cache*)mem.l3)->size / ((Cache*)mem.l3)->n_sets)) % ((Cache*)mem.l3)->n_sets;
+            int lineAddress = ((line.tag << ((Cache*)mem.l3)->setBitSize) + set) << ((Cache*)mem.l3)->offsetBitSize;
 
-        int x = (lineAddress / 4) & 1023, y = (lineAddress / 4) / 1024;
-        for (int j = 0; j < 16; j++) {
-            screen->Plot( x + 10 + j, y + 10, ((uint*)line.bytes)[j] >> 16 );
+            int x = (lineAddress / 4) & 1023, y = (lineAddress / 4) / 1024;
+            for (int j = 0; j < mem.l3->cacheLineWidth/4; j++) {
+                screen->Plot( x + 10 + j, y + 10, ((uint*)line.bytes)[j] >> 16 );
+            }
         }
-    }
 
-    // draw the contents of the first cache level over the DRAM contents
-    // fully hardcoded for the sample cache (size, associative, 1 layer)
-    for (int i = 0; i < ((Cache*)mem.l2)->size; i++)
-    {
-        CacheLine& line = ((Cache*)mem.l2)->backdoor( i );
+        // draw the contents of the first cache level over the DRAM contents
+        // fully hardcoded for the sample cache (size, associative, 1 layer)
+        for (int i = 0; i < ((Cache*)mem.l2)->size; i++)
+        {
+            CacheLine& line = ((Cache*)mem.l2)->backdoor( i );
 
-        int set = (i / (((Cache*)mem.l2)->size / ((Cache*)mem.l2)->n_sets)) % ((Cache*)mem.l2)->n_sets;
-        int lineAddress = ((line.tag << ((Cache*)mem.l2)->setBitSize) + set) << ((Cache*)mem.l2)->offsetBitSize;
+            int set = (i / (((Cache*)mem.l2)->size / ((Cache*)mem.l2)->n_sets)) % ((Cache*)mem.l2)->n_sets;
+            int lineAddress = ((line.tag << ((Cache*)mem.l2)->setBitSize) + set) << ((Cache*)mem.l2)->offsetBitSize;
 
-        int x = (lineAddress / 4) & 1023, y = (lineAddress / 4) / 1024;
-        for (int j = 0; j < 16; j++) {
-            screen->Plot( x + 10 + j, y + 10, ((uint*)line.bytes)[j] >> 8 );
+            int x = (lineAddress / 4) & 1023, y = (lineAddress / 4) / 1024;
+            for (int j = 0; j < mem.l2->cacheLineWidth/4; j++) {
+                screen->Plot( x + 10 + j, y + 10, ((uint*)line.bytes)[j] >> 8 );
+            }
         }
-    }
 
-    // draw the contents of the first cache level over the DRAM contents
-    // fully hardcoded for the sample cache (size, associative, 1 layer)
-    for (int i = 0; i < ((Cache*)mem.l1)->size; i++)
-    {
-        CacheLine& line = ((Cache*)mem.l1)->backdoor( i );
+        // draw the contents of the first cache level over the DRAM contents
+        // fully hardcoded for the sample cache (size, associative, 1 layer)
+        for (int i = 0; i < ((Cache*)mem.l1)->size; i++)
+        {
+            CacheLine& line = ((Cache*)mem.l1)->backdoor( i );
 
-        int set = (i / (((Cache*)mem.l1)->size / ((Cache*)mem.l1)->n_sets)) % ((Cache*)mem.l1)->n_sets;
-        int lineAddress = ((line.tag << ((Cache*)mem.l1)->setBitSize) + set) << ((Cache*)mem.l1)->offsetBitSize;
+            int set = (i / (((Cache*)mem.l1)->size / ((Cache*)mem.l1)->n_sets)) % ((Cache*)mem.l1)->n_sets;
+            int lineAddress = ((line.tag << ((Cache*)mem.l1)->setBitSize) + set) << ((Cache*)mem.l1)->offsetBitSize;
 
-        int x = (lineAddress / 4) & 1023, y = (lineAddress / 4) / 1024;
-        for (int j = 0; j < 16; j++) {
-            screen->Plot( x + 10 + j, y + 10, ((uint*)line.bytes)[j] );
+            int x = (lineAddress / 4) & 1023, y = (lineAddress / 4) / 1024;
+            for (int j = 0; j < mem.l1->cacheLineWidth/4; j++) {
+                screen->Plot( x + 10 + j, y + 10, ((uint*)line.bytes)[j] );
+            }
         }
     }
 
@@ -121,6 +119,11 @@ void Game::VisualizeMem()
 void Game::Init()
 {
     for (V = 1024, F = 1, I = 1; I < 4; I++ );
+
+    a = 0, r = 300;
+    lineIndex = 0;
+
+    I,N,F,O,M,_O,V=2019;
 }
 
 // -----------------------------------------------------------

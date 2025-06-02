@@ -79,7 +79,7 @@ namespace Tmpl8 {
 
             evictionPolicy = policy;
 
-            printf("Cache: %u sets, %u blocks\n", nSets, n_blocks);
+            //printf("Cache: %u sets, %u blocks\n", nSets, n_blocks);
         }
         void WriteLine( uint address, CacheLine line );
         CacheLine ReadLine( uint address );
@@ -119,8 +119,6 @@ namespace Tmpl8 {
             cacheLineWidth = lineWidth;
             offsetBitSize = static_cast<int>(log2(lineWidth));
             setBitSize = static_cast<int>(log2(nSets));
-
-            printf("%u %u\n", offsetBitSize, setBitSize);
         }
         void WriteLine( uint address, CacheLine line );
         CacheLine ReadLine( uint address );

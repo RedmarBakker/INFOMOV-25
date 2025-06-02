@@ -5,6 +5,8 @@
 #pragma once
 #include "cache.h"
 
+enum CacheVisualization { SPIRAL, BUDDHA, LINE };
+
 namespace Tmpl8
 {
 
@@ -25,7 +27,9 @@ namespace Tmpl8
     class Game : public TheApp
     {
     public:
-        Game(int l1Size, int l2Size, int l3Size, int nSets, int cacheLineWidth, EvictionPolicy evictionPolicy) : mem(l1Size, l2Size, l3Size, nSets, cacheLineWidth, evictionPolicy) {}
+        Game(int l1Size, int l2Size, int l3Size, int nSets, int cacheLineWidth, EvictionPolicy evictionPolicy, CacheVisualization visualization) : mem(l1Size, l2Size, l3Size, nSets, cacheLineWidth, evictionPolicy) {
+            currentVisualization = visualization;
+        }
         // game flow methods
         void Init();
         void Tick( float deltaTime );
@@ -41,6 +45,7 @@ namespace Tmpl8
         // data members
         int2 mousePos;
         MemHierarchy mem;
+        CacheVisualization currentVisualization;
     };
 
 } // namespace Tmpl8

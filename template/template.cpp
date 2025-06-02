@@ -179,16 +179,9 @@ int main()
 	// but from what I've seen this isn't *really* necessary
 #endif
 
-	// initialize application
-	InitRenderTarget(SCRWIDTH, SCRHEIGHT);
-	Surface *screen = new Surface(SCRWIDTH, SCRHEIGHT);
-	app = new Game(64, 512, 8192, 16, 64, PLRU);
-	app->screen = screen;
-	app->Init();
-	// done, enter main loop
 #if 0
 	// crt shader, https://github.com/libretro/slang-shaders/tree/master/crt/shaders/hyllian
-	char fs[] = 
+	char fs[] =
 		"#version 330											\n"
 		"uniform sampler2D c; in vec2 uv; out vec4 f;			\n"
 		"#define SCRWIDTH             							\n"
@@ -373,56 +366,181 @@ int main()
 		true);
 #endif
 #endif
-	float deltaTime = 0;
-	static int frameNr = 0;
-	static Timer timer;
-	while (!glfwWindowShouldClose(window))
-	{
-		deltaTime = min(500.0f, 1000.0f * timer.elapsed());
-		timer.reset();
-		app->Tick(deltaTime);
-		// send the rendering result to the screen using OpenGL
-		if (frameNr++ > 1)
-		{
-			if (app->screen)
-				renderTarget->CopyFrom(app->screen);
-			shader->Bind();
-			shader->SetInputTexture(0, "c", renderTarget);
-			DrawQuad();
-			shader->Unbind();
-			glfwSwapBuffers(window);
-			glfwPollEvents();
-		}
+    #include <vector>
 
-        if (frameNr > 13000) {
-            break;
+    struct Config {
+        int l1Size, l2Size, l3Size, nSets, cacheLineWidth;
+        EvictionPolicy evictionPolicy;
+        CacheVisualization visualization;
+    };
+
+    std::vector<Config> configurations = {
+//        // different cache level sizes with 8 sets, 32 bytes cache line width
+//        {64/2, 512/2, 8192/2, 8, 32, RANDOM, SPIRAL},
+//        {64, 512, 8192, 8, 32, RANDOM, SPIRAL},
+//        {64*2, 512*2, 8192*2, 8, 32, RANDOM, SPIRAL},
+//
+//        // different cache level sizes with 16 sets, 32 bytes cache line width
+//        {64/2, 512/2, 8192/2, 16, 32, RANDOM, SPIRAL},
+//        {64, 512, 8192, 16, 32, RANDOM, SPIRAL},
+//        {64*2, 512*2, 8192*2, 16, 32, RANDOM, SPIRAL},
+//
+//        // different cache level sizes with 32 sets, 32 bytes cache line width
+//        {64/2, 512/2, 8192/2, 32, 32, RANDOM, SPIRAL},
+//        {64, 512, 8192, 32, 32, RANDOM, SPIRAL},
+//        {64*2, 512*2, 8192*2, 32, 32, RANDOM, SPIRAL},
+//
+//        // different cache level sizes with 8 sets, 64 bytes cache line width
+//        {64/2, 512/2, 8192/2, 8, 64, RANDOM, SPIRAL},
+//        {64, 512, 8192, 8, 64, RANDOM, SPIRAL},
+//        {64*2, 512*2, 8192*2, 8, 64, RANDOM, SPIRAL},
+//
+//        // different cache level sizes with 16 sets, 64 bytes cache line width
+//        {64/2, 512/2, 8192/2, 16, 64, RANDOM, SPIRAL},
+//        {64, 512, 8192, 16, 64, RANDOM, SPIRAL},
+//        {64*2, 512*2, 8192*2, 16, 64, RANDOM, SPIRAL},
+//
+//        // different cache level sizes with 32 sets, 64 bytes cache line width
+//        {64/2, 512/2, 8192/2, 32, 64, RANDOM, SPIRAL},
+//        {64, 512, 8192, 32, 64, RANDOM, SPIRAL},
+//        {64*2, 512*2, 8192*2, 32, 64, RANDOM, SPIRAL},
+//
+//        // different cache level sizes with 8 sets, 128 bytes cache line width
+//        {64/2, 512/2, 8192/2, 8, 128, RANDOM, SPIRAL},
+//        {64, 512, 8192, 8, 128, RANDOM, SPIRAL},
+//        {64*2, 512*2, 8192*2, 8, 128, RANDOM, SPIRAL},
+//
+//        // different cache level sizes with 16 sets, 128 bytes cache line width
+//        {64/2, 512/2, 8192/2, 16, 128, RANDOM, SPIRAL},
+//        {64, 512, 8192, 16, 128, RANDOM, SPIRAL},
+//        {64*2, 512*2, 8192*2, 16, 128, RANDOM, SPIRAL},
+//
+//        // different cache level sizes with 32 sets, 128 bytes cache line width
+//        {64/2, 512/2, 8192/2, 32, 128, RANDOM, SPIRAL},
+//        {64, 512, 8192, 32, 128, RANDOM, SPIRAL},
+//        {64*2, 512*2, 8192*2, 32, 128, RANDOM, SPIRAL},
+
+        // different cache level sizes with 8 sets, 32 bytes cache line width
+        {64/2, 512/2, 8192/2, 8, 32, RANDOM, BUDDHA},
+        {64, 512, 8192, 8, 32, RANDOM, BUDDHA},
+        {64*2, 512*2, 8192*2, 8, 32, RANDOM, BUDDHA},
+
+        // different cache level sizes with 16 sets, 32 bytes cache line width
+        {64/2, 512/2, 8192/2, 16, 32, RANDOM, BUDDHA},
+        {64, 512, 8192, 16, 32, RANDOM, BUDDHA},
+        {64*2, 512*2, 8192*2, 16, 32, RANDOM, BUDDHA},
+
+        // different cache level sizes with 32 sets, 32 bytes cache line width
+        {64/2, 512/2, 8192/2, 32, 32, RANDOM, BUDDHA},
+        {64, 512, 8192, 32, 32, RANDOM, BUDDHA},
+        {64*2, 512*2, 8192*2, 32, 32, RANDOM, BUDDHA},
+
+        // different cache level sizes with 8 sets, 64 bytes cache line width
+        {64/2, 512/2, 8192/2, 8, 64, RANDOM, BUDDHA},
+        {64, 512, 8192, 8, 64, RANDOM, BUDDHA},
+        {64*2, 512*2, 8192*2, 8, 64, RANDOM, BUDDHA},
+
+        // different cache level sizes with 16 sets, 64 bytes cache line width
+        {64/2, 512/2, 8192/2, 16, 64, RANDOM, BUDDHA},
+        {64, 512, 8192, 16, 64, RANDOM, BUDDHA},
+        {64*2, 512*2, 8192*2, 16, 64, RANDOM, BUDDHA},
+
+        // different cache level sizes with 32 sets, 64 bytes cache line width
+        {64/2, 512/2, 8192/2, 32, 64, RANDOM, BUDDHA},
+        {64, 512, 8192, 32, 64, RANDOM, BUDDHA},
+        {64*2, 512*2, 8192*2, 32, 64, RANDOM, BUDDHA},
+
+        // different cache level sizes with 8 sets, 128 bytes cache line width
+        {64/2, 512/2, 8192/2, 8, 128, RANDOM, BUDDHA},
+        {64, 512, 8192, 8, 128, RANDOM, BUDDHA},
+        {64*2, 512*2, 8192*2, 8, 128, RANDOM, BUDDHA},
+
+        // different cache level sizes with 16 sets, 128 bytes cache line width
+        {64/2, 512/2, 8192/2, 16, 128, RANDOM, BUDDHA},
+        {64, 512, 8192, 16, 128, RANDOM, BUDDHA},
+        {64*2, 512*2, 8192*2, 16, 128, RANDOM, BUDDHA},
+
+        // different cache level sizes with 32 sets, 128 bytes cache line width
+        {64/2, 512/2, 8192/2, 32, 128, RANDOM, BUDDHA},
+        {64, 512, 8192, 32, 128, RANDOM, BUDDHA},
+        {64*2, 512*2, 8192*2, 32, 128, RANDOM, BUDDHA},
+    };
+
+    InitRenderTarget(SCRWIDTH, SCRHEIGHT);
+    Surface *screen = new Surface(SCRWIDTH, SCRHEIGHT);
+
+    for (const auto& config : configurations) {
+        app = new Game(config.l1Size, config.l2Size, config.l3Size, config.nSets, config.cacheLineWidth, config.evictionPolicy, config.visualization);
+        app->screen = screen;
+        app->Init();
+
+        float deltaTime = 0;
+        static Timer timer;
+        int frameNr = 0;
+
+        while (!glfwWindowShouldClose(window)) {
+            deltaTime = min(500.0f, 1000.0f * timer.elapsed());
+            timer.reset();
+            app->Tick(deltaTime);
+
+            if (frameNr++ > 1) {
+                if (app->screen)
+                    renderTarget->CopyFrom(app->screen);
+                shader->Bind();
+                shader->SetInputTexture(0, "c", renderTarget);
+                DrawQuad();
+                shader->Unbind();
+                glfwSwapBuffers(window);
+                glfwPollEvents();
+            }
+
+            if (frameNr > 100) break;
+            if (!running) break;
         }
 
-		if (!running)
-			break;
-	}
-    printf("Level 1 Read Hits: %u\n", ((Game*)app)->mem.l1->total_r_hit);
-    printf("Level 1 Read Misses: %u\n", ((Game*)app)->mem.l1->total_r_miss);
-    printf("Level 1 Write Hits: %u\n", ((Game*)app)->mem.l1->total_w_hit);
-    printf("Level 1 Write Misses: %u\n", ((Game*)app)->mem.l1->total_w_miss);
+        printf("Level 1 cache size (bytes): %u\n", config.l1Size);
+        printf("Level 2 cache size (bytes): %u\n", config.l2Size);
+        printf("Level 3 cache size (bytes): %u\n", config.l3Size);
+        printf("Number of sets: %u\n", config.nSets);
+        printf("Cache line width (bytes): %u\n", config.cacheLineWidth);
+        printf("Eviction policy: %s\n", (config.evictionPolicy == RANDOM ? "RANDOM" : config.evictionPolicy == LFU ? "LFU" : config.evictionPolicy == LRU ? "LRU" : "CLAIRVOYANT"));
+        printf("Total frames: %u\n", frameNr);
+        printf("\n");
+        printf("Level 1 Read Hits: %u\n", ((Game*)app)->mem.l1->total_r_hit);
+        printf("Level 1 Read Misses: %u\n", ((Game*)app)->mem.l1->total_r_miss);
+        printf("Level 1 Write Hits: %u\n", ((Game*)app)->mem.l1->total_w_hit);
+        printf("Level 1 Write Misses: %u\n", ((Game*)app)->mem.l1->total_w_miss);
+        printf("Level 1 Read Ratio: %.2f\n", (float)((Game*)app)->mem.l1->total_r_hit / (((Game*)app)->mem.l1->total_r_miss + ((Game*)app)->mem.l1->total_r_hit));
+        printf("Level 1 Write Ratio: %.2f\n", (float)((Game*)app)->mem.l1->total_w_hit / (((Game*)app)->mem.l1->total_w_miss + ((Game*)app)->mem.l1->total_w_hit));
+        printf("\n");
+        printf("Level 2 Read Hits: %u\n", ((Game*)app)->mem.l2->total_r_hit);
+        printf("Level 2 Read Misses: %u\n", ((Game*)app)->mem.l2->total_r_miss);
+        printf("Level 2 Write Hits: %u\n", ((Game*)app)->mem.l2->total_w_hit);
+        printf("Level 2 Write Misses: %u\n", ((Game*)app)->mem.l2->total_w_miss);
+        printf("Level 2 Read Ratio: %.2f\n", (float)((Game*)app)->mem.l2->total_r_hit / (((Game*)app)->mem.l2->total_r_miss + ((Game*)app)->mem.l2->total_r_hit));
+        printf("Level 2 Write Ratio: %.2f\n", (float)((Game*)app)->mem.l2->total_w_hit / (((Game*)app)->mem.l2->total_w_miss + ((Game*)app)->mem.l2->total_w_hit));
+        printf("\n");
+        printf("Level 3 Read Hits: %u\n", ((Game*)app)->mem.l3->total_r_hit);
+        printf("Level 3 Read Misses: %u\n", ((Game*)app)->mem.l3->total_r_miss);
+        printf("Level 3 Write Hits: %u\n", ((Game*)app)->mem.l3->total_w_hit);
+        printf("Level 3 Write Misses: %u\n", ((Game*)app)->mem.l3->total_w_miss);
+        printf("Level 3 Read Ratio: %.2f\n", (float)((Game*)app)->mem.l3->total_r_hit / (((Game*)app)->mem.l3->total_r_miss + ((Game*)app)->mem.l3->total_r_hit));
+        printf("Level 3 Write Ratio: %.2f\n", (float)((Game*)app)->mem.l3->total_w_hit / (((Game*)app)->mem.l3->total_w_miss + ((Game*)app)->mem.l3->total_w_hit));
+        printf("\n");
+        printf("DRAM Read Hits: %u\n", ((Game*)app)->mem.dram->total_r_hit);
+        printf("DRAM Read Misses: %u\n", ((Game*)app)->mem.dram->total_r_miss);
+        printf("DRAM Write Hits: %u\n", ((Game*)app)->mem.dram->total_w_hit);
+        printf("DRAM Write Misses: %u\n", ((Game*)app)->mem.dram->total_w_miss);
+        printf("DRAM Read Ratio: %.2f\n", (float)((Game*)app)->mem.dram->total_r_hit / (((Game*)app)->mem.dram->total_r_miss + ((Game*)app)->mem.dram->total_r_hit));
+        printf("DRAM Write Ratio: %.2f\n", (float)((Game*)app)->mem.dram->total_w_hit / (((Game*)app)->mem.dram->total_w_miss + ((Game*)app)->mem.dram->total_w_hit));
 
-    printf("Level 2 Read Hits: %u\n", ((Game*)app)->mem.l2->total_r_hit);
-    printf("Level 2 Read Misses: %u\n", ((Game*)app)->mem.l2->total_r_miss);
-    printf("Level 2 Write Hits: %u\n", ((Game*)app)->mem.l2->total_w_hit);
-    printf("Level 2 Write Misses: %u\n", ((Game*)app)->mem.l2->total_w_miss);
+        printf("\n\n");
 
-    printf("Level 3 Read Hits: %u\n", ((Game*)app)->mem.l3->total_r_hit);
-    printf("Level 3 Read Misses: %u\n", ((Game*)app)->mem.l3->total_r_miss);
-    printf("Level 3 Write Hits: %u\n", ((Game*)app)->mem.l3->total_w_hit);
-    printf("Level 3 Write Misses: %u\n", ((Game*)app)->mem.l3->total_w_miss);
-
-    printf("DRAM Read Hits: %u\n", ((Game*)app)->mem.dram->total_r_hit);
-    printf("DRAM Read Misses: %u\n", ((Game*)app)->mem.dram->total_r_miss);
-    printf("DRAM Write Hits: %u\n", ((Game*)app)->mem.dram->total_w_hit);
-    printf("DRAM Write Misses: %u\n", ((Game*)app)->mem.dram->total_w_miss);
+        app->Shutdown();
+        delete app;
+    }
 
 	// close down
-	app->Shutdown();
 	Kernel::KillCL();
 	glfwDestroyWindow(window);
 	glfwTerminate();
