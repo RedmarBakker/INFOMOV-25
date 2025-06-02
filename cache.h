@@ -100,6 +100,9 @@ namespace Tmpl8 {
         int n_sets;
 
         EvictionPolicy evictionPolicy;
+
+        std::vector<uint> futureAccesses;
+        int futureAccessIndex = 0;
     private:
         std::vector<std::vector<CacheLine>> slot;
 

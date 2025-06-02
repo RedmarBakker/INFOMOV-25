@@ -3,9 +3,6 @@
 
 int globalAccessTime = 0;
 
-std::vector<uint> futureAccesses;
-int futureAccessIndex = 0;
-
 void Memory::WriteLine( uint address, CacheLine line )
 {
     // verify that the address is a multiple of the cacheline width
@@ -146,11 +143,6 @@ void Cache::WriteLine( uint address, CacheLine line )
                     blockToEvict = i;
                     break;
                 }
-
-                // Where to put this?
-
-//                futureAccesses.push_back(address - (address % cacheLineWidth));
-//                futureAccessIndex++;
             }
             break;
         }
@@ -258,6 +250,11 @@ uint MemHierarchy::ReadUint( uint address )
     // fetch the cacheline for the specified address
     int offsetInLine = address & (l1->cacheLineWidth - 1);
     assert( (offsetInLine & 3) == 0 ); // we will not support straddlers
+
+    ((Cache*)l1)->futureAccessIndex++;
+    ((Cache*)l2)->futureAccessIndex++;
+    ((Cache*)l3)->futureAccessIndex++;
+
     int lineAddress = address - offsetInLine;
     CacheLine line = l1->ReadLine( lineAddress );
     return ((uint*)line.bytes)[offsetInLine / 4];

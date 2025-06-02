@@ -420,50 +420,50 @@ int main()
 //        {64, 512, 8192, 32, 128, RANDOM, SPIRAL},
 //        {64*2, 512*2, 8192*2, 32, 128, RANDOM, SPIRAL},
 
-        // different cache level sizes with 8 sets, 32 bytes cache line width
-        {64/2, 512/2, 8192/2, 8, 32, RANDOM, BUDDHA},
-        {64, 512, 8192, 8, 32, RANDOM, BUDDHA},
-        {64*2, 512*2, 8192*2, 8, 32, RANDOM, BUDDHA},
-
-        // different cache level sizes with 16 sets, 32 bytes cache line width
-        {64/2, 512/2, 8192/2, 16, 32, RANDOM, BUDDHA},
-        {64, 512, 8192, 16, 32, RANDOM, BUDDHA},
-        {64*2, 512*2, 8192*2, 16, 32, RANDOM, BUDDHA},
-
-        // different cache level sizes with 32 sets, 32 bytes cache line width
-        {64/2, 512/2, 8192/2, 32, 32, RANDOM, BUDDHA},
-        {64, 512, 8192, 32, 32, RANDOM, BUDDHA},
-        {64*2, 512*2, 8192*2, 32, 32, RANDOM, BUDDHA},
-
-        // different cache level sizes with 8 sets, 64 bytes cache line width
-        {64/2, 512/2, 8192/2, 8, 64, RANDOM, BUDDHA},
-        {64, 512, 8192, 8, 64, RANDOM, BUDDHA},
-        {64*2, 512*2, 8192*2, 8, 64, RANDOM, BUDDHA},
-
-        // different cache level sizes with 16 sets, 64 bytes cache line width
-        {64/2, 512/2, 8192/2, 16, 64, RANDOM, BUDDHA},
-        {64, 512, 8192, 16, 64, RANDOM, BUDDHA},
-        {64*2, 512*2, 8192*2, 16, 64, RANDOM, BUDDHA},
-
-        // different cache level sizes with 32 sets, 64 bytes cache line width
-        {64/2, 512/2, 8192/2, 32, 64, RANDOM, BUDDHA},
-        {64, 512, 8192, 32, 64, RANDOM, BUDDHA},
-        {64*2, 512*2, 8192*2, 32, 64, RANDOM, BUDDHA},
-
-        // different cache level sizes with 8 sets, 128 bytes cache line width
-        {64/2, 512/2, 8192/2, 8, 128, RANDOM, BUDDHA},
-        {64, 512, 8192, 8, 128, RANDOM, BUDDHA},
-        {64*2, 512*2, 8192*2, 8, 128, RANDOM, BUDDHA},
-
-        // different cache level sizes with 16 sets, 128 bytes cache line width
-        {64/2, 512/2, 8192/2, 16, 128, RANDOM, BUDDHA},
-        {64, 512, 8192, 16, 128, RANDOM, BUDDHA},
-        {64*2, 512*2, 8192*2, 16, 128, RANDOM, BUDDHA},
-
-        // different cache level sizes with 32 sets, 128 bytes cache line width
-        {64/2, 512/2, 8192/2, 32, 128, RANDOM, BUDDHA},
-        {64, 512, 8192, 32, 128, RANDOM, BUDDHA},
-        {64*2, 512*2, 8192*2, 32, 128, RANDOM, BUDDHA},
+//        // different cache level sizes with 8 sets, 32 bytes cache line width
+//        {64/2, 512/2, 8192/2, 8, 32, RANDOM, BUDDHA},
+//        {64, 512, 8192, 8, 32, RANDOM, BUDDHA},
+//        {64*2, 512*2, 8192*2, 8, 32, RANDOM, BUDDHA},
+//
+//        // different cache level sizes with 16 sets, 32 bytes cache line width
+//        {64/2, 512/2, 8192/2, 16, 32, RANDOM, BUDDHA},
+//        {64, 512, 8192, 16, 32, RANDOM, BUDDHA},
+//        {64*2, 512*2, 8192*2, 16, 32, RANDOM, BUDDHA},
+//
+//        // different cache level sizes with 32 sets, 32 bytes cache line width
+//        {64/2, 512/2, 8192/2, 32, 32, RANDOM, BUDDHA},
+//        {64, 512, 8192, 32, 32, RANDOM, BUDDHA},
+//        {64*2, 512*2, 8192*2, 32, 32, RANDOM, BUDDHA},
+//
+//        // different cache level sizes with 8 sets, 64 bytes cache line width
+//        {64/2, 512/2, 8192/2, 8, 64, RANDOM, BUDDHA},
+//        {64, 512, 8192, 8, 64, RANDOM, BUDDHA},
+//        {64*2, 512*2, 8192*2, 8, 64, RANDOM, BUDDHA},
+//
+//        // different cache level sizes with 16 sets, 64 bytes cache line width
+//        {64/2, 512/2, 8192/2, 16, 64, RANDOM, BUDDHA},
+//        {64, 512, 8192, 16, 64, RANDOM, BUDDHA},
+//        {64*2, 512*2, 8192*2, 16, 64, RANDOM, BUDDHA},
+//
+//        // different cache level sizes with 32 sets, 64 bytes cache line width
+//        {64/2, 512/2, 8192/2, 32, 64, RANDOM, BUDDHA},
+//        {64, 512, 8192, 32, 64, RANDOM, BUDDHA},
+//        {64*2, 512*2, 8192*2, 32, 64, RANDOM, BUDDHA},
+//
+//        // different cache level sizes with 8 sets, 128 bytes cache line width
+//        {64/2, 512/2, 8192/2, 8, 128, RANDOM, BUDDHA},
+//        {64, 512, 8192, 8, 128, RANDOM, BUDDHA},
+//        {64*2, 512*2, 8192*2, 8, 128, RANDOM, BUDDHA},
+//
+//        // different cache level sizes with 16 sets, 128 bytes cache line width
+//        {64/2, 512/2, 8192/2, 16, 128, RANDOM, BUDDHA},
+//        {64, 512, 8192, 16, 128, RANDOM, BUDDHA},
+//        {64*2, 512*2, 8192*2, 16, 128, RANDOM, BUDDHA},
+//
+//        // different cache level sizes with 32 sets, 128 bytes cache line width
+//        {64/2, 512/2, 8192/2, 32, 128, RANDOM, BUDDHA},
+//        {64, 512, 8192, 32, 128, RANDOM, BUDDHA},
+//        {64*2, 512*2, 8192*2, 32, 128, RANDOM, BUDDHA},
     };
 
     InitRenderTarget(SCRWIDTH, SCRHEIGHT);
