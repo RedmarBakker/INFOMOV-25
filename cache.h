@@ -79,7 +79,7 @@ namespace Tmpl8 {
 
             evictionPolicy = policy;
 
-            //printf("Cache: %u sets, %u blocks\n", nSets, n_blocks);
+            //printf("Cache: %u sets, %u blocks, lineWidth %u\n", nSets, n_blocks, lineWidth);
         }
         void WriteLine( uint address, CacheLine line );
         CacheLine ReadLine( uint address );

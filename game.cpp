@@ -27,12 +27,13 @@ both schemes, or include this in the experiments for challenge 2 (up to 1pt).
 #include "game.h"
 
 // static variables for graph / fractal drawing / obfuscation
-static float a = 0, r = 300;
-static Graph gr[8];
+//static float a = 0, r = 300;
+//static Graph gr[8];
 #define _oOo_oOo_ (O>=V|N>=800?0:(((N<<10)+O)*4)
-uint* image[4], I,N,F,O,M,_O,V=2019; double K[999], Q[999];
-float R(){I^=I<<13;I^=I>>17;I^=I<<5;return I*2.3283064365387e-10f*6-3;} // rng
-int lineIndex = 0;
+//uint* image[4], I,N,F,O,M,_O,V=2019;
+//double K[999], Q[999];
+//float R(){I^=I<<13;I^=I>>17;I^=I<<5;return I*2.3283064365387e-10f*6-3;} // rng
+//int lineIndex = 0;
 
 // -----------------------------------------------------------
 // Visualization of the data stored in the memory hierarchy
@@ -44,7 +45,7 @@ void Game::VisualizeMem()
     for (int y = 0; y < 700; y++) for (int x = 0; x < 1024; x++)
     {
         int value = *((uint*)&((Memory*)mem.dram)->backdoor()[(x + y * 1024) * 4]);
-        screen->Plot( x + 10, y + 10, (value >> 1) & 0x4f4f4f /* 50% */ );
+        screen->Plot( x + 10, y + 10, (value >> 1) & (currentVisualization == SPIRAL ? 0x4f4f4f : 0x7f7f7f) /* soften */ );
     }
 
     if (currentVisualization == SPIRAL) {
@@ -119,11 +120,6 @@ void Game::VisualizeMem()
 void Game::Init()
 {
     for (V = 1024, F = 1, I = 1; I < 4; I++ );
-
-    a = 0, r = 300;
-    lineIndex = 0;
-
-    I,N,F,O,M,_O,V=2019;
 }
 
 // -----------------------------------------------------------

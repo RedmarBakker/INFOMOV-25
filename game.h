@@ -46,6 +46,13 @@ namespace Tmpl8
         int2 mousePos;
         MemHierarchy mem;
         CacheVisualization currentVisualization;
+
+        float a = 0, r = 300;
+        Graph gr[8];
+        uint* image[4], I,N,F,O,M,_O,V=2019;
+        double K[999], Q[999];
+        float R(){I^=I<<13;I^=I>>17;I^=I<<5;return I*2.3283064365387e-10f*6-3;} // rng
+        int lineIndex = 0;
     };
 
 } // namespace Tmpl8
