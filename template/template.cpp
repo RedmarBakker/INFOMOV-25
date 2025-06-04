@@ -497,7 +497,7 @@ int main()
     };
 	/* Set frameStop to 100 if access pattern == BUDDHA
 		set to 13000 if else*/
-	int frameStop = 13000
+	//int frameStop = 100;
 
     InitRenderTarget(SCRWIDTH, SCRHEIGHT);
     Surface *screen = new Surface(SCRWIDTH, SCRHEIGHT);
@@ -527,7 +527,7 @@ int main()
                 glfwPollEvents();
             }
 
-            if (frameNr > frameStop) break;
+            if (frameNr > 100) break;
             if (!running) break;
         }
 
