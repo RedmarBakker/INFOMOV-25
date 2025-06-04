@@ -375,6 +375,9 @@ int main()
     };
 
     std::vector<Config> configurations = {
+//----------------------------------------------------------------------------------------------
+//		  //CONFIGURATION EXPERIMENTS
+
 //        // different cache level sizes with 8 sets, 32 bytes cache line width
 //        {64/2, 512/2, 8192/2, 8, 32, RANDOM, SPIRAL},
 //        {64, 512, 8192, 8, 32, RANDOM, SPIRAL},
@@ -464,19 +467,37 @@ int main()
 //        {64/2, 512/2, 8192/2, 32, 128, RANDOM, BUDDHA},
 //        {64, 512, 8192, 32, 128, RANDOM, BUDDHA},
 //        {64*2, 512*2, 8192*2, 32, 128, RANDOM, BUDDHA},
-		  // eviction policy experiments
-		  // for every access pattern (using the optimal configuration) --> RANDOM, LRU, LFU
+
+//----------------------------------------------------------------------------------------------
+		  // EVICTION POLICY EXPERIMENTS
+		  // for every access pattern (using the optimal configuration)
+//			 --> LRU, LFU, RANDOM
+
 		  // SPIRAL
 	      //{64*2, 512*2, 8192*2, 32, 128, LRU, SPIRAL},
 	      //{64*2, 512*2, 8192*2, 32, 128, LFU, SPIRAL},
+	      //{64*2, 512*2, 8192*2, 32, 128, RANDOM, SPIRAL},
+
 		  ////LINE
 	      //{64*2, 512*2, 8192*2, 32, 128, LRU, LINE},
+	      //{64*2, 512*2, 8192*2, 32, 128, LFU, LINE},
 	      //{64*2, 512*2, 8192*2, 32, 128, RANDOM, LINE},
+
 		  //BUDDHA
-	      {64*2, 512*2, 8192*2, 32, 128, LRU, BUDDHA},
-	      {64*2, 512*2, 8192*2, 32, 128, LFU, BUDDHA},
+	      //{64*2, 512*2, 8192*2, 32, 128, LRU, BUDHHA},
+	      //{64*2, 512*2, 8192*2, 32, 128, LFU, BUDDHA},
+	      //{64*2, 512*2, 8192*2, 32, 128, RANDOM, BUDDHA},
+
+//----------------------------------------------------------------------------------------------
+		  //CLAIRVOYENT EXPERIMENT
+		  //{64*2, 512*2, 8192*2, 32, 128, CLAIRVOYANT, SPIRAL},
+		  //{64*2, 512*2, 8192*2, 32, 128, CLAIRVOYANT, LINE},
+		  //{64*2, 512*2, 8192*2, 32, 128, CLAIRVOYANT, BUDDHA},
 
     };
+	/* Set frameStop to 100 if access pattern == BUDDHA
+		set to 13000 if else*/
+	int frameStop = 13000
 
     InitRenderTarget(SCRWIDTH, SCRHEIGHT);
     Surface *screen = new Surface(SCRWIDTH, SCRHEIGHT);
@@ -506,7 +527,7 @@ int main()
                 glfwPollEvents();
             }
 
-            if (frameNr > 100) break;
+            if (frameNr > frameStop) break;
             if (!running) break;
         }
 
