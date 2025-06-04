@@ -48,9 +48,8 @@ void Game::VisualizeMem()
         screen->Plot( x + 10, y + 10, (value >> 1) & (currentVisualization == SPIRAL ? 0x4f4f4f : 0x7f7f7f) /* soften */ );
     }
 
-    if (currentVisualization == SPIRAL) {
-        // draw the contents of the first cache level over the DRAM contents
-        // fully hardcoded for the sample cache (size, associative, 1 layer)
+    if (currentVisualization == SPIRAL || currentVisualization == LINE) {
+
         for (int i = 0; i < ((Cache*)mem.l3)->size; i++)
         {
             CacheLine& line = ((Cache*)mem.l3)->backdoor( i );
