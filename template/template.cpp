@@ -474,25 +474,25 @@ int main()
 //			 --> LRU, LFU, RANDOM
 
 		  // SPIRAL
-	      //{64*2, 512*2, 8192*2, 32, 128, LRU, SPIRAL},
-	      //{64*2, 512*2, 8192*2, 32, 128, LFU, SPIRAL},
-	      //{64*2, 512*2, 8192*2, 32, 128, RANDOM, SPIRAL},
+	      //{64*2, 512*2, 8192*2, 8, 128, LRU, SPIRAL},
+	      //{64*2, 512*2, 8192*2, 8, 128, LFU, SPIRAL},
+	      //{64*2, 512*2, 8192*2, 8, 128, RANDOM, SPIRAL},
 
 		  ////LINE
-	      //{64*2, 512*2, 8192*2, 32, 128, LRU, LINE},
-	      //{64*2, 512*2, 8192*2, 32, 128, LFU, LINE},
-	      //{64*2, 512*2, 8192*2, 32, 128, RANDOM, LINE},
+	      //{64*2, 512*2, 8192*2, 8, 128, LRU, LINE},
+	      //{64*2, 512*2, 8192*2, 8, 128, LFU, LINE},
+	      //{64*2, 512*2, 8192*2, 8, 128, RANDOM, LINE},
 
 		  //BUDDHA
-	      //{64*2, 512*2, 8192*2, 32, 128, LRU, BUDHHA},
-	      //{64*2, 512*2, 8192*2, 32, 128, LFU, BUDDHA},
-	      //{64*2, 512*2, 8192*2, 32, 128, RANDOM, BUDDHA},
+	      //{64*2, 512*2, 8192*2, 8, 128, LRU, BUDHHA},
+	      //{64*2, 512*2, 8192*2, 8, 128, LFU, BUDDHA},
+	      //{64*2, 512*2, 8192*2, 8, 128, RANDOM, BUDDHA},
 
 //----------------------------------------------------------------------------------------------
 		  //CLAIRVOYENT EXPERIMENT
-		  //{64*2, 512*2, 8192*2, 32, 128, CLAIRVOYANT, SPIRAL},
-		  //{64*2, 512*2, 8192*2, 32, 128, CLAIRVOYANT, LINE},
-		  //{64*2, 512*2, 8192*2, 32, 128, CLAIRVOYANT, BUDDHA},
+		  //{64*2, 512*2, 8192*2, 8, 128, CLAIRVOYANT, SPIRAL},
+		  //{64*2, 512*2, 8192*2, 8, 128, CLAIRVOYANT, LINE},
+		  //{64*2, 512*2, 8192*2, 8, 128, CLAIRVOYANT, BUDDHA},
 
     };
 	/* Set frameStop to 100 if access pattern == BUDDHA
@@ -527,7 +527,7 @@ int main()
                 glfwPollEvents();
             }
 
-            if (frameNr > 100) break;
+            if (frameNr > 13000) break;
             if (!running) break;
         }
 

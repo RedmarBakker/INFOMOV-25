@@ -79,7 +79,6 @@ namespace Tmpl8 {
 
             evictionPolicy = policy;
 
-            //printf("Cache: %u sets, %u blocks, lineWidth %u\n", nSets, n_blocks, lineWidth);
         }
         void WriteLine( uint address, CacheLine line );
         CacheLine ReadLine( uint address );
@@ -89,8 +88,6 @@ namespace Tmpl8 {
 
             assert(set >= 0 && set <= n_sets);
             assert(block >= 0 && block < n_blocks);
-
-            //printf("%u: %u, %u\n", i, set, block);
 
             return slot[set][block];
         } /* for visualization without side effects */

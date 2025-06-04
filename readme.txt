@@ -3,6 +3,9 @@ Build instructions:
 - cd in the folder cache25
 - bootstrap ```build.sh```
 - run ```sh build.sh``` in the terminal
+- Run configuration can be changed in:
+    template.cpp --> std::vector<Config> configurations (line 337)
+    Select one or more configuration to run
 
 Important note!
 When configuring the experiments in template.cpp, on line 530;

@@ -26,14 +26,7 @@ both schemes, or include this in the experiments for challenge 2 (up to 1pt).
 #include "precomp.h"
 #include "game.h"
 
-// static variables for graph / fractal drawing / obfuscation
-//static float a = 0, r = 300;
-//static Graph gr[8];
 #define _oOo_oOo_ (O>=V|N>=800?0:(((N<<10)+O)*4)
-//uint* image[4], I,N,F,O,M,_O,V=2019;
-//double K[999], Q[999];
-//float R(){I^=I<<13;I^=I>>17;I^=I<<5;return I*2.3283064365387e-10f*6-3;} // rng
-//int lineIndex = 0;
 
 // -----------------------------------------------------------
 // Visualization of the data stored in the memory hierarchy
@@ -50,6 +43,7 @@ void Game::VisualizeMem()
 
     if (currentVisualization == SPIRAL || currentVisualization == LINE) {
 
+        //draw the L3 cache
         for (int i = 0; i < ((Cache*)mem.l3)->size; i++)
         {
             CacheLine& line = ((Cache*)mem.l3)->backdoor( i );
@@ -63,8 +57,7 @@ void Game::VisualizeMem()
             }
         }
 
-        // draw the contents of the first cache level over the DRAM contents
-        // fully hardcoded for the sample cache (size, associative, 1 layer)
+        // draw the L2 cache
         for (int i = 0; i < ((Cache*)mem.l2)->size; i++)
         {
             CacheLine& line = ((Cache*)mem.l2)->backdoor( i );
@@ -78,8 +71,7 @@ void Game::VisualizeMem()
             }
         }
 
-        // draw the contents of the first cache level over the DRAM contents
-        // fully hardcoded for the sample cache (size, associative, 1 layer)
+        // draw the L1 cache
         for (int i = 0; i < ((Cache*)mem.l1)->size; i++)
         {
             CacheLine& line = ((Cache*)mem.l1)->backdoor( i );
@@ -99,7 +91,8 @@ void Game::VisualizeMem()
     screen->Print( "level 2 R/W", 1050, 90 , 0xffffff );
     screen->Print( "level 3 R/W", 1050, 170 , 0xffffff );
     screen->Print( "DRAM R/W", 1050, 250 , 0xffffff );
-    //screen updates for l1:
+    //screen updates for
+    //l1:
     gr[0].Update( screen, 1050, 20, mem.l1->r_hit, mem.l1->r_miss );
     gr[1].Update( screen, 1170, 20, mem.l1->w_hit, mem.l1->w_miss );
     //l2
@@ -120,9 +113,10 @@ void Game::Init()
 {
     for (V = 1024, F = 1, I = 1; I < 4; I++ );
 
+    //run the simulation when clairvoyant to save the future memory addresses
     if (evictionPolicy == CLAIRVOYANT) {
         if (currentVisualization == SPIRAL) {
-            // simple spiral							ACCESS PATTERN: STRUCTURED
+
             for (int i = 0; i < 10; i++)
             {
                 int x = (int)(sinf( a ) * r + 512), y = (int)(cosf( a ) * r + 350);
@@ -134,7 +128,7 @@ void Game::Init()
                 ((Cache*)mem.l3)->futureAccesses.push_back((x + y * 1024) * 4 - ((x + y * 1024) * 4 % ((Cache*)mem.l3)->cacheLineWidth));
             }
         } else if (currentVisualization == BUDDHA) {
-            // the buddhabrot based on Paul Bourke		ACCESS PATTERN: MOSTLY RANDOM
+
             for(int G,M,T,E=0;++E<2;)for(G=0;++G<V
                 <<7;){double B=0,y=0,t=R(),e,z=R();for
                 (T=0;T<E<<8;){e=2*B*y+z,B=K[T]=B*B-y*y
@@ -171,7 +165,7 @@ void Game::Tick( float )
      * Branching... I know, but for testing usability much better.
      * */
     if (currentVisualization == SPIRAL) {
-        // simple spiral							ACCESS PATTERN: STRUCTURED
+        // ACCESS PATTERN: SPIRAL
         for (int i = 0; i < 10; i++)
         {
             int x = (int)(sinf( a ) * r + 512), y = (int)(cosf( a ) * r + 350);
@@ -180,6 +174,7 @@ void Game::Tick( float )
             mem.WriteUint( (x + y * 1024) * 4, 0xff0000 );
         }
     } else if (currentVisualization == LINE) {
+        // ACCESS PATTERN: LINE
         const int max = lineIndex + 10;
         for (lineIndex; lineIndex < max; lineIndex++)
         {
