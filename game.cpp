@@ -119,6 +119,39 @@ void Game::VisualizeMem()
 void Game::Init()
 {
     for (V = 1024, F = 1, I = 1; I < 4; I++ );
+
+    if (evictionPolicy == CLAIRVOYANT) {
+        if (currentVisualization == SPIRAL) {
+            // simple spiral							ACCESS PATTERN: STRUCTURED
+            for (int i = 0; i < 10; i++)
+            {
+                int x = (int)(sinf( a ) * r + 512), y = (int)(cosf( a ) * r + 350);
+                a += 0.01f; r -= 0.005f;
+                if (r < -300) r = -300;
+
+                ((Cache*)mem.l1)->futureAccesses.push_back((x + y * 1024) * 4 - ((x + y * 1024) * 4 % ((Cache*)mem.l1)->cacheLineWidth));
+                ((Cache*)mem.l2)->futureAccesses.push_back((x + y * 1024) * 4 - ((x + y * 1024) * 4 % ((Cache*)mem.l2)->cacheLineWidth));
+                ((Cache*)mem.l3)->futureAccesses.push_back((x + y * 1024) * 4 - ((x + y * 1024) * 4 % ((Cache*)mem.l3)->cacheLineWidth));
+            }
+        } else if (currentVisualization == BUDDHA) {
+            // the buddhabrot based on Paul Bourke		ACCESS PATTERN: MOSTLY RANDOM
+            for(int G,M,T,E=0;++E<2;)for(G=0;++G<V
+                <<7;){double B=0,y=0,t=R(),e,z=R();for
+                (T=0;T<E<<8;){e=2*B*y+z,B=K[T]=B*B-y*y
+               +t,y=Q[T++]=e;
+
+            if(B*B+y*y>9) {
+                for (M=0; M<T;) {
+                    O=400+.3*V*Q[M],N=.3*V*K[M++]+520;
+                    ((Cache*)mem.l1)->futureAccesses.push_back(_oOo_oOo_ - (_oOo_oOo_ % ((Cache*)mem.l1)->cacheLineWidth))));
+                    ((Cache*)mem.l2)->futureAccesses.push_back(_oOo_oOo_ - (_oOo_oOo_ % ((Cache*)mem.l2)->cacheLineWidth))));
+                    ((Cache*)mem.l3)->futureAccesses.push_back(_oOo_oOo_ - (_oOo_oOo_ % ((Cache*)mem.l3)->cacheLineWidth))));
+                    /* END OF BLACK BOX CODE */
+                }
+                break;
+            }}}
+        }
+    }
 }
 
 // -----------------------------------------------------------

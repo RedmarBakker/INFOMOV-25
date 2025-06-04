@@ -27,8 +27,9 @@ namespace Tmpl8
     class Game : public TheApp
     {
     public:
-        Game(int l1Size, int l2Size, int l3Size, int nSets, int cacheLineWidth, EvictionPolicy evictionPolicy, CacheVisualization visualization) : mem(l1Size, l2Size, l3Size, nSets, cacheLineWidth, evictionPolicy) {
+        Game(int l1Size, int l2Size, int l3Size, int nSets, int cacheLineWidth, EvictionPolicy eviction, CacheVisualization visualization) : mem(l1Size, l2Size, l3Size, nSets, cacheLineWidth, eviction) {
             currentVisualization = visualization;
+            evictionPolicy = eviction;
         }
         // game flow methods
         void Init();
@@ -46,6 +47,7 @@ namespace Tmpl8
         int2 mousePos;
         MemHierarchy mem;
         CacheVisualization currentVisualization;
+        EvictionPolicy evictionPolicy;
 
         float a = 0, r = 300;
         Graph gr[8];
